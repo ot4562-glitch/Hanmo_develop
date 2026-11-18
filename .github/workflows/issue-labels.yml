@@ -1,0 +1,41 @@
+name: Issue labels
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/issue-labels.yml'
+      - '.github/scripts/issue-labels*.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - run: node --test .github/scripts/issue-labels.test.mjs
+
+  label:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && (github.event.action != 'edited' || github.event.changes.title))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    concurrency:
+      group: issue-labels-${{ github.event.issue.number || 'backfill' }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - run: node .github/scripts/issue-labels.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
