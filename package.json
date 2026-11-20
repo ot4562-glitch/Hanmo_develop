@@ -6,7 +6,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run js/academic/core js/academic/views",
     "build": "esbuild js/academic/app/student-forecast.ts --bundle --platform=browser --format=iife --target=es2022 --outfile=.build/student-forecast.js && esbuild js/academic/app/student-entry.ts --bundle --platform=browser --format=iife --target=es2022 --outfile=.build/student-entry.js && esbuild js/academic/app/academic-progress.ts --bundle --platform=browser --format=iife --target=es2022 --outfile=.build/academic-progress.js && node scripts/stage-static.mjs",
-    "smoke": "node scripts/check-static-pages.mjs && node --test tests/student-navigation.test.cjs tests/student-profile.test.cjs tests/home-fit.test.cjs tests/vsugang-fit.test.cjs",
+    "smoke": "node scripts/check-static-pages.mjs && node --test tests/academic-data-source.test.cjs tests/student-navigation.test.cjs tests/student-profile.test.cjs tests/home-fit.test.cjs tests/vsugang-fit.test.cjs",
     "check": "npm run typecheck && npm run test && npm run build && npm run smoke",
     "check:legacy": "node --test tests/device-gate.test.cjs tests/legacy-baseline.test.cjs",
     "check:protected": "node scripts/assert-protected.mjs"

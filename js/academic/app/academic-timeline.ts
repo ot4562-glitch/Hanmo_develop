@@ -1,5 +1,5 @@
 import {
-  AcademicEventSchema,AcademicProfileSchema,AcademicAuditHintSchema,ACADEMIC_AUDIT_BRIDGE_KEY,GRADUATION_STEPS,
+  AcademicProfileSchema,AcademicAuditHintSchema,ACADEMIC_AUDIT_BRIDGE_KEY,GRADUATION_STEPS,
   buildAcademicAgenda,parseAcademicSchedule,
   type AcademicAgendaItem,type AcademicEvent,type AcademicGroup,type AcademicProfile,type GraduationStepId,
 } from '../core/academic-schedule.js';
@@ -287,40 +287,9 @@ function renderSteps():void{
     row.append(sel);root.append(row);
   }
 }
-const demoTime=(days:number):string=>new Date(Date.now()+days*86400000).toISOString();
-function demo():AcademicEvent[]{
-  const base=(id:string,title:string,type:AcademicEvent['type'],offset:number):AcademicEvent=>
-    AcademicEventSchema.parse({
-      id,revision:'r1',title:'[가상] '+title,type,
-      source:{title:'Hanmo 합성 시뮬레이션',review:'SYNTHETIC'},
-      opensAt:demoTime(offset-5),deadlineAt:demoTime(offset),
-      memo:'모의 데이터입니다. 한국외국어대학교의 실제 신청기간과 다릅니다.',
-      studentActionRequired:true,
-    });
-  return [
-    base('SYN-COURSE','다음 학기 수강신청', 'COURSE_REGISTRATION',4),
-    base('SYN-DOUBLE','이중전공 신청', 'DOUBLE_MAJOR_APPLICATION',9),
-    base('SYN-GRAD-EXAM','졸업시험 응시 신청','GRADUATION_EXAM',17),
-    base('SYN-LANGUAGE','졸업 외국어인증 서류 제출','LANGUAGE_CERTIFICATION',24),
-    base('SYN-GRADE','성적 정정 접수','GRADE_CORRECTION',31),
-    base('SYN-DOCUMENT','졸업 심사 서류 제출','GRADUATION_DOCUMENT',38),
-  ];
-}
-async function officialTitles():Promise<void>{
-  try{
-    const r=await fetch('./data/academic-notices-reference.json',{cache:'no-store'});
-    if(!r.ok)throw new Error('정적 JSON을 읽지 못했습니다: '+r.status);
-    const json=await r.json() as {schemaVersion?:number;events?:unknown;note?:string;snapshotDate?:string};
-    const loaded=parseAcademicSchedule({schemaVersion:json.schemaVersion,events:json.events});
-    records=loaded.events;
-    setMessage('data-message','게시 제목 '+records.length+'건 · '+(json.snapshotDate??'미상')+
-      ' 기준 참고 자료. 신청·마감일은 수록되지 않았습니다. '+loaded.invalid.length+'건 제외.');
-    render();
-  }catch(e){
-    records=[];render();
-    setMessage('data-message','기본 자료를 읽지 못했습니다: '+(e instanceof Error?e.message:String(e))+
-      ' · 정적 파일 서버에서 페이지를 열었는지 확인하세요.');
-  }
+function officialTitles():void{
+  records=[];render();
+  setMessage('data-message','승인된 학사자료가 아직 연결되지 않았습니다. 출처 검수 전에는 공지·마감일을 표시하지 않습니다.');
 }
 /** 사용자가 명시적으로 실행할 때만 반영한다. 계산기 결과는 링크를 제안해도 공식 요건의 완료를 확정하지 않는다. */
 function applyLocalAuditHints():void{
@@ -367,14 +336,10 @@ element<HTMLInputElement>('profile-import').addEventListener('change',()=>{void 
 element<HTMLButtonElement>('profile-legacy').addEventListener('click',importLegacy);
 element<HTMLButtonElement>('audit-transfer').addEventListener('click',applyLocalAuditHints);
 element<HTMLButtonElement>('profile-clear').addEventListener('click',clearSaved);
-element<HTMLButtonElement>('data-official').addEventListener('click',()=>{void officialTitles();});
-element<HTMLButtonElement>('data-demo').addEventListener('click',()=>{
-  records=demo();render();
-  setMessage('data-message','합성 마감 시연 '+records.length+'건. 아래 D-day와 신청기간은 실제 학교 일정이 아닙니다.');
-});
+element<HTMLButtonElement>('data-official').addEventListener('click',()=>{officialTitles();});
 element<HTMLInputElement>('timeline-file').addEventListener('change',()=>{void importJson();});
 element<HTMLButtonElement>('template-export').addEventListener('click',exportJson);
 element<HTMLSelectElement>('group-filter').addEventListener('change',render);
 element<HTMLInputElement>('agenda-search').addEventListener('input',render);
 element<HTMLInputElement>('include-unknown').addEventListener('change',render);
-loadSaved();renderSteps();void officialTitles();
+loadSaved();renderSteps();officialTitles();

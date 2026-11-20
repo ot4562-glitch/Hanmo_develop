@@ -21,10 +21,12 @@ for(const name of [
   'js/student-profile-bar.js','css/hanmo-flat.css',
   'js/home-fit.js','css/home-fit.css',
   'js/vsugang-fit.js','css/vsugang-fit.css',
-  'data/academic-notices-reference.json','html/pc-only.html','js/pc-only.js',
+  'data/academic-source-config.json','js/academic-data-source.js','html/pc-only.html','js/pc-only.js',
   ...htmlRoutes,
 ])await must(name);
 if(await exists(join(dist,'CNAME')))throw Error('CNAME leaked into fork QA');
+if(await exists(join(dist,'data/academic-notices-reference.json')))
+  throw Error('Unapproved historical notice feed leaked into public preview');
 if((await readdir(dist)).includes('degree-rescue'))throw Error('Academic student pages must not live under /degree-rescue/');
 let linkCount=0,ariaCount=0;
 for(const page of htmlRoutes){
