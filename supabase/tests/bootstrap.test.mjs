@@ -8,7 +8,8 @@ const verify = readFileSync(new URL('../hanmo-verify.sql', import.meta.url), 'ut
 test('single SQL transaction with empty initial data', () => {
   assert.match(setup, /^BEGIN;\s/m);
   assert.match(setup, /\bCOMMIT;\s*$/);
-  assert.doesNotMatch(setup, /\bINSERT\s+INTO\b/i);
+  // Administrative publish functions contain INSERT; the installer itself has no top-level seed SQL.
+  assert.doesNotMatch(setup, /^INSERT\s+INTO\b/im);
   assert.doesNotMatch(setup, /\bCOPY\s+.+\s+FROM\b/i);
 });
 
