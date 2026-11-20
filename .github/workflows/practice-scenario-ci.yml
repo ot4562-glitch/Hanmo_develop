@@ -4,6 +4,8 @@ on:
     paths:
       - 'js/scenario-engine.js'
       - 'tests/scenario-engine.test.cjs'
+      - 'js/scenario-course-map.js'
+      - 'tests/scenario-course-map.test.cjs'
       - '.github/workflows/practice-scenario-ci.yml'
 
 permissions:
@@ -18,5 +20,5 @@ jobs:
         with:
           persist-credentials: false
       - run: node --version
-      - run: node --check js/scenario-engine.js
-      - run: node --test tests/scenario-engine.test.cjs
+      - run: node --check js/scenario-engine.js && node --check js/scenario-course-map.js
+      - run: node --test tests/scenario-engine.test.cjs tests/scenario-course-map.test.cjs
