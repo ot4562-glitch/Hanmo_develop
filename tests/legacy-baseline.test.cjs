@@ -314,3 +314,90 @@ test('each actual HTML page loads classic scripts in order without global collis
     assert.equal(h.location.href,'/',page+' must not navigate to external site');
   }
 });
+
+/**
+ * #71 deterministic OFF parity baseline. This proves only the VM-observed classic
+ * script contracts. A Windows Chrome/Edge focus, keyboard, timer and real DOM
+ * baseline is an additional, still-required gate before attaching ON hooks.
+ */
+test('scenario OFF overlay preserves BASIC/TIME/SELECT observed legacy contracts',()=>{
+  const config={
+    schemaVersion:1,scenarioId:'RECONNECT_RECOVERY',mode:'SELECT',
+    seed:19,enabled:false,virtualClockStart:'2026-11-19T10:00:00+09:00',
+    syntheticCourseIds:['SYN-BASELINE'],alternatives:[],
+  };
+  function addDisabledOverlay(h){
+    h.load('scenario-engine.js');
+    const off=h.expr('HanmoScenario.createScenario('+JSON.stringify(config)+')');
+    assert.equal(off.state,'OFF');
+    assert.equal(off.actions.length,0);
+    assert.strictEqual(h.expr('HanmoScenario.dispatch(HanmoScenario.createScenario('
+      +JSON.stringify(config)+'), {type:"SUBMIT"}).state'), 'OFF');
+  }
+  function observed(mode,overlay){
+    const seed={practiceSetter:mode,psubjectValue:3,subjectValue:3,
+      waitingValue:'no',TIMEtime:'0',SELECTtime:'0',SELECTWaitTime:'0'};
+    const practice=createHarness(seed);
+    if(overlay)addDisabledOverlay(practice);
+    practice.load('practice.js');
+    const initialTimer=practice.get('timer').innerHTML;
+    if(mode!==3){
+      practice.context.window.onload();
+      practice.get('sugang').onclick(); // before gate: do not navigate
+      practice.events.timeouts[0].fn();
+      practice.now('2026-11-19T10:00:03+09:00');
+      practice.get('sugang').onclick();
+    }
+    const practiceSnapshot={
+      mode:practice.get('practiceMode').innerText,initialTimer,
+      alerts:[...practice.events.alert],
+      navigations:[...practice.events.navigations],
+      intervals:practice.events.intervals.map(x=>x.delay),
+      timeouts:practice.events.timeouts.map(x=>x.delay),
+      storage:Object.fromEntries([...practice.map].sort(([a],[b])=>a.localeCompare(b))),
+    };
+
+    const selecting=createHarness(seed);
+    if(overlay)addDisabledOverlay(selecting);
+    selecting.load('selectZone.js');
+    selecting.expr('registerClick(1)');
+    selecting.expr('registerClick(1)'); // duplicate: must still alert and not count
+    selecting.expr('registerClick(2)');
+    selecting.expr('deleteDone(1)'); // restore for a separate selection
+    selecting.expr('registerClick(3)');
+    const selectSnapshot={
+      mode:selecting.get('practiceMode').innerText,
+      count:selecting.expr('count'),
+      registeredRows:selecting.get('done').children.map(row=>({
+        id:row.attributes.id,
+        label:row.children[5].textContent,
+        onclick:row.children[1].firstElementChild.attributes.onClick,
+      })),
+      selected:JSON.parse(selecting.expr('JSON.stringify(rc)')),
+      alerts:[...selecting.events.alert],
+      confirmations:[...selecting.events.confirm],
+      navigations:[...selecting.events.navigations],
+      storage:Object.fromEntries([...selecting.map].sort(([a],[b])=>a.localeCompare(b))),
+    };
+
+    const result=createHarness({...seed,
+      TIMEtime:'3.25',SELECTtime:'15.5',SELECTWaitTime:'2.5'});
+    if(overlay)addDisabledOverlay(result);
+    result.load('result.js');
+    const report={
+      summary:result.get('result').innerHTML,
+      detail:result.get('time').innerHTML,
+      storage:Object.fromEntries([...result.map].sort(([a],[b])=>a.localeCompare(b))),
+    };
+    return {practice:practiceSnapshot,select:selectSnapshot,report};
+  }
+  for(const mode of [1,2,3]){
+    const original=observed(mode,false);
+    const withOffScenario=observed(mode,true);
+    assert.deepEqual(withOffScenario,original,'OFF parity mode '+mode);
+    assert.equal(original.select.count,2);
+    assert.equal(original.select.registeredRows.length,2);
+    assert.equal(original.select.selected.filter(Boolean).length,2);
+    assert.ok(Object.keys(original.practice.storage).every(k=>!k.startsWith('hanmo.practice.scenario.')));
+  }
+});
