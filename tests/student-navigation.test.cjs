@@ -22,22 +22,17 @@ test('index contains only academic links and no duplicate simulation entry',()=>
  assert.ok(!src.includes('scenario-workshop.html'), 'dead standalone page link');
  assert.ok(!src.includes('href="./degree-rescue/'), 'no academic UI link to old folder');
 });
-test('three independently selected incidents are OFF by default; no standalone or composite UI',()=>{
+test('two opt-in incidents default OFF, without substitute search or conflict UI',()=>{
  const html=fs.readFileSync(path.join(ROOT,'html/vsugang.html'),'utf8');
  assert.match(html,/id="scenario-settings"/);
  assert.match(html,/id="incident-practice"/);
- assert.match(html,/id="incident-search"/);
  assert.match(html,/id="incident-404"/);
- assert.equal((html.match(/data-scenario-toggle="/g)||[]).length,3);
- assert.equal((html.match(/data-scenario-off="/g)||[]).length,3);
- assert.ok(!html.includes('학업 플래너로 이동 →'));
- assert.ok(!html.includes('scenario-all-on')&&!html.includes('scenario-all-off'));
- for(const key of ['LAST_VALID','LAST_CONFLICT','RECONNECT']){
+ assert.equal((html.match(/data-scenario-toggle="/g)||[]).length,2);
+ assert.equal((html.match(/data-scenario-off="/g)||[]).length,2);
+ for(const key of ['LAST_VALID','RECONNECT'])
   assert.ok(html.includes('name="incident-'+key+'" value="no" data-scenario-off="'+key+'" checked'));
- }
- assert.equal((html.match(/data-alt-course="/g)||[]).length,3);
+ assert.doesNotMatch(html,/LAST_CONFLICT|data-base-course|data-alt-course|incident-search|incident-candidates/);
  assert.doesNotMatch(html,/data-scenario-toggle="[^"]+"\s+checked/);
- assert.doesNotMatch(html,/data-scenario-toggle="(?:COMPOSITE|LAST_NONE)"|workshop-preset/);
  assert.equal(fs.existsSync(path.join(ROOT,'html/scenario-workshop.html')),false);
  assert.equal(fs.existsSync(path.join(ROOT,'html/scenario-lab.html')),false);
  for(const page of student){

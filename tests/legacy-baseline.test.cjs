@@ -310,7 +310,7 @@ test('each actual HTML page loads classic scripts in order without global collis
     // Restore the original notice/device/semester behavior alongside the shared top navigation.
     assert.equal(originalScripts.length,page==='index.html'?2:3,page+' original script count');
     if(page==='html/vsugang.html')assert.deepEqual(scripts.slice(3),[
-      'incident-courses.js','scenario-settings.js',
+      'incident-options.js','scenario-settings.js',
     ],'isolated synthetic scripts must load only after original settings/gnb/hanmoSys');
     const h=createHarness({deviceInfo:'true',practiceSetter:1,psubjectValue:2,
       subjectValue:2,waitingValue:'no',TIMEtime:'1',SELECTtime:'1',SELECTWaitTime:'0'});

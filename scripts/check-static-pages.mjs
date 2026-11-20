@@ -128,25 +128,27 @@ if(!fitStyles.includes('vsugang-compact-scroll')||
    !fitStyles.includes('--vsugang-topbar-bottom')||
    !fitStyles.includes('#incident-practice:not([hidden])'))
   throw Error('Missing viewport and settings accessibility protection');
-for(const id of ['scenario-settings','incident-practice','incident-search',
- 'incident-candidates','incident-404','incident-404-refresh','incident-404-back']){
+for(const id of ['scenario-settings','incident-practice','incident-404',
+ 'incident-404-refresh','incident-404-back']){
  if(!menu.includes('id="'+id+'"'))throw Error('Missing in-menu incident UI: '+id);
 }
-for(const file of ['js/incident-courses.js','js/scenario-settings.js','css/scenario-settings.css'])
-  await must(file);
-if((menu.match(/data-scenario-toggle=/g)||[]).length!==3||
-   (menu.match(/data-scenario-off=/g)||[]).length!==3)
-  throw Error('Three independent yes/no radio pairs are required');
-for(const preset of ['LAST_VALID','LAST_CONFLICT','RECONNECT']){
-  if(!menu.includes('name="incident-'+preset+'" value="no" data-scenario-off="'+preset+'" checked'))
-    throw Error('Incident setting must default to No: '+preset);
+for(const file of ['js/incident-options.js','js/scenario-settings.js','css/scenario-settings.css'])
+ await must(file);
+if((menu.match(/data-scenario-toggle=/g)||[]).length!==2||
+   (menu.match(/data-scenario-off=/g)||[]).length!==2)
+ throw Error('Two independent yes/no radio pairs are required');
+for(const preset of ['LAST_VALID','RECONNECT']){
+ if(!menu.includes('name="incident-'+preset+'" value="no" data-scenario-off="'+preset+'" checked'))
+   throw Error('Incident setting must default to No: '+preset);
 }
+if(/LAST_CONFLICT|data-base-course|data-alt-course|incident-search|incident-candidates|대체과목 검색/.test(menu))
+ throw Error('Deferred substitute/conflict UI must be absent');
 if(/학업 플래너로 이동|scenario-all-on|scenario-all-off/.test(menu))
-  throw Error('Legacy-mode landing has an obsolete extra link or bulk incident control');
-if((menu.match(/data-alt-course=/g)||[]).length!==3)
-  throw Error('Three numbered substitute courses required');
-if(menu.includes('data-scenario-toggle="COMPOSITE"')||menu.includes('data-scenario-toggle="LAST_NONE"'))
-  throw Error('Composite or removed no-alternative switch must not exist');
+ throw Error('Legacy-mode landing has an obsolete extra link or bulk incident control');
+for(const retired of ['js/incident-courses.js','js/scenario-engine.js','js/scenario-composite.js',
+ 'js/scenario-lab.js','js/scenario-workshop.js','js/scenario-review.js'])
+ if(await exists(join(dist,retired)))throw Error('Removed prototype leaked: '+retired);
+
 for(const page of [root]){
  // Landing must not advertise a standalone incident exercise.
  if(page.includes('scenario-workshop.html')||page.includes('vsugang.html#scenario-settings'))
@@ -160,4 +162,4 @@ for(const p of htmlRoutes){
     throw Error('Dead standalone scenario link from '+p);
 }
 console.log('Student preview smoke: '+studentPages.length+' student pages, '+
-  linkCount+' links, '+ariaCount+' ARIA references; three independent incidents are OFF-by-default settings within vsugang.html.');
+  linkCount+' links, '+ariaCount+' ARIA references; two independent incidents are OFF-by-default settings within vsugang.html.');
