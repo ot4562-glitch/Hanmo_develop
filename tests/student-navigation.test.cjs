@@ -175,7 +175,7 @@ test('vsugang menu fits under the navigation while settings and incident remain 
   assert.ok(css.includes(expected),'missing viewport protection '+expected);
  assert.ok(js.includes('landing.scrollHeight'));
  assert.ok(js.includes('main.clientHeight'));
- assert.equal((html.match(/data-scenario-off="/g)||[]).length,3);
+ assert.equal((html.match(/data-scenario-off="/g)||[]).length,2);
 });
 
 test('every non-imitation topbar puts the editable self-declared student summary before rightmost 내정보',()=>{

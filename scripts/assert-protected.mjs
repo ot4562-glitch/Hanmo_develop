@@ -7,7 +7,7 @@ const protectedFiles=new Set(['html/practice.html','html/selectZone.html',
  'js/practice.js','js/selectZone.js','css/practice.css','css/vsugang.css']);
 const offenders=changed.filter(path=>protectedFiles.has(path));
 if(offenders.length)throw Error('Protected HUFS imitation changed:\n'+offenders.join('\n'));
-const allowed=p=>p.startsWith('degree-rescue/')||p.startsWith('js/academic/')||(p.startsWith('js/scenario-')||p==='js/incident-courses.js')
+const allowed=p=>p.startsWith('degree-rescue/')||p.startsWith('js/academic/')||(p.startsWith('js/scenario-')||['js/incident-courses.js','js/incident-options.js'].includes(p))
  ||p.startsWith('docs/')||p.startsWith('scripts/')||p.startsWith('data/')
  ||p.startsWith('tests/')||p.startsWith('css/')||p.startsWith('html/')
  ||p.startsWith('.github/workflows/')||['index.html','package.json','tsconfig.json',
