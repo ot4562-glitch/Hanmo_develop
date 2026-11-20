@@ -36,6 +36,25 @@
 
 > **미리보기 안내:** 위 이미지는 `main` 브랜치의 현재 기능·화면 구성을 바탕으로 다시 제작한 **설명용 시각화**이며 실제 브라우저 화면 캡처가 아닙니다. 공지의 전공별 적용 대상, 공식 강의 개설 원장, 최신 강좌·교수 데이터는 검수·연결 전입니다. [실제 화면 소스 보기](html/) · [QA 배포 워크플로](.github/workflows/deploy-pages.yml)
 
+### 학사종합지원센터 검토용 SVG 자료 4종
+
+**현재 구현과 향후 계획을 구분한 벡터 자료**입니다. 별도 이미지 생성 결과가 아닌, 이 저장소에 직접 추가한 **편집 가능한 SVG 원본**이며 공식 학교 안내문·승인 자료는 아닙니다.
+
+<table>
+<tr>
+<td width="50%"><a href="docs/images/hanmo-01-project-overview.svg"><img src="docs/images/hanmo-01-project-overview.svg" alt="한모 프로젝트 개요 — 모의신청, 학업 탐색, 로컬 입력, 정보 안전 원칙" width="640"></a><br><b>01 · 프로젝트 개요</b></td>
+<td width="50%"><a href="docs/images/hanmo-02-page-map.svg"><img src="docs/images/hanmo-02-page-map.svg" alt="페이지 연결 구조 — 홈, 모의신청 3개 모드, 학업 지원 페이지" width="640"></a><br><b>02 · 페이지 구조와 이동</b></td>
+</tr>
+<tr>
+<td><a href="docs/images/hanmo-03-data-flow.svg"><img src="docs/images/hanmo-03-data-flow.svg" alt="학사자료 연결·승인 파이프라인과 미연결·자료 없음·오프라인·검증 실패·정상 상태" width="640"></a><br><b>03 · 승인 데이터와 오류 상태</b></td>
+<td><a href="docs/images/hanmo-04-roadmap.svg"><img src="docs/images/hanmo-04-roadmap.svg" alt="한모 개발 4단계 — 학업 플랫폼, 모의신청 안정화, 승인자료 연계, JavaScript 전환" width="640"></a><br><b>04 · 개발 단계 및 협의사항</b></td>
+</tr>
+</table>
+
+[**학사종합지원센터 참고용 설명서 (그림 4장 + 검토 요청사항)**](docs/academic-support-center-brief.md) · [아키텍처 기준 문서](docs/architecture.md)
+
+> 참고: **학교 자료 사용·재배포 허가 및 Supabase 실연동은 아직 완료되지 않았습니다.** 그림의 승인 절차는 추진·검토 대상이며, 서비스가 학교 공식 시스템이라는 뜻이 아닙니다.
+
 ## ◇ 기능 현황
 
 | 영역 | 현재 확인할 수 있는 것 | 범위 · 주의사항 |
