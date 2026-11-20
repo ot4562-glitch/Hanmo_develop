@@ -25,14 +25,14 @@
 <table>
   <tr>
     <td width="33%"><strong>01 · PRACTICE</strong><br><br>세 가지 모의수강신청 모드로 신청 흐름과 타이밍을 연습합니다.</td>
-    <td width="33%"><strong>02 · DISCOVER</strong><br><br>학사 공지 제목과 원문 확인 경로를 살펴보고, 강의 검색 화면의 사용 흐름을 체험합니다.</td>
+    <td width="33%"><strong>02 · DISCOVER</strong><br><br>검수된 공지·강좌가 연결되면 검색하며, 현재는 연결 상태를 안내합니다.</td>
     <td width="33%"><strong>03 · PREPARE</strong><br><br>강의 개설 근거와 학점 계획을 검토하되, 확인되지 않은 자료는 추정으로 단정하지 않습니다.</td>
   </tr>
 </table>
 
 ## ◈ 미리보기
 
-[![한모 현재 기능 미리보기: 학사 공지의 검수 상태, 강의 전망의 가상 예시, BASIC TIME SELECT 연습 모드](docs/images/hanmo-feature-preview.svg)](https://github.com/ot4562-glitch/Hanmo_develop/tree/main/html)
+[![한모 현재 기능 미리보기: 학사 공지·강의 전망 연결 대기, BASIC TIME SELECT 연습 모드](docs/images/hanmo-feature-preview.svg)](https://github.com/ot4562-glitch/Hanmo_develop/tree/main/html)
 
 > **미리보기 안내:** 위 이미지는 `main` 브랜치의 현재 기능·화면 구성을 바탕으로 다시 제작한 **설명용 시각화**이며 실제 브라우저 화면 캡처가 아닙니다. 공지의 전공별 적용 대상, 공식 강의 개설 원장, 최신 강좌·교수 데이터는 검수·연결 전입니다. [실제 화면 소스 보기](html/) · [QA 배포 워크플로](.github/workflows/deploy-pages.yml)
 
@@ -43,9 +43,9 @@
 | **모의수강신청** | BASIC / TIME / SELECT 기본 연습 | 원작의 기존 흐름 유지 |
 | **돌발상황 연습** | 가상 신청 실패 상태 확인·404 후 복귀 | **두 가지 기본 OFF 옵션** · 대체과목 검색·시간 충돌 시연 코드 제거 · 실제 학교 장애·신청 결과와 무관 |
 | **내정보** | 캠퍼스 · 전공 · 입학년도 선택 | **이 브라우저에만 저장**, 학교 계정과 미연동 |
-| **학사 공지** | 제목·게시일 중심 검색과 공식 원문 확인 | 전공별 적용 대상과 학생 마감은 검수 전 |
-| **강의·교수 검색** | 검색 화면 및 가상 예시 체험 | 검수된 최신 공식 강좌 데이터 미연결 |
-| **강의 개설 전망** | 학수번호·학기 기반 근거 확인 UI, 가상 예시 | 실제 개설 원장 미연결 · 미래 개설 확률을 임의 생성하지 않음 |
+| **학사 공지** | 승인 자료 연결 대기 · 미연결/빈 목록/오류 안내 | 과거 참고 공지 JSON 제거 · 학생 대상과 마감은 원문 확인 |
+| **강의·교수 검색** | 승인된 공개 강좌만 검색 · 빈 목록/연결 오류 표시 | 가상 강좌 삭제 · 실자료 승인 전까지 결과 없음 |
+| **강의 개설 전망** | 학수번호·학기 입력과 연결·검수 상태 안내 | 합성 개설 이력 삭제 · 근거 확보 전 UNKNOWN |
 | **학점 정리** | 직접 입력한 학점 합산 및 학기별 A/B/C 계획 비교 | 공식 이수 판정·졸업 가능 여부 아님 · 비필수 기능 |
 
 **핵심 원칙:** 확인된 사실과 가상 시연을 분리하고, 공지·학칙의 근거와 적용 대상을 확인할 수 없는 경우 **‘확인 필요’**로 남깁니다. 한국어 학사 FAQ, 개설·행사 시기 전망과 졸업 요건 계산 코어는 검증 상태에 따라 별도 확장합니다.
@@ -74,9 +74,10 @@ flowchart TB
 
     subgraph D["데이터 입력·공급"]
         direction TB
-        J["참고 공지 JSON · data/"] --> N
-        X["가상 예시 데이터"] --> F
-        X --> C
+        J["공개 자료 설정 · 기본 비활성"] --> E["미연결 · 자료 없음 · 오류 안내"]
+        E --> N
+        E --> F
+        E --> C
         U["학생 직접 입력"] --> I
         I --> LS["브라우저 로컬 저장"]
         U --> G
@@ -92,11 +93,11 @@ flowchart TB
     classDef data fill:#173b35,stroke:#78ad9e,color:#eff6fc
     classDef planned fill:#3c321e,stroke:#f4c76c,color:#f4c76c
     class H,NAV,N,F,C,G,I,M,PR,SZ,R page
-    class J,X,U,LS data
+    class J,E,U,LS data
     class S,V,DB,API planned
 ```
 
-> **현재:** 학사 공지는 `data/academic-notices-reference.json`의 과거 제목 참고 목록을 사용합니다. 강의 검색과 강의 전망에는 가상 예시가 있으며, 내정보는 사용자의 브라우저에만 저장됩니다. **3차 예정:** 학교의 자료 이용 허가와 독립 검수·승인을 거친 구조화 자료만 Supabase에 반입하고 학생 화면에는 공개 읽기 API(장애 시 유효한 정적 스냅샷 대체)를 연결합니다. 학생 성적·개인 계획은 서버에 자동 업로드하지 않습니다.
+> **현재:** 오래된 공지 참고 목록과 가상 강좌·개설 이력은 제거했습니다. `data/academic-source-config.json`은 기본 비활성이고 화면은 **미연결 / 승인 자료 없음 / 오류·유효성 문제**를 구분해 안내합니다. **3차 연동 목표:** 학교의 자료 이용 허가와 독립 검수·승인이 끝난 Supabase의 승인 공개판본만 읽습니다. 연결 실패 시 승인되지 않은 과거 데이터를 자동 재사용하지 않습니다. 학생 성적·개인 계획은 서버에 전송하지 않습니다.
 
 [실제 페이지 파일](html/) · [자료·Supabase 상세 설계](docs/architecture.md) · [3차 설치 패키지 초안 PR #93](https://github.com/ot4562-glitch/Hanmo_develop/pull/93)
 
@@ -122,7 +123,7 @@ npm run check:legacy
 | `html/` · `css/` | 학생용 정적 화면과 한모 디자인 |
 | `js/academic/` | TypeScript 학업 계산 코어 및 계약 |
 | `js/` | 기존 모의신청 JavaScript와 화면 로직 |
-| `data/` | 검토·참고용 학사 자료 스냅샷 |
+| `data/` | 공개 자료 연결 설정 · 기본 비활성, 테스트 학사자료 없음 |
 | `tests/` · `scripts/` | 회귀 테스트, 빌드 및 검증 도구 |
 | `docs/architecture.md` | **현행 제품·기술 설계의 기준 문서** |
 
