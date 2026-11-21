@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <script src="../js/pc-only.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="학점·이수 현황 · 한모 학생용 학업 도우미">
+  <title>학점·이수 현황 | 한모</title>
+  <link rel="icon" href="../img/hanmo_color.png">
+  <link rel="stylesheet" href="../css/student-ui.css">
+  <script src="../js/student-progress.js" defer></script>
+  <script src="../js/academic-progress.js" defer></script>
+  <link rel="stylesheet" href="../css/academic-progress.css">
+  <script src="../js/student-profile-bar.js" defer></script>
+</head>
+<body class="hanmo-ui">
+  <a class="hanmo-skip" href="#main">본문으로 이동</a>
+  <header class="hanmo-topbar">
+  <a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모 <span>HUFS 학업 도우미</span></a>
+  <nav aria-label="주요 서비스">
+    <a href="./academic-timeline.html">학사 공지</a>
+    <a href="./forecast.html">강의 전망</a>
+    <a href="./catalog.html">강의 검색</a>
+    <a href="./academic-progress.html" aria-current="page">학점 정리</a>
+    <span class="hanmo-profile-summary" data-profile-summary role="status" aria-live="polite" aria-label="브라우저에 저장한 내정보, 학교 로그인 아님">내정보 미설정</span>
+    <a class="hanmo-me-link" href="./planner.html">내정보</a>
+  </nav>
+</header>
+  <main id="main" class="hanmo-main" tabindex="-1">
+  <div class="hanmo-schoolmark" aria-label="학점·이수 현황 화면">
+    <h2>학점·이수 현황</h2>
+    <div class="hanmo-markline" aria-hidden="true"><span></span><img src="../img/hanmo_white.svg" alt=""><span></span></div>
+  </div>
+<div class="hanmo-card-grid two">
+<section class="hanmo-card" aria-labelledby="progress-form-title">
+  <h2 id="progress-form-title">내 학점 간단 정리</h2>
+  <p style="margin:10px 0 18px">이수 구분·재수강·학칙은 계산하지 않아요. 이 기기에도 입력값을 자동 저장하지 않습니다.</p>
+  <form class="hanmo-form" id="credit-form">
+    <div class="hanmo-fields">
+      <label class="hanmo-field" for="credit-target">내가 확인한 목표 학점<input id="credit-target" type="number" min="1" max="400" step="0.5" placeholder="예: 134" required></label>
+      <label class="hanmo-field" for="credit-earned">취득 학점<input id="credit-earned" type="number" min="0" max="400" step="0.5" placeholder="예: 64" required></label>
+      <label class="hanmo-field" for="credit-going">수강 중 학점<input id="credit-going" type="number" min="0" max="100" step="0.5" value="0"></label>
+      <label class="hanmo-field" for="credit-planned">예정 학점<input id="credit-planned" type="number" min="0" max="100" step="0.5" value="0"></label>
+    </div>
+    <div class="hanmo-actions"><button type="submit" class="hanmo-btn">학점 정리하기</button><button id="credit-reset" type="reset" class="hanmo-btn secondary">입력 지우기</button></div>
+  </form>
+</section>
+<section class="hanmo-card" aria-labelledby="credit-summary-title">
+  <h2 id="credit-summary-title">내 계산 결과</h2>
+  <div class="hanmo-result" id="credit-summary" role="status" aria-live="polite"><h3>숫자를 입력하면 결과가 표시됩니다.</h3><p>재수강·교과 구분·학칙 적용은 학교의 공식 판정과 다를 수 있습니다.</p></div>
+  <div class="hanmo-progress-track" aria-hidden="true"><div id="credit-bar" class="hanmo-progress-fill"></div></div>
+  <p class="hanmo-status" id="credit-status"></p>
+  <p style="margin-top:16px">정확한 이수요건은 본인의 교육과정 적용연도와 공식 학교 안내에서 확인하세요.</p>
+</section>
+</div>
+<div class="hanmo-progress-port">
+<div class="hanmo-section-title"><h2>학기별 계획도 비교해 보세요</h2><p>2학기 A안 · 3학기 B안 · 4학기 C안</p></div>
+<div class="hanmo-note" role="note"><strong>비공식 자가 입력 계획</strong> 아래 표는 본인이 입력한 과목·학점만 합산합니다. 졸업 가능 시점, 학교 인정 학점 및 정원 여부는 판정하지 않습니다.</div>
+    <section class="hanmo-card hanmo-progress-section" aria-labelledby="record-heading">
+      <div class="hanmo-section-title"><h2 id="record-heading">1. 내 과목 기록 입력</h2><p>취득 완료와 수강 중 학점을 구분해 입력하세요. 실제 성적표 전체를 올릴 필요는 없습니다. 취득 학기는 이미 종료된 학기여야 합니다.</p></div>
+      <form id="record-form" class="progress-form" aria-describedby="record-help">
+        <label for="record-course">학수번호
+          <input id="record-course" type="text" maxlength="128" placeholder="예: ECON101" autocomplete="off" required>
+        </label>
+        <label for="record-credits">학점
+          <input id="record-credits" type="number" min="0.5" max="30" step="0.5" value="3" required>
+        </label>
+        <label for="record-term">이수·수강 학기
+          <input id="record-term" type="text" pattern="20[0-9]{2}-[12]" maxlength="6" placeholder="예: 2025-1" required>
+        </label>
+        <label for="record-slot">상태
+          <select id="record-slot">
+            <option value="EARNED">취득 완료(자가 입력)</option>
+            <option value="IN_PROGRESS">현재 수강 중</option>
+          </select>
+        </label>
+        <div class="progress-form-action"><button id="record-add" type="submit">과목 기록에 추가</button></div>
+      </form>
+      <p id="record-help" class="small-note">과목명이나 학수번호가 같은 재수강·대체 과목의 공식 인정 관계는 자동으로 확정하지 않습니다. 중복 가능 기록은 확인이 필요합니다.</p>
+      <p id="record-message" class="progress-message" role="status" aria-live="polite"></p>
+      <div class="progress-table-scroll" role="region" aria-label="직접 입력한 과목 기록" tabindex="0">
+        <table><caption>이 페이지에서 임시 입력한 과목</caption><thead><tr><th scope="col">학수번호</th><th scope="col">학기</th><th scope="col">학점</th><th scope="col">상태</th><th scope="col">삭제</th></tr></thead><tbody id="record-rows"></tbody></table>
+      </div>
+      <div id="credit-overview" class="credit-overview" role="status" aria-live="polite">
+        <p>기록을 입력하면 취득·수강 중 학점을 각각 표시합니다.</p>
+      </div>
+    </section>
+    <section class="hanmo-card hanmo-progress-section" aria-labelledby="scenarios-heading">
+      <div class="hanmo-section-title"><h2 id="scenarios-heading">2. 앞으로의 학기별 계획 만들기</h2><p>각 안에 과목을 추가해 2학기(A)·3학기(B)·4학기(C)의 입력 학점을 비교합니다. 과목 개설, 시간표, 졸업요건, 최적 추천은 검수된 자료가 없어 계산하지 않습니다.</p></div>
+      <fieldset class="scenario-fieldset" id="scenario-choice">
+        <legend>작성할 계획 선택</legend>
+        <label><input type="radio" name="scenario" value="A" checked> A안 · 2학기</label>
+        <label><input type="radio" name="scenario" value="B"> B안 · 3학기</label>
+        <label><input type="radio" name="scenario" value="C"> C안 · 4학기</label>
+      </fieldset>
+      <form id="plan-form" class="progress-form" aria-describedby="plan-help">
+        <label for="plan-term">목표 학기
+          <select id="plan-term" required></select>
+        </label>
+        <label for="plan-course">계획할 학수번호
+          <input id="plan-course" type="text" maxlength="128" autocomplete="off" placeholder="예: ECON201" required>
+        </label>
+        <label for="plan-credits">예상 학점(자가 입력)
+          <input id="plan-credits" type="number" min="0.5" max="30" step="0.5" value="3" required>
+        </label>
+        <div class="progress-form-action"><button id="plan-add" type="submit">선택한 계획에 추가</button></div>
+      </form>
+      <p id="plan-help" class="small-note">학점 정보도 학생이 직접 입력한 값입니다. 공식 강의 목록이나 학칙 적용을 검증하지 않았으므로 실제 이수·개설을 보장하지 않습니다.</p>
+      <p id="plan-message" class="progress-message" role="status" aria-live="polite"></p>
+      <div id="plan-rows" class="plan-rows" aria-live="polite"></div>
+    </section>
+    <section class="hanmo-card hanmo-progress-section" aria-labelledby="compare-heading">
+      <div class="hanmo-section-title"><h2 id="compare-heading">3. A/B/C 학점 계획 비교</h2><p>기존 학점 코어의 고유 학점 합산을 사용합니다. 기간·계획 학점의 차이만 비교하며 공식 졸업 가능 시점이나 추천 순위를 생성하지 않습니다.</p></div>
+      <div id="scenario-comparison" class="scenario-comparison" aria-live="polite">
+        <p>과목을 입력하면 세 계획의 조건부 합산 결과를 확인할 수 있습니다.</p>
+      </div>
+      <div class="progress-next">
+        <h3>졸업요건과 전공 변경 영향은 검수 자료 연결 후 안내합니다</h3>
+        <p>입학년도·캠퍼스·전공별 승인된 RulePack이 없으므로 부족한 공식 학점, 필수과목, 재수강 인정, 전공 변경 전후 결과는 현재 <strong>확인 필요</strong> 상태입니다. 현재 계획을 졸업 확정이나 신청 자격 판정에 사용하지 마세요.</p>
+        <a href="./academic-timeline.html">관련 학사공지와 공식 원문 확인하기</a>
+        <a href="./academic-timeline.html">졸업 체크리스트 14항목 펼쳐보기</a>
+        <a href="./catalog.html">강의 검색 연결 상태 보기</a>
+      </div>
+    </section>
+
+</div></main>
+  <footer class="hanmo-footer">© 한모 · 비공식 학습 지원 · 학교 로그인·자동 수강신청·성적표 업로드 없음</footer>
+</body>
+</html>

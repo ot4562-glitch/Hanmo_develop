@@ -1,0 +1,57 @@
+/* Flat student workspace: block-level surfaces no longer look like SaaS rounded cards.
+ * Only student academic pages and developer about page; preserve original Hanmo home
+ * plus the imitated registration flow (vsugang/practice/selectZone/result).
+ */
+body.hanmo-ui .hanmo-card,
+body.hanmo-ui .hanmo-item,
+body.hanmo-ui .hanmo-result,
+body.hanmo-ui .hanmo-empty,
+body.hanmo-ui .hanmo-note,
+body.hanmo-ui .hanmo-metric,
+body.hanmo-ui .credit-card,
+body.hanmo-ui .scenario-card,
+body.hanmo-ui .plan-row,
+body.hanmo-ui .term-breakdown li,
+body.hanmo-ui .progress-table-scroll,
+body.hanmo-ui .scenario-fieldset{
+  background:transparent;
+  background-image:none;
+  box-shadow:none;
+  border:0;
+  border-radius:0;
+}
+body.hanmo-ui .hanmo-card{padding:18px 0;margin-top:0;min-width:0}
+body.hanmo-ui .hanmo-card+ .hanmo-card{border-top:1px solid #385367}
+body.hanmo-ui .hanmo-card-grid.two{gap:clamp(22px,4vw,52px)}
+body.hanmo-ui .hanmo-card-grid.two>.hanmo-card:nth-child(2){border-left:1px solid #385367;padding-left:clamp(18px,3vw,36px)}
+body.hanmo-ui .hanmo-note{padding:8px 0;margin:12px 0 22px;color:#d8c4a1}
+body.hanmo-ui .hanmo-result{min-height:80px;padding:14px 0;margin-top:8px}
+body.hanmo-ui .hanmo-empty{padding:21px 0;text-align:left}
+body.hanmo-ui .hanmo-item{padding:19px 0;border-bottom:1px solid #385367}
+body.hanmo-ui .hanmo-item:first-child{border-top:1px solid #385367}
+body.hanmo-ui .hanmo-metric,body.hanmo-ui .credit-card{padding:14px 0}
+body.hanmo-ui .hanmo-progress-section{padding:28px 0;margin:14px 0;border-top:1px solid #385367}
+body.hanmo-ui .hanmo-progress-section:first-of-type{border-top:0}
+body.hanmo-ui .progress-table-scroll{overflow-x:auto}
+body.hanmo-ui .scenario-fieldset{padding:12px 0;margin:8px 0 16px}
+body.hanmo-ui .scenario-fieldset label{border:1px solid #4a6c81;border-radius:0;background:transparent}
+body.hanmo-ui .scenario-fieldset label:has(input:checked){background:transparent;border-color:#f4c76c}
+body.hanmo-ui .plan-row{padding:12px 0;border-bottom:1px solid #385367}
+body.hanmo-ui .scenario-card{padding:15px 0;border-top:2px solid #47667b}
+body.hanmo-ui .term-breakdown li{padding:8px 0;border-bottom:1px solid #344d60}
+body.hanmo-ui .credit-overview{gap:28px}
+body.hanmo-ui .hanmo-progress-port{margin-top:36px}
+body.hanmo-ui .hanmo-section-title{margin:22px 0 14px}
+body.hanmo-ui .hanmo-card>h2{margin-bottom:14px}
+body.hanmo-ui .hanmo-status{color:#c4d8e4}
+body.hanmo-ui .hanmo-card-grid.two+section.hanmo-card{margin-top:32px!important;border-top:1px solid #385367;padding-top:30px}
+body.hanmo-ui .progress-next{border-top:1px solid #385367}
+body.hanmo-flat-legacy .info.blueBox{background:transparent;border:0;border-radius:0;
+  box-shadow:none;padding:18px 0}
+body.hanmo-flat-legacy .info.blueBox+ .info.blueBox{border-top:1px solid #385367}
+body.hanmo-flat-legacy .info .card{background:transparent;border:0;border-radius:0}
+@media(max-width:830px){
+  body.hanmo-ui .hanmo-card-grid.two>.hanmo-card:nth-child(2){
+    border-left:0;border-top:1px solid #385367;padding-left:0
+  }
+}

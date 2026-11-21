@@ -1,0 +1,26 @@
+/* Scoped strictly to the mode menu; original imitation screens are unchanged. */
+html:has(body.hanmo-vsugang){height:100%;overflow:hidden}
+body.hanmo-vsugang{box-sizing:border-box;display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0;margin:0;overflow:hidden;overscroll-behavior:none}
+body.hanmo-vsugang>.hanmo-topbar{box-sizing:border-box;flex:0 0 auto;width:100%;z-index:120}
+body.hanmo-vsugang>main{box-sizing:border-box;position:relative;flex:1 1 auto;height:auto;min-height:0;width:100%;margin:0;padding:10px 16px;overflow:hidden}
+body.hanmo-vsugang .f-dirt-down{position:absolute;top:calc((100% - var(--vsugang-footer-height,0px))/2);left:50%;width:max-content;max-width:none;transform:translate(-50%,-50%) scale(var(--vsugang-fit-scale,1));transform-origin:center}
+body.hanmo-vsugang .titleContainer{top:0;margin:0}
+body.hanmo-vsugang .container{margin-top:clamp(12px,2.5vh,30px)}
+body.hanmo-vsugang .grid{margin-top:0}
+body.hanmo-vsugang .f-dirt-up{position:absolute;bottom:0;left:0;right:0;box-sizing:border-box;width:100%;height:auto;min-height:0;max-height:35%}
+/* SETTING dialog stays below the topbar and scrolls internally. */
+body.hanmo-vsugang .settingSection{box-sizing:border-box;top:var(--vsugang-topbar-bottom,66px)!important;bottom:0!important;height:auto!important;max-height:none;z-index:110}
+body.hanmo-vsugang .settingPanel{max-height:calc(100dvh - var(--vsugang-topbar-bottom,66px) - 32px)}
+/* Visible incident content scrolls inside the viewport; never pushes the nav offscreen. */
+body.hanmo-vsugang main:has(#incident-practice:not([hidden])) .f-dirt-down,
+body.hanmo-vsugang main:has(#incident-practice:not([hidden])) .f-dirt-up{display:none}
+body.hanmo-vsugang #incident-practice:not([hidden]){box-sizing:border-box;width:min(1050px,calc(100% - 16px));max-height:100%;height:100%;margin:0 auto;overflow-y:auto;overscroll-behavior:contain}
+/* At extreme PC zoom, preserve readable controls using main-only scrolling. */
+body.hanmo-vsugang.vsugang-compact-scroll>main{display:block;overflow-y:auto;overscroll-behavior:contain}
+body.hanmo-vsugang.vsugang-compact-scroll .f-dirt-down{position:relative;top:auto;left:auto;width:min(600px,100%);max-width:100%;margin:0 auto 20px;transform:none}
+body.hanmo-vsugang.vsugang-compact-scroll .container{width:100%;margin-top:15px}
+body.hanmo-vsugang.vsugang-compact-scroll .grid{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(110px,auto));grid-template-areas:"b b" "s t" "set t"}
+body.hanmo-vsugang.vsugang-compact-scroll .grid div h2{font-size:clamp(20px,4vw,32px)}
+body.hanmo-vsugang.vsugang-compact-scroll .grid p{display:none}
+body.hanmo-vsugang.vsugang-compact-scroll .f-dirt-up{display:none}
+body.hanmo-vsugang.vsugang-compact-scroll main:has(#incident-practice:not([hidden])){overflow:hidden}

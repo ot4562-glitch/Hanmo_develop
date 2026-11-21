@@ -13,7 +13,7 @@ function run(ua, overrides={}) {
   const redirects=[];
   const attributes={};
   const styles=[];
-  const location={href:base+'degree-rescue/catalog.html',replace(href){redirects.push(href);}};
+  const location={href:base+'html/catalog.html',replace(href){redirects.push(href);}};
   const document={
     currentScript:{src:base+'js/pc-only.js'},
     documentElement:{setAttribute(key,value){attributes[key]=value;}},

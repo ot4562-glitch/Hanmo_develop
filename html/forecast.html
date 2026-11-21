@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <script src="../js/pc-only.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="강의 개설 전망 · 한모 학생용 학업 도우미">
+  <title>강의 개설 전망 | 한모</title>
+  <link rel="icon" href="../img/hanmo_color.png">
+  <link rel="stylesheet" href="../css/student-ui.css">
+  <script src="../js/academic-data-source.js" defer></script>
+  <script src="../js/student-forecast.js" defer></script>
+  <script src="../js/student-profile-bar.js" defer></script>
+</head>
+<body class="hanmo-ui">
+  <a class="hanmo-skip" href="#main">본문으로 이동</a>
+  <header class="hanmo-topbar">
+  <a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모 <span>HUFS 학업 도우미</span></a>
+  <nav aria-label="주요 서비스">
+    <a href="./academic-timeline.html">학사 공지</a>
+    <a href="./forecast.html" aria-current="page">강의 전망</a>
+    <a href="./catalog.html">강의 검색</a>
+    <a href="./academic-progress.html">학점 정리</a>
+    <span class="hanmo-profile-summary" data-profile-summary role="status" aria-live="polite" aria-label="브라우저에 저장한 내정보, 학교 로그인 아님">내정보 미설정</span>
+    <a class="hanmo-me-link" href="./planner.html">내정보</a>
+  </nav>
+</header>
+  <main id="main" class="hanmo-main" tabindex="-1">
+  <div class="hanmo-schoolmark" aria-label="강의 개설 전망 화면">
+    <h2>강의 개설 전망</h2>
+    <div class="hanmo-markline" aria-hidden="true"><span></span><img src="../img/hanmo_white.svg" alt=""><span></span></div>
+  </div>
+<div class="hanmo-card-grid two">
+  <section class="hanmo-card" aria-labelledby="form-title">
+    <h2 id="form-title">어떤 강의를 찾으세요?</h2>
+    <p style="margin:10px 0 18px">기술적인 자료를 준비할 필요 없이 과목 정보만 입력하세요.</p>
+    <form class="hanmo-form" id="forecast-form">
+      <label class="hanmo-field" for="forecast-course-id">학수번호<input id="forecast-course-id" type="text" required maxlength="80" autocomplete="off" placeholder="학교 시간표에 표시된 학수번호"></label>
+      <div class="hanmo-fields">
+        <label class="hanmo-field" for="forecast-year">학년도<input id="forecast-year" type="number" min="2020" max="2099" step="1" required value="2027"></label>
+        <label class="hanmo-field" for="forecast-semester">학기<select id="forecast-semester"><option value="1">1학기</option><option value="2">2학기</option></select></label>
+      </div>
+      <div class="hanmo-actions"><button class="hanmo-btn" type="submit">개설 근거 확인</button></div>
+    </form>
+  </section>
+  <section class="hanmo-card" aria-labelledby="result-title">
+    <h2 id="result-title">조회 결과</h2>
+    <p class="hanmo-status" id="forecast-status" role="status">승인된 강의 개설 자료의 연결 상태를 확인하고 있습니다.</p>
+    <div id="forecast-response" class="hanmo-result" aria-live="polite"><h3>조회 조건을 입력하세요.</h3><p>학교 공식 개설 자료가 확인되지 않으면 임의로 개설 여부를 예측하지 않습니다.</p></div>
+    <div class="hanmo-actions" style="margin-top:16px"><button id="forecast-retry" class="hanmo-btn secondary" type="button">연결 다시 시도</button></div>
+    <p style="margin-top:18px">실제 개설·시간표·분반 정보는 <a href="https://hufs.ac.kr/" target="_blank" rel="noopener noreferrer">학교 공식 페이지</a>에서 확인하세요.</p>
+  </section>
+</div>
+<section class="hanmo-card" style="margin-top:22px"><h2>왜 바로 확률이 나오지 않나요?</h2><p>개설 기록의 연속성, 개설 목록의 누락, 학수번호 동등성, 원문 판본이 확인되지 않은 경우 과거 횟수를 미래 개설 확률처럼 표시할 수 없기 때문입니다. 이 화면은 근거가 확보된 범위까지만 안내합니다.</p></section></main>
+  <footer class="hanmo-footer">© 한모 · 비공식 학습 지원 · 학교 로그인·자동 수강신청·성적표 업로드 없음</footer>
+</body>
+</html>

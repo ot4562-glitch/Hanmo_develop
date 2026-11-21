@@ -1,0 +1,80 @@
+/* Academic and new workshop views match the original dark-centered Hanmo visual baseline. */
+body.hanmo-ui{margin:0;min-height:100vh;background:var(--hm-night) url("../img/background.svg") center right / cover fixed no-repeat;
+  color:var(--hm-white);line-height:1.65}
+.hanmo-main{max-width:1070px;margin:0 auto;padding:34px 24px 70px;min-height:75vh}
+.hanmo-hero{border:1px solid var(--hm-border-strong);border-radius:18px;background:linear-gradient(135deg,#071927,#133448);
+  padding:30px 35px;margin-bottom:25px;color:var(--hm-white)}
+.hanmo-hero h1{color:var(--hm-white);font-size:clamp(26px,3.2vw,34px);line-height:1.38;
+  letter-spacing:-.028em;font-weight:700;margin:0 0 10px}
+.hanmo-hero p{font-size:14px;color:#d2e0eb;margin:0;max-width:830px}
+.hanmo-eyebrow{color:#9ccce2;font-size:12px;letter-spacing:.05em;font-weight:800;margin:0 0 8px!important}
+.hanmo-section-title{display:flex;justify-content:space-between;flex-wrap:wrap;align-items:baseline;gap:12px;margin:30px 0 15px}
+.hanmo-section-title h2{font-size:22px;color:var(--hm-white);margin:0}
+.hanmo-section-title p{font-size:13px;color:var(--hm-muted);margin:0}
+.hanmo-ui .hanmo-card h2:not(.hanmo-section-title h2){color:var(--hm-white)}
+/* Original mimic pages keep their own DOM/CSS. Workshop is an isolated addon. */
+body.hanmo-workshop{margin:0;color:var(--hm-white)!important;
+ background:var(--hm-night) url("../img/background.svg") center right / cover fixed no-repeat!important;font-family:var(--hm-font)}
+body.hanmo-workshop main{max-width:1070px;margin:28px auto 0;padding:0 24px 34px}
+body.hanmo-workshop h1,body.hanmo-workshop h2,body.hanmo-workshop h3,body.hanmo-workshop h4{color:var(--hm-white)}
+body.hanmo-workshop .workshop-eyebrow,body.hanmo-workshop .kicker{color:#9ac9e4}
+body.hanmo-workshop .workshop-intro,body.hanmo-workshop .workshop-help,
+body.hanmo-workshop .workshop-section-title p{color:var(--hm-muted)}
+body.hanmo-workshop .workshop-safety{background:#252016;border-left-color:var(--hm-gold);color:#f6d9a6}
+body.hanmo-workshop .workshop-stepper li{background:#0b2231;border:1px solid var(--hm-border);color:var(--hm-muted)}
+body.hanmo-workshop .workshop-stepper li[aria-current=step]{background:#193a50;color:var(--hm-gold);border-color:var(--hm-gold)}
+body.hanmo-workshop .workshop-stepper li[data-complete=true]{background:#14332c;color:#d0ebdc;border-color:#537c60}
+body.hanmo-workshop .workshop-status{background:#102f44;color:#d6e9f7}
+body.hanmo-workshop .workshop-error{color:#ffce86}
+body.hanmo-workshop .catalog-option,body.hanmo-workshop .workshop-panel,
+body.hanmo-workshop .workshop-consent,body.hanmo-workshop .workshop-mapping,
+body.hanmo-workshop .workshop-metrics div{background:var(--hm-panel);color:var(--hm-white);border:1px solid var(--hm-border)}
+body.hanmo-workshop .catalog-option:has(input:checked){background:#11354e;border-color:#8db5ce;box-shadow:0 0 0 1px #8db5ce}
+body.hanmo-workshop .catalog-option strong{color:var(--hm-white)}
+body.hanmo-workshop .catalog-option small,body.hanmo-workshop .workshop-panel p,
+body.hanmo-workshop .workshop-timeline,body.hanmo-workshop .mapping-status,
+body.hanmo-workshop .workshop-mapping p{color:var(--hm-muted)}
+body.hanmo-workshop .option-meta{color:#9cd1e9}
+body.hanmo-workshop .workshop-scene-desc{color:#c0d2df}
+body.hanmo-workshop .phase-pill,body.hanmo-workshop .map-pill{background:#204158;color:#e7d09c}
+body.hanmo-workshop .queue-preview,body.hanmo-workshop .alternatives{background:#0e2839;border-color:#557a91}
+body.hanmo-workshop .queue-preview p,body.hanmo-workshop .alternatives p{color:var(--hm-muted)}
+body.hanmo-workshop .queue-track{background:#274658}
+body.hanmo-workshop .queue-fill{background:var(--hm-gold)}
+body.hanmo-workshop .button-primary{background:var(--hm-gold);color:#001521}
+body.hanmo-workshop .button-primary:hover{background:#ffda8e}
+body.hanmo-workshop .button-muted{background:#0e3047;color:#f1f6fa;border-color:#53788f}
+body.hanmo-workshop .button-muted:hover{background:#204359}
+body.hanmo-workshop button[data-risk=true]{background:#42301e!important;color:#ffdca3!important;border-color:#836034!important}
+body.hanmo-workshop .workshop-report-hero{background:#102f40;border:1px solid var(--hm-border)}
+body.hanmo-workshop .workshop-report-hero p{color:var(--hm-muted)}
+body.hanmo-workshop .workshop-metrics strong{color:var(--hm-gold)}
+body.hanmo-workshop .workshop-metrics span{color:var(--hm-muted)}
+body.hanmo-workshop .feedback-list li{background:#0e2836;border:1px solid var(--hm-border);color:var(--hm-white)}
+body.hanmo-workshop .feedback-list li span{color:var(--hm-muted)}
+body.hanmo-workshop .workshop-mistakes{border-left-color:var(--hm-gold)}
+body.hanmo-workshop .workshop-mistakes>p{color:var(--hm-muted)}
+body.hanmo-workshop .mapping-details div{background:#102637;border:1px solid var(--hm-border)}
+body.hanmo-workshop .mapping-details dd,body.hanmo-workshop .mapping-details dt{color:var(--hm-muted)}
+body.hanmo-workshop #workshop-copy-status{color:#c2e4c4}
+body.hanmo-workshop footer{border-color:#28475a}
+body.hanmo-workshop .workshop-catalog input{accent-color:var(--hm-gold)}
+body.hanmo-workshop a{color:#c9dfec}
+body.hanmo-lab{background:var(--hm-night) url("../img/background.svg") center right / cover fixed no-repeat;color:var(--hm-white)}
+body.hanmo-lab #scenario-lab{background:#071b29;border:1px solid #36556d;border-radius:15px;box-shadow:none;margin:30px auto}
+body.hanmo-lab #scenario-lab h1,body.hanmo-lab #scenario-lab h2{color:#f4f4f4}
+body.hanmo-lab #scenario-lab .lead{color:var(--hm-muted)}
+body.hanmo-lab #scenario-lab .safety{background:#241e14;color:#f4d3a7;border-color:var(--hm-gold)}
+body.hanmo-lab #scenario-lab input,body.hanmo-lab #scenario-lab select{background:#152b3b;border-color:#557a91;color:var(--hm-white)}
+body.hanmo-lab #scenario-lab button{background:var(--hm-gold);color:#0b1720;font-weight:800}
+body.hanmo-lab #scenario-lab .controls button:nth-child(2){background:#16384c;color:#f4f5f6}
+body.hanmo-lab #scenario-status{background:#15354b;color:#dbeaf5}
+body.hanmo-lab #scenario-details,body.hanmo-lab #scenario-history,body.hanmo-lab #scenario-lab footer{color:var(--hm-muted)}
+body.hanmo-lab #scenario-errors{color:#efc98c}
+body.hanmo-lab #scenario-lab a{color:var(--hm-gold)}
+@media(max-width:700px){.hanmo-main{padding:20px 16px}.hanmo-schoolmark h2{font-size:22px}
+ .hanmo-hero{padding:24px 18px}body.hanmo-workshop main{padding:0 16px}}
+
+/* Fill the document around standalone exercises. */
+html:has(body.hanmo-lab),html:has(body.hanmo-workshop){background:var(--hm-night)!important;color:var(--hm-white)}
+body.hanmo-lab{min-height:100vh}

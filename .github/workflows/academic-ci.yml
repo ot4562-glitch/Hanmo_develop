@@ -1,0 +1,43 @@
+name: Academic core and student UI
+on:
+  pull_request:
+    paths:
+      - 'js/academic/**'
+      - 'js/student-*.js'
+      - 'html/**'
+      - 'css/student-ui.css'
+      - 'css/scenario-workshop.css'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'data/**'
+      - 'docs/architecture.md'
+      - 'package.json'
+      - 'tsconfig.json'
+      - '.github/workflows/academic-ci.yml'
+      - 'degree-rescue/**'
+permissions:
+  contents: read
+concurrency:
+  group: hanmo-academic-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  core-and-site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - run: node scripts/assert-protected.mjs
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm run check
+      - run: npm run check:legacy
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hanmo-root-static-preview
+          path: dist
+          retention-days: 3

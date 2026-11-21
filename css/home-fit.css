@@ -1,0 +1,121 @@
+/* Home-only full-viewport layout. The classic academic and mock-registration pages are untouched. */
+html:has(body.hanmo-home) {
+  height: 100%;
+  overflow: hidden;
+}
+body.hanmo-home {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+body.hanmo-home > .hanmo-topbar {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 100%;
+  z-index: 10;
+}
+body.hanmo-home > main {
+  box-sizing: border-box;
+  position: relative;
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  width: 100%;
+  margin: 0;
+  padding: clamp(8px, 1.5vh, 20px) 16px;
+  overflow: hidden;
+}
+/* Center a measured inner wrapper. Its scale changes only if the viewport is
+   too short or narrow for the original notice/buttons, including at PC zoom. */
+body.hanmo-home .home-fit-content {
+  position: absolute;
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(700px, calc(100% - 32px));
+  transform: translate(-50%, -50%) scale(var(--home-fit-scale, 1));
+  transform-origin: center center;
+}
+body.hanmo-home .f-dirt-down {
+  position: relative;
+  width: 100%;
+  align-items: center;
+}
+body.hanmo-home .titleContainer {
+  top: auto;
+  margin: 0 0 clamp(12px, 2.8vh, 26px);
+  width: 100%;
+}
+body.hanmo-home .titleContainer h1 {
+  margin: 0 0 8px;
+  font-size: clamp(23px, 3.6vh, 34px);
+  line-height: 1.35;
+}
+body.hanmo-home .container {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 0;
+}
+body.hanmo-home .notice,
+body.hanmo-home .mainNotice {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 700px;
+  min-width: 0;
+}
+body.hanmo-home .notice {
+  height: clamp(40px, 7.5vh, 70px);
+  margin-top: 0;
+  padding: 0 clamp(10px, 2.4vw, 24px);
+}
+body.hanmo-home .mainNotice {
+  margin-top: clamp(8px, 1.5vh, 20px);
+  padding: clamp(12px, 2.2vh, 23px) 12px;
+}
+body.hanmo-home .mainNotice p {
+  margin: clamp(4px, 0.9vh, 12px) 0;
+  font-size: clamp(14px, 1.85vh, 19px);
+  line-height: clamp(24px, 3.45vh, 38px);
+}
+body.hanmo-home .mainNotice span {
+  margin-left: clamp(10px, 2vw, 50px);
+}
+body.hanmo-home .mainNotice hr {
+  margin: clamp(8px, 1.45vh, 18px) 0;
+}
+body.hanmo-home .buttonContainer {
+  box-sizing: border-box;
+  margin: clamp(11px, 1.8vh, 20px) 0 0;
+  gap: clamp(7px, 1.4vw, 20px);
+  max-width: 100%;
+}
+body.hanmo-home .button {
+  box-sizing: border-box;
+  padding: clamp(8px, 1.3vh, 12px) clamp(10px, 1.6vw, 20px);
+  font-size: clamp(14px, 2.3vh, 20px);
+  white-space: nowrap;
+}
+body.hanmo-home .f-dirt-up {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+}
+@media (max-height: 650px) {
+  body.hanmo-home .titleContainer { margin-bottom: 8px; }
+  body.hanmo-home .mainNotice { padding: 8px 10px; }
+  body.hanmo-home .mainNotice p { margin: 3px 0; line-height: 24px; }
+  body.hanmo-home .mainNotice hr { margin: 6px 0; }
+  body.hanmo-home .buttonContainer { margin-top: 8px; }
+}

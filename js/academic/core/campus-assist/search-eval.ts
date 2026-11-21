@@ -1,0 +1,254 @@
+import {z} from 'zod';
+
+/**
+ * #40 통합 학업 검색 품질 게이트 — 평가셋 분할 규칙과 지표 계산 (순수 코어).
+ *
+ * 이 모듈은 측정 도구다. 여기서 계산한 수치는 입력 평가셋의 성격을 그대로 따른다.
+ * 평가셋이 SYNTHETIC이면 게이트 결과는 항상 SYNTHETIC_ONLY이며 출시 PASS가 될 수 없다.
+ * 사람이 검수한 골드셋(#41·#42, #27 이후)으로만 RELEASE 판정을 낼 수 있다.
+ *
+ * 분할 원칙(§4.6): 튜닝/홀드아웃은 문서 계열(documentFamily) 단위로 나눈다.
+ * 같은 문서 계열이 두 분할에 모두 나오면 누수(leak)로 보고하고 게이트를 막는다.
+ */
+const Id=z.string().trim().min(1).max(120).regex(/^[A-Za-z0-9_.:-]+$/);
+export const SearchDomainSchema=z.enum(['NOTICE','COURSE','FAQ','UNKNOWN']);
+export type SearchDomain=z.infer<typeof SearchDomainSchema>;
+export const SearchEvalSubsetSchema=z.enum([
+  'PLAIN','SPACING','TYPO','ABBREVIATION','PARTICLE','AMBIGUOUS','MULTI','NEGATION','HOMONYM','OFF_TOPIC','UNANSWERABLE',
+]);
+export type SearchEvalSubset=z.infer<typeof SearchEvalSubsetSchema>;
+export const SearchEvalCaseSchema=z.strictObject({
+  caseId:Id,
+  query:z.string().trim().min(1).max(500),
+  /** 사람이 지정한 검색 분야. 학생 적용 대상 YES/NO/UNKNOWN 판정과는 별개다. */
+  intent:SearchDomainSchema,
+  subsets:z.array(SearchEvalSubsetSchema).min(1).max(6),
+  /** 정답 근거 인용 ID 목록. 빈 배열은 '정답 없음 — 보류해야 함'이다. */
+  relevant:z.array(z.string().min(1).max(200)).max(20),
+  /** 분할 단위. 정답 근거가 속한 문서 계열(정답 없음 사례는 질의 계열). */
+  documentFamily:Id,
+  split:z.enum(['TUNE','HOLDOUT']),
+  provenance:z.enum(['SYNTHETIC','HUMAN_REVIEWED']),
+}).refine(c=>new Set(c.relevant).size===c.relevant.length,'duplicate relevant id')
+  .refine(c=>!c.subsets.includes('UNANSWERABLE')||c.relevant.length===0,'unanswerable case must have no relevant ids');
+export type SearchEvalCase=z.infer<typeof SearchEvalCaseSchema>;
+export const SearchEvalRunSchema=z.strictObject({
+  caseId:Id,
+  /** 검색기가 반환한 순위 목록(인용 ID). 보류했으면 빈 배열이어도 된다. */
+  ranked:z.array(z.string().min(1).max(200)).max(50),
+  predictedIntent:SearchDomainSchema,
+  abstained:z.boolean(),
+  latencyMs:z.number().nonnegative().max(600000),
+  /** 고위험 안전 오류(미근거 마감 확정, 타 캠퍼스 YES, 철회 문단 노출 등). 사람이 판정해 기록한다. */
+  safetyViolations:z.array(z.enum([
+    'UNSUPPORTED_DEADLINE','WRONG_SCOPE_YES','REVOKED_EXPOSED','UNREVIEWED_COURSE_CONFIRMED',
+  ])).max(4).default([]),
+});
+export type SearchEvalRun=z.input<typeof SearchEvalRunSchema>;
+
+/** §4.6·#40 초기 출시 목표. 설계 요구이며 측정값이 아니다. */
+export const SEARCH_GATE_TARGETS={
+  recallAt5:0.90, mrr:0.80, intentMacroF1:0.90,
+  /** 오타·띄어쓰기 하위집합 Recall@5가 PLAIN 대비 떨어져도 되는 최대 폭(5%p). */
+  maxNoiseDrop:0.05,
+  p95LatencyMs:300,
+  safetyViolations:0,
+} as const;
+
+// ───────────── 분할 규칙 ─────────────
+
+/** 문서 계열 ID를 결정적으로 TUNE/HOLDOUT에 배정한다. 같은 seed·계열이면 언제나 같은 결과다. */
+export function assignFamilySplit(documentFamily:string,seed:string,holdoutRatio=0.3):'TUNE'|'HOLDOUT'{
+  if(!(holdoutRatio>0&&holdoutRatio<1))throw new RangeError('holdoutRatio must be in (0,1)');
+  // FNV-1a 32비트. 무결성·보안 목적이 아니라 결정적 버킷 배정용이다.
+  let h=0x811c9dc5;
+  for(const ch of new TextEncoder().encode(seed+'\u0000'+documentFamily)){h^=ch;h=Math.imul(h,0x01000193)>>>0;}
+  // FNV-1a만으로는 비슷한 ID의 상위 비트가 몰리므로 murmur3 fmix32로 섞는다.
+  h^=h>>>16;h=Math.imul(h,0x85ebca6b)>>>0;h^=h>>>13;h=Math.imul(h,0xc2b2ae35)>>>0;h^=h>>>16;
+  return (h>>>0)/0x100000000<holdoutRatio?'HOLDOUT':'TUNE';
+}
+
+export interface SplitIssue{
+  kind:'FAMILY_LEAK'|'EMPTY_HOLDOUT'|'DUPLICATE_CASE'|'MIXED_PROVENANCE'|'RELEVANT_SHARED_ACROSS_SPLITS';
+  detail:string;
+}
+/** 평가셋의 분할 규칙 위반을 모두 찾는다. 빈 배열이면 분할 규칙을 지킨 것이다. */
+export function validateSearchEvalSplit(raw:readonly unknown[]):SplitIssue[]{
+  const cases=SearchEvalCaseSchema.array().max(20000).parse(raw);
+  const issues:SplitIssue[]=[];
+  const ids=new Set<string>();
+  for(const c of cases){
+    if(ids.has(c.caseId))issues.push({kind:'DUPLICATE_CASE',detail:c.caseId});
+    ids.add(c.caseId);
+  }
+  const splitsBy=(key:(c:SearchEvalCase)=>string[])=>{
+    const m=new Map<string,Set<string>>();
+    for(const c of cases)for(const k of key(c)){const s=m.get(k)??new Set();s.add(c.split);m.set(k,s);}
+    return [...m].filter(([,s])=>s.size>1).map(([k])=>k).sort();
+  };
+  for(const f of splitsBy(c=>[c.documentFamily]))issues.push({kind:'FAMILY_LEAK',detail:f});
+  // 계열 표기가 달라도 같은 정답 근거가 양쪽에 있으면 누수다.
+  for(const r of splitsBy(c=>c.relevant))issues.push({kind:'RELEVANT_SHARED_ACROSS_SPLITS',detail:r});
+  if(cases.length&&!cases.some(c=>c.split==='HOLDOUT'))issues.push({kind:'EMPTY_HOLDOUT',detail:'no HOLDOUT case'});
+  if(new Set(cases.map(c=>c.provenance)).size>1)issues.push({kind:'MIXED_PROVENANCE',detail:'SYNTHETIC and HUMAN_REVIEWED mixed'});
+  return issues;
+}
+
+// ───────────── 지표 ─────────────
+
+export interface RetrievalMetrics{cases:number;recallAt5:number|null;mrr:number|null;}
+export interface SearchEvalReport{
+  split:'TUNE'|'HOLDOUT';
+  provenance:SearchEvalCase['provenance'];
+  caseCount:number;
+  /** 정답이 있는 사례만으로 계산한 검색 지표. 정답 있는 사례가 없으면 null. */
+  overall:RetrievalMetrics;
+  bySubset:Partial<Record<SearchEvalSubset,RetrievalMetrics>>;
+  byDomain:Partial<Record<SearchDomain,RetrievalMetrics>>;
+  intent:{macroF1:number|null;perLabel:Partial<Record<SearchDomain,{precision:number;recall:number;f1:number;support:number}>>;
+    /** confusion[정답][예측] */
+    confusion:Record<SearchDomain,Record<SearchDomain,number>>;};
+  /** 정답 없음 사례에서 보류하지 않은 비율. */
+  noAnswerFalsePositiveRate:number|null;
+  abstention:{precision:number|null;recall:number|null};
+  latency:{samples:number;p95Ms:number|null};
+  safetyViolationCount:number;
+  /** 정답 근거가 있는데 검색 결과가 없는 사례 ID(재현용 반례 목록). */
+  missedCaseIds:string[];
+}
+const DOMAINS=SearchDomainSchema.options;
+const round=(x:number)=>Math.round(x*1e6)/1e6;
+const mean=(xs:number[])=>xs.length?round(xs.reduce((a,b)=>a+b,0)/xs.length):null;
+
+/** 최근접 순위 방식 p95(정렬 후 ceil(0.95n)번째). 보간하지 않아 작은 표본에서 과소평가하지 않는다. */
+export function percentileNearestRank(values:readonly number[],p:number):number|null{
+  if(!values.length)return null;
+  const sorted=[...values].sort((a,b)=>a-b);
+  return sorted[Math.max(0,Math.ceil(p*sorted.length)-1)]!;
+}
+
+function retrieval(rows:{c:SearchEvalCase;r:z.output<typeof SearchEvalRunSchema>}[]):RetrievalMetrics{
+  const answerable=rows.filter(x=>x.c.relevant.length>0);
+  const recall=answerable.map(({c,r})=>{
+    const top=new Set(r.abstained?[]:r.ranked.slice(0,5));
+    return c.relevant.filter(id=>top.has(id)).length/c.relevant.length;
+  });
+  const rr=answerable.map(({c,r})=>{
+    if(r.abstained)return 0;
+    const rel=new Set(c.relevant);
+    const i=r.ranked.findIndex(id=>rel.has(id));
+    return i<0?0:1/(i+1);
+  });
+  return {cases:answerable.length,recallAt5:mean(recall),mrr:mean(rr)};
+}
+
+/**
+ * 한 분할(기본 HOLDOUT)의 사례와 실행 결과로 지표를 계산한다.
+ * 실행 결과가 없는 사례, 평가셋에 없는 실행 결과, 중복 실행은 측정 오류로 던진다(조용히 빼지 않는다).
+ */
+export function evaluateSearchRun(rawCases:readonly unknown[],rawRuns:readonly unknown[],
+  split:'TUNE'|'HOLDOUT'='HOLDOUT'):SearchEvalReport{
+  const all=SearchEvalCaseSchema.array().max(20000).parse(rawCases);
+  const provenances=new Set(all.map(c=>c.provenance));
+  if(provenances.size>1)throw new RangeError('Mixed evaluation provenance');
+  const cases=all.filter(c=>c.split===split);
+  if(!cases.length)throw new RangeError('No cases in split '+split);
+  const runs=SearchEvalRunSchema.array().max(20000).parse(rawRuns);
+  const runBy=new Map<string,z.output<typeof SearchEvalRunSchema>>();
+  for(const r of runs){
+    if(runBy.has(r.caseId))throw new RangeError('Duplicate run for case '+r.caseId);
+    runBy.set(r.caseId,r);
+  }
+  const allIds=new Set(all.map(c=>c.caseId));
+  for(const id of runBy.keys())if(!allIds.has(id))throw new RangeError('Run for unknown case '+id);
+  const rows=cases.map(c=>{
+    const r=runBy.get(c.caseId);
+    if(!r)throw new RangeError('Missing run for case '+c.caseId);
+    return {c,r};
+  });
+
+  const bySubset:SearchEvalReport['bySubset']={};
+  for(const s of SearchEvalSubsetSchema.options){
+    const sub=rows.filter(x=>x.c.subsets.includes(s));
+    if(sub.length)bySubset[s]=retrieval(sub);
+  }
+  const byDomain:SearchEvalReport['byDomain']={};
+  for(const d of DOMAINS){
+    const sub=rows.filter(x=>x.c.intent===d);
+    if(sub.length)byDomain[d]=retrieval(sub);
+  }
+
+  const confusion=Object.fromEntries(DOMAINS.map(t=>[t,Object.fromEntries(DOMAINS.map(p=>[p,0]))])) as
+    Record<SearchDomain,Record<SearchDomain,number>>;
+  for(const {c,r} of rows)confusion[c.intent][r.predictedIntent]++;
+  const perLabel:SearchEvalReport['intent']['perLabel']={};
+  const f1s:number[]=[];
+  // 정답 또는 예측에 한 번이라도 등장한 분야만 macro 평균에 넣는다.
+  for(const d of DOMAINS){
+    const tp=confusion[d][d];
+    const support=DOMAINS.reduce((n,p)=>n+confusion[d][p],0);
+    const predicted=DOMAINS.reduce((n,t)=>n+confusion[t][d],0);
+    if(!support&&!predicted)continue;
+    const precision=predicted?tp/predicted:0,recall=support?tp/support:0;
+    const f1=precision+recall?2*precision*recall/(precision+recall):0;
+    perLabel[d]={precision:round(precision),recall:round(recall),f1:round(f1),support};
+    f1s.push(f1);
+  }
+
+  const noAnswer=rows.filter(x=>x.c.relevant.length===0);
+  const abstainedRows=rows.filter(x=>x.r.abstained);
+  const correctAbstain=abstainedRows.filter(x=>x.c.relevant.length===0).length;
+  const latencies=rows.map(x=>x.r.latencyMs);
+  return {
+    split,provenance:cases[0]!.provenance,caseCount:rows.length,
+    overall:retrieval(rows),bySubset,byDomain,
+    intent:{macroF1:mean(f1s),perLabel,confusion},
+    noAnswerFalsePositiveRate:noAnswer.length?round(noAnswer.filter(x=>!x.r.abstained).length/noAnswer.length):null,
+    abstention:{
+      precision:abstainedRows.length?round(correctAbstain/abstainedRows.length):null,
+      recall:noAnswer.length?round(correctAbstain/noAnswer.length):null,
+    },
+    latency:{samples:latencies.length,p95Ms:percentileNearestRank(latencies,0.95)},
+    safetyViolationCount:rows.reduce((n,x)=>n+x.r.safetyViolations.length,0),
+    missedCaseIds:rows.filter(({c,r})=>c.relevant.length>0
+      &&(r.abstained||!r.ranked.slice(0,5).some(id=>c.relevant.includes(id)))).map(x=>x.c.caseId).sort(),
+  };
+}
+
+// ───────────── 게이트 ─────────────
+
+export type GateCheckStatus='PASS'|'FAIL'|'NOT_EVALUABLE';
+export interface SearchGateResult{
+  /**
+   * RELEASE_PASS: 사람 검수 홀드아웃에서 모든 기준 통과.
+   * RELEASE_BLOCKED: 하나라도 FAIL·NOT_EVALUABLE이거나 분할 규칙 위반.
+   * SYNTHETIC_ONLY: 합성 평가셋 — 기준별 결과는 참고용이며 출시 판정이 아니다.
+   */
+  status:'RELEASE_PASS'|'RELEASE_BLOCKED'|'SYNTHETIC_ONLY';
+  checks:Record<'recallAt5'|'mrr'|'intentMacroF1'|'typoDrop'|'spacingDrop'|'p95Latency'|'safety'|'split'|'heldOut',
+    {status:GateCheckStatus;value:number|null;target:number|null}>;
+}
+export function checkSearchGate(report:SearchEvalReport,splitIssues:readonly SplitIssue[]):SearchGateResult{
+  const T=SEARCH_GATE_TARGETS;
+  const atLeast=(v:number|null,t:number)=>({status:(v===null?'NOT_EVALUABLE':v>=t?'PASS':'FAIL') as GateCheckStatus,value:v,target:t});
+  const atMost=(v:number|null,t:number)=>({status:(v===null?'NOT_EVALUABLE':v<=t?'PASS':'FAIL') as GateCheckStatus,value:v,target:t});
+  const plain=report.bySubset.PLAIN?.recallAt5??null;
+  const drop=(s:SearchEvalSubset)=>{
+    const v=report.bySubset[s]?.recallAt5??null;
+    return plain===null||v===null?null:round(plain-v);
+  };
+  const checks:SearchGateResult['checks']={
+    recallAt5:atLeast(report.overall.recallAt5,T.recallAt5),
+    mrr:atLeast(report.overall.mrr,T.mrr),
+    intentMacroF1:atLeast(report.intent.macroF1,T.intentMacroF1),
+    typoDrop:atMost(drop('TYPO'),T.maxNoiseDrop),
+    spacingDrop:atMost(drop('SPACING'),T.maxNoiseDrop),
+    p95Latency:atMost(report.latency.p95Ms,T.p95LatencyMs),
+    safety:atMost(report.safetyViolationCount,T.safetyViolations),
+    split:{status:splitIssues.length?'FAIL':'PASS',value:splitIssues.length,target:0},
+    heldOut:{status:report.split==='HOLDOUT'?'PASS':'FAIL',value:null,target:null},
+  };
+  if(report.provenance==='SYNTHETIC')return {status:'SYNTHETIC_ONLY',checks};
+  const ok=Object.values(checks).every(c=>c.status==='PASS');
+  return {status:ok?'RELEASE_PASS':'RELEASE_BLOCKED',checks};
+}

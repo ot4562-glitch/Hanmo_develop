@@ -303,12 +303,19 @@ test('each actual HTML page loads classic scripts in order without global collis
   for(const page of pages){
     const html=fs.readFileSync(path.join(ROOT,page),'utf8');
     const scripts=[...html.matchAll(/<script\s+src=['"](?:\.\/|\.\.\/)js\/([^'"]+\.js)['"]/g)]
-      .map(match=>match[1]).filter(file=>file!=='pc-only.js');
-    assert.equal(scripts.length,page==='index.html'?2:3,page+' script count');
+      .map(match=>match[1]).filter(file=>file!=='pc-only.js'&&file!=='student-profile-bar.js'&&file!=='home-fit.js'&&file!=='vsugang-fit.js');
+    // The registration menu may load isolated, opt-in synthetic controllers;
+    // the three original classic scripts and their order must remain unchanged.
+    const originalScripts=page==='html/vsugang.html'?scripts.slice(0,3):scripts;
+    // Restore the original notice/device/semester behavior alongside the shared top navigation.
+    assert.equal(originalScripts.length,page==='index.html'?2:3,page+' original script count');
+    if(page==='html/vsugang.html')assert.deepEqual(scripts.slice(3),[
+      'incident-options.js','scenario-settings.js',
+    ],'isolated synthetic scripts must load only after original settings/gnb/hanmoSys');
     const h=createHarness({deviceInfo:'true',practiceSetter:1,psubjectValue:2,
       subjectValue:2,waitingValue:'no',TIMEtime:'1',SELECTtime:'1',SELECTWaitTime:'0'});
     h.now('2026-11-19T10:11:00+09:00');
-    for(const script of scripts){
+    for(const script of originalScripts){
       assert.doesNotThrow(()=>h.load(script),page+' loading '+script);
     }
     assert.equal(h.location.href,'/',page+' must not navigate to external site');

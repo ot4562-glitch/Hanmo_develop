@@ -1,0 +1,36 @@
+name: Practice failure and virtual 404 recovery
+on:
+  pull_request:
+    paths:
+      - 'js/scenario-settings.js'
+      - 'js/incident-options.js'
+      - 'html/vsugang.html'
+      - 'css/scenario-settings.css'
+      - 'tests/scenario-settings.test.cjs'
+      - 'tests/student-navigation.test.cjs'
+      - 'tests/legacy-baseline.test.cjs'
+      - 'scripts/check-static-pages.mjs'
+      - '.github/workflows/scenario-workshop-ci.yml'
+permissions:
+  contents: read
+jobs:
+  failure-and-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check js/scenario-settings.js
+          node --check js/incident-options.js
+      - name: Failure, reconnect, and legacy contracts
+        run: |
+          node --test tests/scenario-settings.test.cjs \
+            tests/student-navigation.test.cjs \
+            tests/legacy-baseline.test.cjs \
+            tests/device-gate.test.cjs
