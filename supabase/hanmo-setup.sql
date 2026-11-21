@@ -300,11 +300,13 @@ BEGIN
     VALUES (p_snapshot_id, 'REVOKE', p_operator_label, p_reason);
 END $$;
 
--- Rights withdrawal immediately hides linked releases, including direct API lookups.
+-- Rights withdrawal or removal of rights verification time immediately hides linked
+-- releases, including direct API lookups. This does not prove independent approval.
 CREATE FUNCTION hanmo_private.on_rights_change()
 RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $$
 BEGIN
-  IF OLD.rights_status = 'ALLOWED' AND NEW.rights_status <> 'ALLOWED' THEN
+  IF OLD.rights_status = 'ALLOWED'
+    AND (NEW.rights_status <> 'ALLOWED' OR NEW.rights_checked_at IS NULL) THEN
     INSERT INTO hanmo_private.release_audit (snapshot_id, action, operator_label, detail)
     SELECT DISTINCT ss.snapshot_id, 'REVOKE', 'SYSTEM',
       'Rights changed for source ' || NEW.source_id
@@ -332,7 +334,7 @@ BEGIN
   RETURN NEW;
 END $$;
 CREATE TRIGGER hanmo_source_rights_gate
-  AFTER UPDATE OF rights_status ON hanmo_private.data_sources
+  AFTER UPDATE OF rights_status, rights_checked_at ON hanmo_private.data_sources
   FOR EACH ROW EXECUTE FUNCTION hanmo_private.on_rights_change();
 
 -- Public releases are immutable except activation and irreversible revocation.

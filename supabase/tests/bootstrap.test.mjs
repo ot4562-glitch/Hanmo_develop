@@ -34,10 +34,16 @@ test('release requires source rights and independent human review records', () =
   assert.match(setup, /rv\.manifest_sha256 = v_snapshot\.manifest_sha256/);
   assert.match(setup, /ap\.manifest_sha256 = v_snapshot\.manifest_sha256/);
   assert.match(setup, /CREATE TRIGGER hanmo_source_rights_gate/);
+  assert.match(setup, /AFTER UPDATE OF rights_status, rights_checked_at ON hanmo_private\.data_sources/);
+  assert.match(setup, /NEW\.rights_status <> 'ALLOWED' OR NEW\.rights_checked_at IS NULL/);
 });
 
 test('verify query checks read privileges, RLS and anonymous visibility', () => {
   assert.match(verify, /has_table_privilege\('anon', 'public\.hanmo_public_snapshots', 'INSERT'\)/);
   assert.match(verify, /has_function_privilege\('anon', 'hanmo_private\.publish_snapshot\(text,text\)', 'EXECUTE'\)/);
   assert.match(verify, /SET LOCAL ROLE anon/);
+  assert.match(verify, /authenticated_select_only/);
+  assert.match(verify, /service_role_cannot_write_public_release/);
+  assert.match(verify, /private_publish_not_executable_by_authenticated/);
+  assert.match(verify, /private_publish_not_executable_by_service_role/);
 });

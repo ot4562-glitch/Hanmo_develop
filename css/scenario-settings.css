@@ -36,20 +36,6 @@
 .hanmo-incident-kicker{font-size:12px;color:#b6d4e6;margin:0 0 5px}
 .hanmo-incident-warning{padding:12px 16px;border-left:4px solid #f4c76c;
  background:#2a2417;color:#ffdea6;font-size:13px;margin:15px 0 24px}
-.hanmo-incident-base{border:1px solid #45667a;border-radius:12px;padding:15px 20px;display:flex;gap:15px;flex-wrap:wrap}
-.hanmo-incident-base legend{font-weight:800;padding:0 8px}
-.hanmo-incident-base p{width:100%;margin:0;font-size:13px;color:#d1dde6}
-.hanmo-incident-base label{display:flex;align-items:center;gap:9px;background:#153249;border:1px solid #476c84;
- border-radius:8px;padding:10px 13px;font-size:14px;cursor:pointer}
-.hanmo-incident-base input{accent-color:#f4c76c;width:18px;height:18px}
-.hanmo-incident-search{display:flex;align-items:center;gap:15px;flex-wrap:wrap;margin:20px 0}
-#incident-search{background:#f4c76c!important;color:#061b2b!important;border-color:#f4c76c!important}
-#incident-status{font-size:13px;color:#c9dfeb;flex:1}
-.hanmo-incident-candidates{padding:18px;background:#0e3044;border:1px solid #466780;border-radius:10px}
-.hanmo-incident-candidates h3{font-size:17px;margin:0 0 13px}
-.hanmo-candidate-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.hanmo-candidate-grid button{text-align:center}
-.hanmo-candidate-grid button[data-conflict="true"]{border-color:#ba8655}
 .hanmo-incident-feedback{font-size:14px;padding:14px 18px;background:#143249;border-radius:9px;
  border:1px solid #3f718e;min-height:56px}
 .hanmo-incident-feedback[data-result="error"]{background:#3b241e;border-color:#b67861;color:#ffdbc8}
@@ -60,5 +46,4 @@
 .hanmo-example-404 h2{font-size:clamp(27px,4vw,44px);font-weight:800;margin:0}
 .hanmo-example-404 p{max-width:630px;line-height:1.8;color:#d0e0eb;margin:0}
 .hanmo-example-404>div{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
-@media(max-width:700px){#incident-practice{padding:19px 15px}.hanmo-candidate-grid{grid-template-columns:1fr}
-}
+@media(max-width:700px){#incident-practice{padding:19px 15px}}

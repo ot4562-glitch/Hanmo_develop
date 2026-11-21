@@ -17,15 +17,15 @@ for(const directory of ['css','js','html','img'])
   await cp(join(root,directory),join(dist,directory),{recursive:true});
 await rm(join(dist,'js','academic'),{recursive:true,force:true});
 await mkdir(join(dist,'data'),{recursive:true});
-await copyFile(join(root,'data','academic-notices-reference.json'),
-  join(dist,'data','academic-notices-reference.json'));
+await copyFile(join(root,'data','academic-source-config.json'),
+  join(dist,'data','academic-source-config.json'));
 await copyFile(compiled,join(dist,'js','student-forecast.js'));
 await copyFile(compiledEntry,join(dist,'js','student-entry.js'));
 await copyFile(compiledProgress,join(dist,'js','academic-progress.js'));
 for(const name of [
  'index.html','html/planner.html','html/forecast.html','html/catalog.html',
  'html/academic-timeline.html','html/academic-progress.html',
- 'html/vsugang.html','js/student-forecast.js','js/student-entry.js','js/academic-progress.js','data/academic-notices-reference.json',
+ 'html/vsugang.html','js/student-forecast.js','js/student-entry.js','js/academic-progress.js','data/academic-source-config.json',
 ])if(!await exists(join(dist,name)))throw Error('Missing public student asset '+name);
 if(await exists(join(dist,'CNAME')))throw Error('CNAME leaked into QA artifact');
 const rootEntries=await readdir(dist);

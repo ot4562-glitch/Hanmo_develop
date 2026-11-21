@@ -8,6 +8,7 @@
   <title>강의 개설 전망 | 한모</title>
   <link rel="icon" href="../img/hanmo_color.png">
   <link rel="stylesheet" href="../css/student-ui.css">
+  <script src="../js/academic-data-source.js" defer></script>
   <script src="../js/student-forecast.js" defer></script>
   <script src="../js/student-profile-bar.js" defer></script>
 </head>
@@ -39,13 +40,14 @@
         <label class="hanmo-field" for="forecast-year">학년도<input id="forecast-year" type="number" min="2020" max="2099" step="1" required value="2027"></label>
         <label class="hanmo-field" for="forecast-semester">학기<select id="forecast-semester"><option value="1">1학기</option><option value="2">2학기</option></select></label>
       </div>
-      <div class="hanmo-actions"><button class="hanmo-btn" type="submit">개설 근거 확인</button><button id="forecast-example" class="hanmo-btn secondary" type="button">가상 예시 체험</button></div>
+      <div class="hanmo-actions"><button class="hanmo-btn" type="submit">개설 근거 확인</button></div>
     </form>
   </section>
   <section class="hanmo-card" aria-labelledby="result-title">
     <h2 id="result-title">조회 결과</h2>
-    <p class="hanmo-status" id="forecast-status" role="status">공식 강의 개설 원장 미연결</p>
+    <p class="hanmo-status" id="forecast-status" role="status">승인된 강의 개설 자료의 연결 상태를 확인하고 있습니다.</p>
     <div id="forecast-response" class="hanmo-result" aria-live="polite"><h3>조회 조건을 입력하세요.</h3><p>학교 공식 개설 자료가 확인되지 않으면 임의로 개설 여부를 예측하지 않습니다.</p></div>
+    <div class="hanmo-actions" style="margin-top:16px"><button id="forecast-retry" class="hanmo-btn secondary" type="button">연결 다시 시도</button></div>
     <p style="margin-top:18px">실제 개설·시간표·분반 정보는 <a href="https://hufs.ac.kr/" target="_blank" rel="noopener noreferrer">학교 공식 페이지</a>에서 확인하세요.</p>
   </section>
 </div>

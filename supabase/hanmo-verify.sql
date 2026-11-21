@@ -15,6 +15,15 @@ WITH checks AS (
     AND NOT has_table_privilege('anon', 'public.hanmo_public_snapshots', 'INSERT')
     AND NOT has_table_privilege('anon', 'public.hanmo_public_snapshots', 'UPDATE')
     AND NOT has_table_privilege('anon', 'public.hanmo_public_snapshots', 'DELETE')
+  UNION ALL SELECT 'authenticated_select_only',
+    has_table_privilege('authenticated', 'public.hanmo_public_snapshots', 'SELECT')
+    AND NOT has_table_privilege('authenticated', 'public.hanmo_public_snapshots', 'INSERT')
+    AND NOT has_table_privilege('authenticated', 'public.hanmo_public_snapshots', 'UPDATE')
+    AND NOT has_table_privilege('authenticated', 'public.hanmo_public_snapshots', 'DELETE')
+  UNION ALL SELECT 'service_role_cannot_write_public_release',
+    NOT has_table_privilege('service_role', 'public.hanmo_public_snapshots', 'INSERT')
+    AND NOT has_table_privilege('service_role', 'public.hanmo_public_snapshots', 'UPDATE')
+    AND NOT has_table_privilege('service_role', 'public.hanmo_public_snapshots', 'DELETE')
   UNION ALL SELECT 'no_anon_private_tables',
     NOT EXISTS (
       SELECT 1 FROM pg_catalog.pg_tables
@@ -26,6 +35,10 @@ WITH checks AS (
       AND tablename='hanmo_public_snapshots' AND policyname='hanmo_approved_active_read')
   UNION ALL SELECT 'private_publish_not_executable_by_anon',
     NOT has_function_privilege('anon', 'hanmo_private.publish_snapshot(text,text)', 'EXECUTE')
+  UNION ALL SELECT 'private_publish_not_executable_by_authenticated',
+    NOT has_function_privilege('authenticated', 'hanmo_private.publish_snapshot(text,text)', 'EXECUTE')
+  UNION ALL SELECT 'private_publish_not_executable_by_service_role',
+    NOT has_function_privilege('service_role', 'hanmo_private.publish_snapshot(text,text)', 'EXECUTE')
 )
 SELECT name, CASE WHEN passed THEN 'PASS' ELSE 'FAIL' END AS status
 FROM checks ORDER BY name;

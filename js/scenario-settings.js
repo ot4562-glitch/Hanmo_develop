@@ -1,8 +1,8 @@
-/* In-page mock-registration incidents. Three independent switches, all OFF by default.
+/* In-page mock-registration incidents. Two independent switches, all OFF by default.
  * Never modifies the protected HUFS imitation pages or their controllers.
  */
 (function(root,factory){
-  const logic=typeof module==='object'&&module.exports?require('./incident-courses.js'):root.HanmoIncidentCourses;
+  const logic=typeof module==='object'&&module.exports?require('./incident-options.js'):root.HanmoIncidentOptions;
   const api=factory(logic);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else {root.HanmoScenarioSettings=api;if(root.document)api.mount(root.document,root);}
@@ -12,6 +12,7 @@
   const MODES=Object.freeze({1:'BASIC',2:'TIME',3:'SELECT'});
   const RESUME_KEY='hanmo.synthetic404.resume.v1';
   const RESUME_MS=5*60*1000;
+  const RESUME_VERSION=2; // Never restore retired candidate selections.
   const selected=logic.enabled;
   function mount(doc,host){
     const byId=id=>doc.getElementById(id);
@@ -21,18 +22,18 @@
     const noById=new Map(noOptions.map(input=>[input.getAttribute('data-scenario-off'),input]));
     if(!settings||!work||toggles.length!==PRESETS.length||
        noOptions.length!==PRESETS.length||noById.size!==PRESETS.length||
-       toggles.some(input=>!noById.has(input.getAttribute('data-scenario-toggle')))||
+       toggles.some(input=>!PRESETS.includes(input.getAttribute('data-scenario-toggle'))||
+         !noById.has(input.getAttribute('data-scenario-toggle')))||
        typeof host.goPractice!=='function'||typeof host.getSettingValue!=='function'||
        typeof host.openSettingPanel!=='function')return null;
     const controls={
-      feedback:byId('incident-feedback'),base:byId('incident-base'),
-      results:byId('incident-candidates'),search:byId('incident-search'),
-      status:byId('incident-status'),mode:byId('incident-mode'),
+      feedback:byId('incident-feedback'),mode:byId('incident-mode'),
       dialog:byId('incident-404'),exit:byId('incident-exit'),
       refresh:byId('incident-404-refresh'),back:byId('incident-404-back')
     };
+    if(Object.values(controls).some(x=>!x)||typeof host.validSetting!=='function')return null;
     const original=host.goPractice,save=host.getSettingValue,open=host.openSettingPanel;
-    let enabled=[],mode=null,base=[],searched=false,courseChosen=false;
+    let enabled=[],mode=null;
     let timer=null,historyPushed=false,showing404=false;
     const local=host.localStorage,session=host.sessionStorage;
     const clock=()=>typeof host.Date?.now==='function'?host.Date.now():Date.now();
@@ -59,33 +60,11 @@
     function saveResume(phase='ready'){
       if(!enabled.includes('RECONNECT')||!session)return;
       try{session.setItem(RESUME_KEY,JSON.stringify({
-        version:1,at:clock(),mode,enabled,base,searched,phase
+        version:RESUME_VERSION,at:clock(),mode,enabled,phase
       }));}catch(_error){/* Private browsing may block storage; buttons still work. */}
     }
     function clearResume(){
       try{session?.removeItem(RESUME_KEY);}catch(_error){}
-    }
-    function renderBase(){
-      for(const box of doc.querySelectorAll('[data-base-course]')){
-        const n=Number(box.getAttribute('data-base-course'));
-        box.checked=base.includes(n);
-      }
-    }
-    function drawCandidates(){
-      controls.results.hidden=!searched;
-      if(!searched)return;
-      for(const button of doc.querySelectorAll('[data-alt-course]')){
-        const n=Number(button.getAttribute('data-alt-course'));
-        button.disabled=false;
-        const conflict=base.includes(n);
-        button.setAttribute('aria-label','가상 대체과목 '+n+'번 신청');
-        button.setAttribute('data-conflict',conflict?'true':'false');
-      }
-      if(logic.noAlternative(base)){
-        controls.status.textContent='선택한 기본과목 1·2·3번과 모든 대체과목의 시간이 겹칩니다.';
-      }else{
-        controls.status.textContent='후보 1·2·3번에서 선택하세요. 기존 과목과 같은 번호만 시간표가 겹칩니다.';
-      }
     }
     function ensureModeValid(n){
       return Boolean(MODES[n]&&host.validSetting(Number(local?.getItem('psubjectValue')),
@@ -95,11 +74,9 @@
       work.hidden=false;
       work.removeAttribute('aria-hidden');
       controls.mode.textContent=MODES[mode]+' MODE · 가상 돌발상황';
-      renderBase();drawCandidates();
-      if(!searched){
-        say(enabled.includes('LAST_VALID')?'마지막 과목이 가상 정원 마감되었습니다. 검색을 눌러 대체과목을 확인하세요.':
-          '원래 담은 기본과목을 확인한 뒤 검색을 눌러 대체과목을 선택하세요.');
-      }
+      say(enabled.includes('LAST_VALID')
+        ?'마지막 과목이 가상 정원 마감으로 실패했습니다. 신청 상태를 확인하세요.'
+        :'가상 접속 단절 예시가 나타나면 새로고침 또는 뒤로가기를 선택하세요.');
       if(typeof work.focus==='function')work.focus();
       if(typeof work.scrollIntoView==='function')work.scrollIntoView({block:'start'});
     }
@@ -112,8 +89,8 @@
       controls.dialog.hidden=true;
       clearTimer();
       saveResume('ready');
-      say('404 예시화면을 '+reason+'으로 닫았습니다. 이어서 대체과목을 검색하거나 신청할 수 있습니다.','success');
-      if(typeof controls.search?.focus==='function')controls.search.focus();
+      say('404 예시화면을 '+reason+'으로 닫았습니다. 신청 결과는 확정되지 않았으니 상태를 확인하세요.','success');
+      if(typeof controls.exit?.focus==='function')controls.exit.focus();
     }
     function show404(){
       timer=null;
@@ -132,7 +109,7 @@
     function resetPractice(){
       clearTimer();showing404=false;historyPushed=false;
       controls.dialog.hidden=true;work.hidden=true;work.setAttribute('aria-hidden','true');
-      controls.results.hidden=true;mode=null;base=[];searched=false;courseChosen=false;
+      mode=null;
       clearResume();
       const tile=doc.querySelector('.setting');
       if(typeof tile?.focus==='function')tile.focus();
@@ -141,8 +118,7 @@
       const active=logic.enabled(enabled);
       if(!active.length)return original(n); // OFF: the untouched legacy route.
       if(!ensureModeValid(n))return original(n);
-      mode=n;base=options.base?logic.selection(options.base):logic.initialCourses(active);
-      searched=Boolean(options.searched);courseChosen=false;
+      mode=n;
       local.setItem('practiceSetter',n);
       drawPractice();
       if(active.includes('RECONNECT')&&!options.resume){
@@ -177,28 +153,6 @@
         refresh();
       });
     }
-    for(const input of doc.querySelectorAll('[data-base-course]')){
-      input.addEventListener('change',()=>{
-        base=logic.selection(Array.from(doc.querySelectorAll('[data-base-course]'))
-          .filter(x=>x.checked).map(x=>Number(x.getAttribute('data-base-course'))));
-        searched=false;controls.results.hidden=true;
-        say('기본과목 구성을 변경했습니다. 대체과목을 다시 검색하세요.');
-        saveResume();
-      });
-    }
-    controls.search.addEventListener('click',()=>{
-      searched=true;drawCandidates();saveResume();
-    });
-    for(const button of doc.querySelectorAll('[data-alt-course]')){
-      button.addEventListener('click',()=>{
-        if(!searched||showing404)return;
-        const n=Number(button.getAttribute('data-alt-course'));
-        const result=logic.choose(base,n);
-        say(result.message,result.ok?'success':'error');
-        if(result.ok){base=logic.selection([...base,n]);courseChosen=true;renderBase();}
-        drawCandidates();saveResume();
-      });
-    }
     controls.exit.addEventListener('click',resetPractice);
     controls.refresh.addEventListener('click',()=>{
       if(!showing404)return;
@@ -221,15 +175,21 @@
       let entry;
       try{entry=JSON.parse(session.getItem(RESUME_KEY)||'null');}catch(_error){clearResume();return false;}
       const nav=host.performance?.getEntriesByType?.('navigation')?.[0]?.type;
-      if(!entry||entry.version!==1||nav!=='reload'||clock()-entry.at>RESUME_MS||
-        !Array.isArray(entry.enabled)||!ensureModeValid(entry.mode)||
-        !entry.enabled.includes('RECONNECT')){clearResume();return false;}
+      const age=clock()-entry?.at;
+      if(!entry||entry.version!==RESUME_VERSION||nav!=='reload'||
+        !Number.isFinite(age)||age<0||age>RESUME_MS||
+        !Array.isArray(entry.enabled)||entry.enabled.length===0||
+        selected(entry.enabled).length!==entry.enabled.length||
+        new Set(entry.enabled).size!==entry.enabled.length||
+        !ensureModeValid(entry.mode)||!entry.enabled.includes('RECONNECT')){
+        clearResume();return false;
+      }
       enabled=selected(entry.enabled);
       for(const toggle of toggles)toggle.checked=enabled.includes(toggle.getAttribute('data-scenario-toggle'));
       refresh();summary();
-      run(entry.mode,{resume:true,base:entry.base,searched:entry.searched});
+      run(entry.mode,{resume:true});
       controls.dialog.hidden=true;showing404=false;
-      say('404 예시화면에서 새로고침 후 연습을 이어갑니다.','success');
+      say('404 예시화면에서 새로고침 후 가상 연습으로 돌아왔습니다. 신청 상태를 확인하세요.','success');
       saveResume('ready');
       return true;
     }
@@ -237,7 +197,7 @@
     restoreReload();
     if(host.location?.hash==='#scenario-settings')host.openSettingPanel();
     return Object.freeze({getEnabled:()=>[...enabled],run,close:resetPractice,
-      getBase:()=>[...base],getMode:()=>mode,is404:()=>showing404,trigger404:show404});
+      getMode:()=>mode,is404:()=>showing404,trigger404:show404});
   }
   return Object.freeze({PRESETS,MODES,selected,mount});
 });
