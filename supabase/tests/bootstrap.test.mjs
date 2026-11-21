@@ -5,6 +5,15 @@ import { readFileSync } from 'node:fs';
 const setup = readFileSync(new URL('../hanmo-setup.sql', import.meta.url), 'utf8');
 const verify = readFileSync(new URL('../hanmo-verify.sql', import.meta.url), 'utf8');
 
+test('PL/pgSQL function bodies use matched dollar-quote delimiters', () => {
+  const functionCount = (setup.match(/CREATE FUNCTION hanmo_private\./g) || []).length;
+  const openingCount = (setup.match(/SECURITY INVOKER SET search_path = pg_catalog AS \$\$/g) || []).length;
+  const closingCount = (setup.match(/END \$\$;/g) || []).length;
+  assert.equal(openingCount, functionCount);
+  // 마지막 DO 블록에도 별도의 종료 구분자가 하나 존재합니다.
+  assert.equal(closingCount, functionCount + 1);
+});
+
 test('single SQL transaction with empty initial data', () => {
   assert.match(setup, /^BEGIN;\s/m);
   assert.match(setup, /\bCOMMIT;\s*$/);
