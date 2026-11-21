@@ -8,7 +8,7 @@ const verify = readFileSync(new URL('../hanmo-verify.sql', import.meta.url), 'ut
 test('single SQL transaction with empty initial data', () => {
   assert.match(setup, /^BEGIN;\s/m);
   assert.match(setup, /\bCOMMIT;\s*$/);
-  // Administrative publish functions contain INSERT; the installer itself has no top-level seed SQL.
+  // 관리용 발행 함수의 INSERT와 달리 초기 설치 SQL에는 최상위 시드 INSERT가 없어야 합니다.
   assert.doesNotMatch(setup, /^INSERT\s+INTO\b/im);
   assert.doesNotMatch(setup, /\bCOPY\s+.+\s+FROM\b/i);
 });
@@ -36,6 +36,12 @@ test('release requires source rights and independent human review records', () =
   assert.match(setup, /CREATE TRIGGER hanmo_source_rights_gate/);
   assert.match(setup, /AFTER UPDATE OF rights_status, rights_checked_at ON hanmo_private\.data_sources/);
   assert.match(setup, /NEW\.rights_status <> 'ALLOWED' OR NEW\.rights_checked_at IS NULL/);
+});
+
+test('revocation is serialized with publication and invalid IDs are rejected', () => {
+  assert.match(setup, /CREATE FUNCTION hanmo_private\.revoke_snapshot\([\s\S]*?PERFORM pg_catalog\.pg_advisory_xact_lock\(24031101\)/);
+  assert.match(setup, /UPDATE hanmo_private\.data_snapshots SET review_state = 'REVOKED'[\s\S]*?IF NOT FOUND THEN[\s\S]*?RAISE EXCEPTION 'Unknown snapshot'/);
+  assert.match(setup, /CREATE FUNCTION hanmo_private\.on_rights_change\(\)[\s\S]*?PERFORM pg_catalog\.pg_advisory_xact_lock\(24031101\)/);
 });
 
 test('verify query checks read privileges, RLS and anonymous visibility', () => {
