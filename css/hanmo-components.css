@@ -1,0 +1,102 @@
+/* Shared original Hanmo visual language. Scoped to new pages + top navigation; never restyle original school-form internals. */
+.hanmo-ui{font-family:var(--hm-font);color:var(--hm-white);min-height:100vh}
+.hanmo-ui *{box-sizing:border-box}
+.hanmo-ui a{color:#e4f0f9;text-underline-offset:3px}
+.hanmo-ui button,.hanmo-ui input,.hanmo-ui select{font:inherit}
+.hanmo-ui a:focus-visible,.hanmo-ui button:focus-visible,.hanmo-ui input:focus-visible,.hanmo-ui select:focus-visible,
+.hanmo-topbar a:focus-visible{outline:3px solid var(--hm-focus);outline-offset:3px}
+.hanmo-skip{position:absolute;top:-100px;left:12px;padding:10px 14px;background:#fff;color:#00111c!important;z-index:100}
+.hanmo-skip:focus{top:12px}
+.hanmo-topbar{box-sizing:border-box;position:relative;top:auto;z-index:10;min-height:66px;background:#00111bee;
+  border-bottom:1px solid #234356;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  width:100%;padding:13px max(24px,calc((100% - 1220px)/2));font-family:var(--hm-font);color:var(--hm-white)}
+.hanmo-topbar .hanmo-brand{display:inline-flex;align-items:center;flex-shrink:0;gap:9px;color:#f6f6f7!important;
+  font-size:20px;font-weight:800;text-decoration:none}
+.hanmo-topbar .hanmo-brand img{object-fit:contain;height:24px;width:29px}
+.hanmo-topbar .hanmo-brand span{color:#b8c6d0;font-size:12px;font-weight:400}
+.hanmo-topbar nav,.hanmo-topbar .hanmo-nav-inline{display:flex;gap:4px 9px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.hanmo-topbar nav a,.hanmo-topbar .hanmo-nav-inline a{color:#ebeff2!important;font-weight:600;text-decoration:none;
+  padding:7px 8px;border-radius:7px;font-size:13px;white-space:nowrap}
+.hanmo-topbar nav a[aria-current="page"],.hanmo-topbar .hanmo-nav-inline a[aria-current="page"],
+.hanmo-topbar nav a:hover,.hanmo-topbar .hanmo-nav-inline a:hover{background:#17384d;color:var(--hm-gold)!important}
+.hanmo-schoolmark{text-align:center;margin:12px 0 32px;color:var(--hm-white)}
+.hanmo-schoolmark h2{font-size:30px;line-height:1.35;letter-spacing:-.025em;margin:0 0 5px;font-weight:700}
+.hanmo-markline{display:flex;align-items:center;justify-content:center;gap:16px;max-width:560px;margin:auto}
+.hanmo-markline span{height:1px;flex:1;background:#bdbdbd}
+.hanmo-markline img{width:27px;height:15px;object-fit:contain}
+.hanmo-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--hm-gap)}
+.hanmo-card-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.hanmo-card,.hanmo-item{background:var(--hm-panel);border:1px solid var(--hm-border);border-radius:var(--hm-radius);padding:25px;min-width:0}
+a.hanmo-card{display:flex;flex-direction:column;gap:12px;text-decoration:none;min-height:190px;
+  color:var(--hm-white)!important;transition:background .15s,border-color .15s,transform .15s}
+a.hanmo-card:hover{background:#112c3d;border-color:#72a7c5;transform:translateY(-2px)}
+.hanmo-card h2,.hanmo-card h3,.hanmo-item h3{font-weight:700;margin:0;color:var(--hm-white);font-size:20px;line-height:1.45}
+.hanmo-card p,.hanmo-item p{color:var(--hm-muted);margin:0;font-size:14px;line-height:1.8}
+.hanmo-card .more{color:var(--hm-gold);margin-top:auto;font-size:13px;font-weight:800}
+.hanmo-tag{display:inline-flex;align-self:flex-start;background:#173f5b;color:#c2e7f5;padding:5px 9px;font-size:12px;
+  border-radius:7px;font-weight:750}
+.hanmo-tag.wait{background:#463924;color:#ffe3ae}
+.hanmo-note{padding:15px 20px;background:#201e1a;border:1px solid #5d4d35;border-left:4px solid var(--hm-gold);
+  border-radius:9px;color:#f4dcad;font-size:13px;line-height:1.8;margin:20px 0}
+.hanmo-note a{color:#ffdc9b!important}
+.hanmo-note strong{margin-right:7px}
+.hanmo-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.hanmo-form{display:grid;gap:18px}
+.hanmo-field{display:grid;gap:7px;font-size:14px;font-weight:650;color:var(--hm-white)}
+.hanmo-field input,.hanmo-field select{box-sizing:border-box;width:100%;min-height:46px;padding:9px 13px;
+  border-radius:9px;background:#132a3a;border:1px solid #648199;color:var(--hm-white)}
+.hanmo-field input::placeholder{color:#9cb0c0}
+.hanmo-field select option{background:#15293a;color:white}
+.hanmo-field small{color:var(--hm-muted);font-size:12px;font-weight:400}
+.hanmo-actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:6px}
+.hanmo-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 19px;
+  background:var(--hm-gold);border:1px solid transparent;border-radius:11px;color:#0b1720!important;
+  font-size:14px;font-weight:800;text-decoration:none!important;cursor:pointer}
+.hanmo-btn:hover{background:#fdd786}
+.hanmo-btn.secondary{background:#0d2637;border-color:#607e94;color:var(--hm-white)!important}
+.hanmo-btn.secondary:hover{background:#22455a}
+.hanmo-btn:disabled{opacity:.55;cursor:not-allowed}
+.hanmo-result{background:#0b2436;border:1px solid #41647e;padding:20px;border-radius:12px;min-height:100px;margin-top:18px}
+.hanmo-result h3{margin:0 0 9px;font-size:18px;color:var(--hm-white)}
+.hanmo-result p{color:var(--hm-muted);font-size:14px;line-height:1.7;margin:7px 0}
+.hanmo-empty{padding:26px;border:1px dashed #49687b;background:#0b1c29;border-radius:12px;text-align:center;
+  color:var(--hm-muted);font-size:14px}
+.hanmo-list{display:grid;gap:15px;list-style:none;margin:0;padding:0}
+.hanmo-item h3{margin:7px 0 9px;font-size:17px}
+.hanmo-item p{margin:7px 0;color:var(--hm-muted)}
+.hanmo-item a{font-size:13px;font-weight:750;color:var(--hm-gold)!important}
+.hanmo-status{min-height:24px;font-size:13px;color:#cadde8;line-height:1.7}
+.hanmo-filter{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:18px 0}
+.hanmo-filter .hanmo-field{flex:1 1 200px}
+.hanmo-metric{padding:18px;border:1px solid #43647a;background:#0e2d40;border-radius:12px}
+.hanmo-metric strong{display:block;font-size:26px;color:#ffda8d}
+.hanmo-progress-track{height:12px;background:#274355;border-radius:99px;margin:15px 0 5px;overflow:hidden}
+.hanmo-progress-fill{height:100%;width:0;background:var(--hm-gold);transition:width .15s}
+.hanmo-footer{font-size:12px;color:var(--hm-muted);border-top:1px solid #214254;text-align:center;padding:24px}
+.hanmo-practice-links{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px;margin:0 0 22px}
+.hanmo-practice-links a{background:#0b2332;color:#f3f3f3!important;border:1px solid #54758b;
+  border-radius:10px;padding:11px 16px;text-decoration:none;font-size:13px;font-weight:700}
+.hanmo-practice-links a:hover{background:#20455b}
+@media(max-width:1250px){.hanmo-topbar{flex-direction:column;align-items:center}.hanmo-topbar nav,.hanmo-topbar .hanmo-nav-inline{justify-content:center}}
+@media(max-width:830px){.hanmo-card-grid,.hanmo-card-grid.two,.hanmo-fields{grid-template-columns:1fr}.hanmo-topbar{padding:12px}}
+@media(prefers-reduced-motion:reduce){a.hanmo-card,.hanmo-progress-fill{transition:none}}
+
+
+/* One profile-driven top navigation: branding on the left, editable information on the right. */
+.hanmo-topbar{flex-wrap:wrap;column-gap:24px;row-gap:5px}
+.hanmo-topbar nav,.hanmo-topbar .hanmo-nav-inline{flex:1 1 780px;min-width:0;gap:5px 10px;justify-content:flex-end;flex-wrap:wrap}
+.hanmo-topbar nav a,.hanmo-topbar .hanmo-nav-inline a{border-radius:0}
+.hanmo-topbar .hanmo-profile-summary{display:inline-block;max-width:min(510px,100%);
+  border-left:1px solid #45647a;padding:6px 3px 6px 13px;margin-left:7px;
+  color:#d2e3ee;font-size:12px;line-height:1.65;font-weight:550;
+  white-space:normal;overflow-wrap:anywhere;text-align:right}
+.hanmo-topbar .hanmo-me-link{flex-shrink:0;border-bottom:2px solid #f4c76c;font-weight:800!important}
+.hanmo-topbar .hanmo-me-link[aria-current="page"]{color:#f4c76c!important}
+@media(max-width:1250px){
+  .hanmo-topbar{flex-direction:row;align-items:center;justify-content:space-between}
+  .hanmo-topbar nav,.hanmo-topbar .hanmo-nav-inline{justify-content:flex-end}
+}
+@media(max-width:950px){
+  .hanmo-topbar nav,.hanmo-topbar .hanmo-nav-inline{flex-basis:100%;justify-content:flex-end}
+  .hanmo-topbar .hanmo-profile-summary{max-width:100%}
+}

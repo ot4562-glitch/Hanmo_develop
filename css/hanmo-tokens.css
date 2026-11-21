@@ -1,0 +1,9 @@
+/* Hanmo original-site inspired token palette: compare /img/background.svg, layout.css, index.css and vsugang.css. */
+:root{
+  --hm-night:#000e18;--hm-backdrop:#00131f;--hm-panel:#06111c;--hm-panel-soft:#0b2232;
+  --hm-card:#102a3e;--hm-highlight:#183b52;--hm-border:#32536b;--hm-border-strong:#467c96;
+  --hm-white:#f2f5f8;--hm-muted:#b8c9d5;--hm-muted-low:#94aabd;
+  --hm-gold:#f4c76c;--hm-gold-dim:#be955c;--hm-warn:#f0c890;--hm-ink:#00131f;
+  --hm-radius:15px;--hm-radius-sm:10px;--hm-gap:16px;--hm-focus:#f4c76c;
+  --hm-font:"Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+}

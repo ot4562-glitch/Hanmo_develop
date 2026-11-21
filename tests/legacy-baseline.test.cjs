@@ -303,101 +303,89 @@ test('each actual HTML page loads classic scripts in order without global collis
   for(const page of pages){
     const html=fs.readFileSync(path.join(ROOT,page),'utf8');
     const scripts=[...html.matchAll(/<script\s+src=['"](?:\.\/|\.\.\/)js\/([^'"]+\.js)['"]/g)]
-      .map(match=>match[1]).filter(file=>file!=='pc-only.js');
-    assert.equal(scripts.length,page==='index.html'?2:3,page+' script count');
+      .map(match=>match[1]).filter(file=>file!=='pc-only.js'&&file!=='student-profile-bar.js'&&file!=='home-fit.js'&&file!=='vsugang-fit.js');
+    // The registration menu may load isolated, opt-in synthetic controllers;
+    // the three original classic scripts and their order must remain unchanged.
+    const originalScripts=page==='html/vsugang.html'?scripts.slice(0,3):scripts;
+    // Restore the original notice/device/semester behavior alongside the shared top navigation.
+    assert.equal(originalScripts.length,page==='index.html'?2:3,page+' original script count');
+    if(page==='html/vsugang.html')assert.deepEqual(scripts.slice(3),[
+      'incident-options.js','scenario-settings.js',
+    ],'isolated synthetic scripts must load only after original settings/gnb/hanmoSys');
     const h=createHarness({deviceInfo:'true',practiceSetter:1,psubjectValue:2,
       subjectValue:2,waitingValue:'no',TIMEtime:'1',SELECTtime:'1',SELECTWaitTime:'0'});
     h.now('2026-11-19T10:11:00+09:00');
-    for(const script of scripts){
+    for(const script of originalScripts){
       assert.doesNotThrow(()=>h.load(script),page+' loading '+script);
     }
     assert.equal(h.location.href,'/',page+' must not navigate to external site');
   }
 });
 
+
 /**
- * #71 deterministic OFF parity baseline. This proves only the VM-observed classic
- * script contracts. A Windows Chrome/Edge focus, keyboard, timer and real DOM
- * baseline is an additional, still-required gate before attaching ON hooks.
+ * #71: Test the CURRENT registration-menu incident overlay, not the retired
+ * scenario-engine. The two options are OFF unless the student opts in.
+ * This is Node VM parity only, not a physical SELECT/Enter keyboard test.
  */
-test('scenario OFF overlay preserves BASIC/TIME/SELECT observed legacy contracts',()=>{
-  const config={
-    schemaVersion:1,scenarioId:'RECONNECT_RECOVERY',mode:'SELECT',
-    seed:19,enabled:false,virtualClockStart:'2026-11-19T10:00:00+09:00',
-    syntheticCourseIds:['SYN-BASELINE'],alternatives:[],
-  };
-  function addDisabledOverlay(h){
-    h.load('scenario-engine.js');
-    const off=h.expr('HanmoScenario.createScenario('+JSON.stringify(config)+')');
-    assert.equal(off.state,'OFF');
-    assert.equal(off.actions.length,0);
-    assert.strictEqual(h.expr('HanmoScenario.dispatch(HanmoScenario.createScenario('
-      +JSON.stringify(config)+'), {type:"SUBMIT"}).state'), 'OFF');
+test('current incident options OFF preserve all BASIC/TIME/SELECT menu routes and storage',()=>{
+  const kinds=['LAST_VALID','RECONNECT'];
+  const page=fs.readFileSync(path.join(ROOT,'html/vsugang.html'),'utf8');
+  for(const kind of kinds){
+    assert.match(page,new RegExp('data-scenario-toggle="'+kind+'"'));
+    assert.match(page,new RegExp('data-scenario-off="'+kind+'"'));
   }
-  function observed(mode,overlay){
-    const seed={practiceSetter:mode,psubjectValue:3,subjectValue:3,
-      waitingValue:'no',TIMEtime:'0',SELECTtime:'0',SELECTWaitTime:'0'};
-    const practice=createHarness(seed);
-    if(overlay)addDisabledOverlay(practice);
-    practice.load('practice.js');
-    const initialTimer=practice.get('timer').innerHTML;
-    if(mode!==3){
-      practice.context.window.onload();
-      practice.get('sugang').onclick(); // before gate: do not navigate
-      practice.events.timeouts[0].fn();
-      practice.now('2026-11-19T10:00:03+09:00');
-      practice.get('sugang').onclick();
+  for(const file of ['practice.html','selectZone.html','result.html']){
+    const html=fs.readFileSync(path.join(ROOT,'html',file),'utf8');
+    assert.doesNotMatch(html,/src=["'][^"']*(?:incident-options|scenario-settings)\.js/);
+  }
+
+  function observed(mode,withMenuOverlay){
+    const h=createHarness({psubjectValue:3,subjectValue:2,waitingValue:'no'});
+    h.get('psugangVal').value='3';
+    h.get('vsugangVal').value='2';
+    h.load('vsugang.js');
+
+    if(withMenuOverlay){
+      const ids=new Map();
+      for(const id of ['scenario-settings','incident-practice','incident-feedback',
+        'incident-mode','incident-404','incident-exit','incident-404-refresh',
+        'incident-404-back'])ids.set(id,element());
+      ids.get('incident-practice').hidden=true;
+      ids.get('incident-404').hidden=true;
+      const radio=(attribute,value,checked)=>{
+        const input=element('input');
+        input.checked=checked;
+        input.getAttribute=name=>name===attribute?value:null;
+        return input;
+      };
+      const yes=kinds.map(kind=>radio('data-scenario-toggle',kind,false));
+      const no=kinds.map(kind=>radio('data-scenario-off',kind,true));
+      h.doc.getElementById=id=>ids.get(id)??null;
+      h.doc.querySelectorAll=selector=>selector==='[data-scenario-toggle]'?yes:
+        selector==='[data-scenario-off]'?no:[];
+      h.load('incident-options.js');
+      h.load('scenario-settings.js');
+      assert.deepEqual(JSON.parse(h.expr('JSON.stringify(HanmoIncidentOptions.OPTIONS)')),kinds);
+      assert.deepEqual(JSON.parse(h.expr('JSON.stringify(HanmoScenarioSettings.selected([]))')),[]);
+      assert.ok(no.every(input=>input.checked));
+      assert.ok(yes.every(input=>!input.checked));
+      assert.equal(ids.get('incident-practice').hidden,true);
     }
-    const practiceSnapshot={
-      mode:practice.get('practiceMode').innerText,initialTimer,
-      alerts:[...practice.events.alert],
-      navigations:[...practice.events.navigations],
-      intervals:practice.events.intervals.map(x=>x.delay),
-      timeouts:practice.events.timeouts.map(x=>x.delay),
-      storage:Object.fromEntries([...practice.map].sort(([a],[b])=>a.localeCompare(b))),
-    };
 
-    const selecting=createHarness(seed);
-    if(overlay)addDisabledOverlay(selecting);
-    selecting.load('selectZone.js');
-    selecting.expr('registerClick(1)');
-    selecting.expr('registerClick(1)'); // duplicate: must still alert and not count
-    selecting.expr('registerClick(2)');
-    selecting.expr('deleteDone(1)'); // restore for a separate selection
-    selecting.expr('registerClick(3)');
-    const selectSnapshot={
-      mode:selecting.get('practiceMode').innerText,
-      count:selecting.expr('count'),
-      registeredRows:selecting.get('done').children.map(row=>({
-        id:row.attributes.id,
-        label:row.children[5].textContent,
-        onclick:row.children[1].firstElementChild.attributes.onClick,
-      })),
-      selected:JSON.parse(selecting.expr('JSON.stringify(rc)')),
-      alerts:[...selecting.events.alert],
-      confirmations:[...selecting.events.confirm],
-      navigations:[...selecting.events.navigations],
-      storage:Object.fromEntries([...selecting.map].sort(([a],[b])=>a.localeCompare(b))),
+    h.expr('goPractice('+mode+')');
+    return {
+      route:h.location.href,
+      settings:[...h.map].sort(([a],[b])=>a.localeCompare(b)),
+      alerts:[...h.events.alert],
     };
-
-    const result=createHarness({...seed,
-      TIMEtime:'3.25',SELECTtime:'15.5',SELECTWaitTime:'2.5'});
-    if(overlay)addDisabledOverlay(result);
-    result.load('result.js');
-    const report={
-      summary:result.get('result').innerHTML,
-      detail:result.get('time').innerHTML,
-      storage:Object.fromEntries([...result.map].sort(([a],[b])=>a.localeCompare(b))),
-    };
-    return {practice:practiceSnapshot,select:selectSnapshot,report};
   }
   for(const mode of [1,2,3]){
     const original=observed(mode,false);
-    const withOffScenario=observed(mode,true);
-    assert.deepEqual(withOffScenario,original,'OFF parity mode '+mode);
-    assert.equal(original.select.count,2);
-    assert.equal(original.select.registeredRows.length,2);
-    assert.equal(original.select.selected.filter(Boolean).length,2);
-    assert.ok(Object.keys(original.practice.storage).every(k=>!k.startsWith('hanmo.practice.scenario.')));
+    const disabled=observed(mode,true);
+    assert.deepEqual(disabled,original,'OFF parity in mode '+mode);
+    assert.equal(original.route,'practice.html');
+    assert.ok(original.settings.some(([name,value])=>name==='practiceSetter'&&value===String(mode)));
+    assert.equal(original.alerts.length,0);
   }
 });

@@ -15,15 +15,20 @@
 		<meta charset='UTF-8'>
 		<meta name="description" content="한국외대 재학생을 위한 모의수강신청 사이트">
 		<meta name="keyword" content="한모, 한국외국어대학교 모의수강신청, HUFS, HUFS수강연습, 외대수강연습, HUFS연습, 외대연습, 수강연습, 한국외대, 한국외대 수강신청, 한국외대 수강신청 연습, 수강신청 연습, 한국외국어대학교, 외대, 외대 수강신청, 외대 수강신청 연습, 수강신청, 수강신청 모의연습, 한국외대 수강신청 모의연습, 한국외대 수강신청 연습, 외대 수강신청 모의연습, sugangpractice, vsugangpractice, 한국외국어대학교 수강신청 모의연습">
-        <meta name="viewpo rt" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
 		<link href="../img/hanmo_color.png" rel="shortcut icon" type="image/x-icon">
 		<link href="../css/gnb.css" rel="stylesheet" type="text/css">
 		<link href="../css/vsugang.css" rel="stylesheet" type="text/css">
 		<link href="../css/layout.css" rel="stylesheet" type="text/css">
 		<link href="../css/normalize.css" rel="stylesheet" type="text/css">
 		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
-	</head>
-    <body>
+	  <link rel="stylesheet" href="../css/student-ui.css">
+  <link rel="stylesheet" href="../css/scenario-settings.css">
+  <link rel="stylesheet" href="../css/vsugang-fit.css">
+  <script src="../js/student-profile-bar.js" defer></script>
+  <script src="../js/vsugang-fit.js" defer></script>
+</head>
+    <body class="hanmo-vsugang">
 		<script>
             (function(){var w=window;if(w.ChannelIO){return w.console.error("ChannelIO script included twice.");}var ch=function(){ch.c(arguments);};ch.q=[];ch.c=function(args){ch.q.push(args);};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return;}w.ChannelIOInitialized=true;var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var x=document.getElementsByTagName("script")[0];if(x.parentNode){x.parentNode.insertBefore(s,x);}}if(document.readyState==="complete"){l();}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l);}})();
         
@@ -47,6 +52,17 @@
 				</ul>
 			</section>
 		</header>
+<nav class="hanmo-topbar" aria-label="전체 기능 바로가기">
+  <a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모 <span>HUFS 학업 도우미</span></a>
+  <div class="hanmo-nav-inline">
+    <a href="./academic-timeline.html">학사 공지</a>
+    <a href="./forecast.html">강의 전망</a>
+    <a href="./catalog.html">강의 검색</a>
+    <a href="./academic-progress.html">학점 정리</a>
+    <span class="hanmo-profile-summary" data-profile-summary role="status" aria-live="polite" aria-label="브라우저에 저장한 내정보, 학교 로그인 아님">내정보 미설정</span>
+    <a class="hanmo-me-link" href="./planner.html">내정보</a>
+  </div>
+</nav>
 		<main>
 			<section class='settingSection'>
 				<div class='settingPanel'>
@@ -69,13 +85,29 @@
 							</fieldset>
 						</li>
 					</ul>
-					<div class='settingButton' onclick='getSettingValue()'>
+<fieldset id="scenario-settings" class="hanmo-incident-options" aria-describedby="scenario-settings-note">
+  <legend>돌발상황 연습 (기본값: 아니오)</legend>
+  <p id="scenario-settings-note">기존 접속 대기 시간 설정과 같은 예/아니오 방식입니다. 원하는 상황만 예로 설정한 뒤 확인을 누르세요.</p>
+  <fieldset class="hanmo-incident-choice">
+    <legend>마지막 과목 신청 실패</legend>
+    <label><input type="radio" name="incident-LAST_VALID" value="yes" data-scenario-toggle="LAST_VALID"><span>예</span></label>
+    <label><input type="radio" name="incident-LAST_VALID" value="no" data-scenario-off="LAST_VALID" checked><span>아니오</span></label>
+    <small>마지막 과목 가상 실패 후 신청 상태 확인</small>
+  </fieldset>
+  <fieldset class="hanmo-incident-choice">
+    <legend>가상 404·접속 끊김</legend>
+    <label><input type="radio" name="incident-RECONNECT" value="yes" data-scenario-toggle="RECONNECT"><span>예</span></label>
+    <label><input type="radio" name="incident-RECONNECT" value="no" data-scenario-off="RECONNECT" checked><span>아니오</span></label>
+    <small>시작 후 0~6초 사이 404 예시 화면 표시</small>
+  </fieldset>
+</fieldset>
+					<button type='button' class='settingButton' onclick='getSettingValue()'>
 						확인
-					</div>
+					</button>
 				</div>
 			</section>
 			<section class='f-dirt-down'>
-				<section class='titleContainer' onclick='location.href="/"'>
+				<section class='titleContainer' onclick='location.href='../index.html''>
 					<h1><span class='title'></span> 한국외국어대학교 모의수강신청</h1>
 					<div class='hanmo'>
 						<hr>
@@ -109,7 +141,7 @@
 								수강신청할 과목을 신속하게 담을 수 있도록 연습할 수 있어요.
 							</p>
 						</div>
-						<div class='setting' style='grid-area: set;' onclick='openSettingPanel()'>
+						<div class='setting' style='grid-area: set;' onclick='openSettingPanel()' onkeydown='if(event.key === "Enter" || event.key === " "){event.preventDefault();openSettingPanel();}' role='button' tabindex='0' aria-label='모의신청 설정 열기'>
 							<h2>
 								SETTING
 							</h2>
@@ -118,6 +150,21 @@
 					</div>
 				</section>
 			</section>
+<section id="incident-practice" class="hanmo-incident-practice" aria-label="가상 돌발상황 모의수강신청" tabindex="-1" hidden>
+  <div class="hanmo-incident-heading">
+    <div><p class="hanmo-incident-kicker">한국외국어대학교 모의수강신청 · 가상 연습</p>
+    <h2 id="incident-mode">SELECT MODE · 가상 돌발상황</h2></div>
+    <button id="incident-exit" type="button">모드 선택으로 돌아가기</button>
+  </div>
+  <p class="hanmo-incident-warning">가상 신청 실패·404 연습입니다. 실제 대학 강좌 정보·신청 결과와 연결되지 않습니다.</p>
+  <p id="incident-feedback" class="hanmo-incident-feedback" role="status" aria-live="polite">연습을 시작하세요.</p>
+  <section id="incident-404" class="hanmo-example-404" role="alertdialog" aria-modal="true" aria-labelledby="incident-404-title" aria-describedby="incident-404-desc" hidden>
+    <h2 id="incident-404-title">404 예시화면 입니다</h2>
+    <p id="incident-404-desc">이 화면은 가상 예시이며 실제 인터넷 연결을 끊지 않습니다. 새로고침 또는 뒤로가기를 선택하면 지금까지의 모의신청을 이어서 진행합니다.</p>
+    <div><button id="incident-404-refresh" type="button">새로고침</button>
+      <button id="incident-404-back" type="button">뒤로가기</button></div>
+  </section>
+</section>
 			<section class='f-dirt-up'>
 				<section class='adfit'>
 					<ins class="kakao_ad_area" style="display:none;" data-ad-unit = "DAN-b3RfXepcKF3cMeyf" data-ad-width = "728" data-ad-height = "90"></ins>
@@ -128,6 +175,8 @@
 		<script src="../js/vsugang.js"></script>
 		<script src="../js/gnb.js"></script>
 		<script src='../js/hanmoSys.js'></script>
+<script src="../js/incident-options.js"></script>
+<script src="../js/scenario-settings.js"></script>
     </body>
 
 </html>

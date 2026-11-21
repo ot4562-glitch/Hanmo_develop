@@ -1,0 +1,49 @@
+/* Settings extension only. No rules affect practice.html or selectZone.html. */
+.settingSection{position:fixed!important;inset:0;height:100dvh!important;overflow-y:auto;z-index:90;
+  background:rgba(0,10,18,.87)!important;padding:20px}
+.settingPanel{box-sizing:border-box;width:min(720px,100%)!important;height:auto!important;
+  max-height:calc(100dvh - 40px);overflow-y:auto;align-items:stretch!important;justify-content:flex-start!important;
+  padding:25px 30px;border:1px solid #567084}
+.settingPanel>ul{list-style:none;padding:0;margin:0}
+.settingPanel>ul li{margin-bottom:12px}
+.settingPanel .textbox{height:37px;color:#f2f5f8;background:#0f2535;border:1px solid #66849c;border-radius:7px;padding:5px 10px}
+.settingPanel .settingButton{align-self:flex-end;margin-top:20px;min-height:44px;border:0;flex:none}
+/* Reuse the simple native yes/no radio presentation of the legacy waiting-time setting. */
+.hanmo-incident-options{border:0;padding:0;margin:6px 0 0;min-width:0}
+.hanmo-incident-options>legend{font-size:15px;font-weight:700;color:#fff;padding:0;margin-bottom:7px}
+.hanmo-incident-options>p{margin:0 0 12px;color:#c6d6e0;font-size:12px;line-height:1.6}
+.hanmo-incident-choice{min-width:0;border:1px solid #506b7b;padding:9px 12px 8px;margin:0 0 11px}
+.hanmo-incident-choice legend{font-size:14px;font-weight:600;color:#fff;padding:0 5px}
+.hanmo-incident-choice label{display:inline-flex;align-items:center;gap:7px;margin-right:22px;min-height:32px;
+  color:#f2f5f8;font-size:14px;cursor:pointer}
+.hanmo-incident-choice input{width:16px;height:16px;accent-color:#b9b9b9}
+.hanmo-incident-choice input:focus-visible{outline:3px solid #ffcf76;outline-offset:2px}
+.hanmo-incident-choice small{display:block;margin:5px 0 0;color:#bacad5;font-size:11px;line-height:1.6}
+
+/* Synthetic drill stays inside vsugang.html and never affects practice/selectZone. */
+#incident-practice[hidden],#incident-practice [hidden]{display:none!important}
+#incident-practice{box-sizing:border-box;width:min(1050px,calc(100% - 36px));margin:32px auto 65px;
+ background:#071b29;border:1px solid #496c83;border-radius:16px;padding:25px 30px;color:#f5f8fa;
+ font:15px/1.65 "Noto Sans KR",system-ui,sans-serif;position:relative}
+#incident-practice *{box-sizing:border-box}
+#incident-practice button{cursor:pointer;min-height:44px;border:1px solid #507c94;border-radius:9px;
+ background:#123b51;color:#f8f8f8;font-family:inherit;font-size:14px;font-weight:700;line-height:1.35;padding:10px 17px}
+#incident-practice button:hover{background:#225a73}
+#incident-practice button:focus-visible,#incident-practice input:focus-visible{outline:3px solid #ffcb73;outline-offset:3px}
+.hanmo-incident-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;
+ border-bottom:1px solid #43667c;padding-bottom:15px;margin-bottom:16px;flex-wrap:wrap}
+.hanmo-incident-heading h2{font-size:27px;font-weight:750;margin:0}
+.hanmo-incident-kicker{font-size:12px;color:#b6d4e6;margin:0 0 5px}
+.hanmo-incident-warning{padding:12px 16px;border-left:4px solid #f4c76c;
+ background:#2a2417;color:#ffdea6;font-size:13px;margin:15px 0 24px}
+.hanmo-incident-feedback{font-size:14px;padding:14px 18px;background:#143249;border-radius:9px;
+ border:1px solid #3f718e;min-height:56px}
+.hanmo-incident-feedback[data-result="error"]{background:#3b241e;border-color:#b67861;color:#ffdbc8}
+.hanmo-incident-feedback[data-result="success"]{background:#143c2f;border-color:#639580;color:#d7f4e5}
+.hanmo-example-404{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;
+ background:#06121ff7;color:#fff}
+.hanmo-example-404 h2{font-size:clamp(27px,4vw,44px);font-weight:800;margin:0}
+.hanmo-example-404 p{max-width:630px;line-height:1.8;color:#d0e0eb;margin:0}
+.hanmo-example-404>div{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+@media(max-width:700px){#incident-practice{padding:19px 15px}}
