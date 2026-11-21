@@ -1,0 +1,22 @@
+name: Supabase bootstrap static safety
+on:
+  pull_request:
+    paths:
+      - 'supabase/**'
+      - 'docs/supabase-operator-handoff.md'
+      - '.github/workflows/supabase-bootstrap-ci.yml'
+permissions:
+  contents: read
+jobs:
+  static-bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Check SQL installer invariants
+        run: node --test supabase/tests/bootstrap.test.mjs
