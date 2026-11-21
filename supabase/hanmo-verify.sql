@@ -1,4 +1,4 @@
--- Hanmo phase-3 bootstrap read-only inspection. Safe to run after setup.
+-- 한모 3차 설치 직후 수행하는 읽기 전용 검증 SQL입니다.
 WITH checks AS (
   SELECT 'private_schema_not_exposed_to_anon' AS name,
     NOT has_schema_privilege('anon', 'hanmo_private', 'USAGE') AS passed
@@ -43,10 +43,10 @@ WITH checks AS (
 SELECT name, CASE WHEN passed THEN 'PASS' ELSE 'FAIL' END AS status
 FROM checks ORDER BY name;
 
--- Inspect Free DB use; 300MB review / 400MB halt per architecture §7.6.
+-- Free DB 용량은 설계 §7.6에 따라 300MB에서 검토하고 400MB에서 대량 반입을 보류합니다.
 SELECT pg_size_pretty(pg_database_size(current_database())) AS current_database_size;
 
--- No unreviewed academic rows should be visible after a fresh install.
+-- 신규 설치 직후 익명 사용자에게 미검수 학사 데이터가 보이면 안 됩니다.
 BEGIN;
 SET LOCAL ROLE anon;
 SELECT count(*) AS anonymous_visible_release_count
