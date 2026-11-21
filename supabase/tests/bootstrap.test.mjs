@@ -62,3 +62,31 @@ test('verify query checks read privileges, RLS and anonymous visibility', () => 
   assert.match(verify, /private_publish_not_executable_by_authenticated/);
   assert.match(verify, /private_publish_not_executable_by_service_role/);
 });
+
+
+test('역사적 강의 개설은 분반 상세와 독립적으로 관측 수를 남길 수 있다', () => {
+  const offering = setup.match(/CREATE TABLE hanmo_private\.course_offerings \(([\s\S]*?)\n\);/)?.[1];
+  const section = setup.match(/CREATE TABLE hanmo_private\.sections \(([\s\S]*?)\n\);/)?.[1];
+  assert.ok(offering);
+  assert.ok(section);
+  assert.match(offering, /observed_section_count integer CHECK \(observed_section_count >= 0\)/);
+  assert.match(offering, /observation_complete boolean NOT NULL DEFAULT false/);
+  assert.match(offering, /offering_status <> 'NOT_OFFERED' OR observation_complete/);
+  assert.doesNotMatch(offering, /day_time|location_label/);
+  assert.match(section, /day_time jsonb/);
+  assert.match(section, /location_label text/);
+});
+
+test('공지 수명주기 분류와 역사적 행사 학생 마감을 구조적으로 분리한다', () => {
+  const notices = setup.match(/CREATE TABLE hanmo_private\.notice_revisions \(([\s\S]*?)\n\);/)?.[1];
+  const events = setup.match(/CREATE TABLE hanmo_private\.event_occurrences \(([\s\S]*?)\n\);/)?.[1];
+  assert.ok(notices);
+  assert.ok(events);
+  assert.match(notices, /retention_class text NOT NULL DEFAULT 'UNCLASSIFIED'/);
+  assert.match(notices, /'CURRENT_ONLY','EVENT_HISTORY','RULE_HISTORY'/);
+  assert.match(notices, /detail_retain_until timestamptz/);
+  assert.match(events, /student_deadline timestamptz/);
+  assert.match(events, /administrative_deadline timestamptz/);
+  // 보존 기한 필드가 생겼다고 실데이터를 자동 삭제하지는 않습니다.
+  assert.doesNotMatch(setup, /\b(?:pg_cron|cron\.schedule)\b/);
+});
