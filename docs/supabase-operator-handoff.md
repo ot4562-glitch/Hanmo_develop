@@ -44,11 +44,11 @@
 node --test supabase/tests/bootstrap.test.mjs
 ```
 
-이 Node 검사는 SQL 패키지의 **정적 보안 게이트**만 점검합니다. 실제 PostgreSQL 적용/쿼리, 익명 REST 요청 거부, 데이터 접근 권한, 인덱스/용량, 수동 백업 복원은 **운영자 환경에서 반드시 추가 검증**해야 합니다. 3차는 파일 설치만으로 완료가 아닙니다.
+이 Node 검사는 SQL 패키지의 **정적 보안 게이트**만 점검합니다. 실제 PostgreSQL 적용/쿼리, 익명 REST 요청 거부, 데이터 접근 권한, 인덱스/용량, 수동 백업 복원은 **운영자 환경에서 반드시 추가 검증**해야 합니다. 특히 **발행과 권리 회수·수동 철회의 동시 실행**, 존재하지 않는 스냅샷 ID 철회 시 오류, 재승인·중복 철회의 동작은 실제 DB 트랜잭션으로 검증합니다. 3차는 파일 설치만으로 완료가 아닙니다.
 
 - [#64](https://github.com/ot4562-glitch/Hanmo_develop/issues/64): SQL 상세 스키마·RLS/물리 검증 — 담당 김채윤
 - [#65](https://github.com/ot4562-glitch/Hanmo_develop/issues/65): GitHub Pages 읽기 어댑터·안전한 정적 대체
 - [#66](https://github.com/ot4562-glitch/Hanmo_develop/issues/66): 권리 승인 후 수집·정규화·검수 연동
 - [#67](https://github.com/ot4562-glitch/Hanmo_develop/issues/67): 실환경·정정/철회·장애 복구·제품 회귀 인수
 
-**기준 문서:** [docs/architecture.md §7](../docs/architecture.md#7-3차--supabase-설계인계-및-실제-제품-연계). 1차 TypeScript 및 2차 JavaScript는 계속 유지하며, 원본 `html/practice.html`, `html/selectZone.html`은 수정하지 않습니다.
+**기준 문서:** [docs/architecture.md §7](../docs/architecture.md#7-3차--supabase-설계인계-및-실제-제품-연계). 1차 학업 코어와 2차 시뮬레이터의 JavaScript/JSDoc 계약을 유지하며, 원본 `html/practice.html`, `html/selectZone.html`은 수정하지 않습니다.
