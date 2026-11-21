@@ -154,3 +154,47 @@ export const FaqAskResponseSchema=z.discriminatedUnion('status',[
       totalTokens:z.number().int().positive()})}),
 ]);
 export type FaqAskResponse=z.infer<typeof FaqAskResponseSchema>;
+
+/*
+ * #44 근거 문단 인덱스 계약 (순수 코어 이식 단계, 매니페스트 항목은 #42와 합의 전 초안).
+ * 공지·FAQ 판본과 검수 스냅샷 매니페스트를 받아 문단 단위 근거를 만든다.
+ * 판본 JSON에 적힌 검수 시각·URL은 자기 선언이며, 매니페스트에 같은 내용 해시로 등재된 판본만 인덱스에 들어간다.
+ */
+export const EvidenceKindSchema=z.enum(['NOTICE','FAQ']);
+export type EvidenceKind=z.infer<typeof EvidenceKindSchema>;
+/** 적용 조건. 값이 없으면 '전체 대상'이 아니라 '미기재'이며, 학생 적용 판정은 하위 코어에서 UNKNOWN으로 다룬다. */
+export const EvidenceConditionsSchema=z.strictObject({
+  campuses:z.array(z.enum(['SEOUL','GLOBAL'])).min(1).max(2).optional(),
+  admissionYears:z.strictObject({from:z.number().int().min(1954).max(2100).optional(),
+    until:z.number().int().min(1954).max(2100).optional()})
+    .refine(r=>r.from!==undefined||r.until!==undefined,'empty range')
+    .refine(r=>r.from===undefined||r.until===undefined||r.from<=r.until,'reversed range').optional(),
+  majors:z.array(Id).min(1).max(50).optional(),
+});
+export type EvidenceConditions=z.infer<typeof EvidenceConditionsSchema>;
+/** 다른 문서 판본을 근거로 삼는 문단 참조(예: 수강신청 FAQ → 수강신청 공지 r2). */
+export const EvidenceRefSchema=z.strictObject({kind:EvidenceKindSchema,documentId:Id,revisionId:Id});
+export type EvidenceRef=z.infer<typeof EvidenceRefSchema>;
+export const EvidenceRevisionSchema=z.strictObject({
+  kind:EvidenceKindSchema, documentId:Id, revisionId:Id,
+  title:z.string().trim().min(2).max(200), sourceUrl:Source,
+  publishedAt:Iso, verifiedAt:Iso,
+  /** 이 판본이 알리는 상태. CORRECTED는 이전 판본을 대체하는 정정본, CANCELLED는 문서 전체 취소다. */
+  state:z.enum(['PUBLISHED','CORRECTED','CANCELLED']),
+  effectiveFrom:Day.optional(), effectiveUntil:Day.optional(),
+  rights:CampusRightsSchema, provenance:CampusProvenanceSchema,
+  conditions:EvidenceConditionsSchema.optional(),
+  paragraphs:z.array(z.strictObject({id:Id,text:z.string().trim().min(5).max(1000),
+    publicContacts:FaqPublicContactsSchema.optional(),
+    refs:z.array(EvidenceRefSchema).min(1).max(8).optional(),
+  })).max(40),
+}).refine(r=>r.state==='CANCELLED'||r.paragraphs.length>0,'paragraphs required')
+  .refine(r=>!r.effectiveFrom||!r.effectiveUntil||r.effectiveFrom<=r.effectiveUntil,'reversed effective range');
+export type EvidenceRevision=z.infer<typeof EvidenceRevisionSchema>;
+const Sha256=z.string().regex(/^[0-9a-f]{64}$/);
+export const EvidenceManifestSchema=z.strictObject({
+  snapshotId:Id, indexRevision:Id, builtAt:Iso, provenance:CampusProvenanceSchema,
+  entries:z.array(z.strictObject({kind:EvidenceKindSchema,documentId:Id,revisionId:Id,contentSha256:Sha256})).max(10000),
+}).refine(m=>new Set(m.entries.map(e=>e.kind+'\u0000'+e.documentId)).size===m.entries.length,
+  'one manifest entry per document');
+export type EvidenceManifest=z.infer<typeof EvidenceManifestSchema>;
