@@ -41,6 +41,9 @@ CREATE TABLE hanmo_private.course_offerings (
   campus text NOT NULL CHECK (campus IN ('SEOUL','GLOBAL')),
   offering_status text NOT NULL CHECK (offering_status IN ('OFFERED','NOT_OFFERED','UNKNOWN')),
   observation_complete boolean NOT NULL DEFAULT false,
+  -- 자세한 분반/시간표를 정리해도 역사적 관측 개수를 보존합니다.
+  -- 완전성 미확인 상태의 관측 분반 수를 전체 분반 수로 단정하지 않습니다.
+  observed_section_count integer CHECK (observed_section_count >= 0),
   source_revision_id text NOT NULL REFERENCES hanmo_private.source_revisions(source_revision_id),
   CHECK (offering_status <> 'NOT_OFFERED' OR observation_complete),
   UNIQUE (course_id, term_id, campus, source_revision_id)
@@ -83,6 +86,11 @@ CREATE TABLE hanmo_private.notice_revisions (
   student_deadline timestamptz,
   administrative_deadline timestamptz,
   revision_state text NOT NULL CHECK (revision_state IN ('ACTIVE','CORRECTED','CANCELLED','UNKNOWN')),
+  -- 원문 상세 보존과 역사적 행사/규정 데이터의 보존 판단을 분리합니다.
+  -- 종료일과 분류가 미확정이면 자동 삭제하지 않는 검수 대기 상태입니다.
+  retention_class text NOT NULL DEFAULT 'UNCLASSIFIED'
+    CHECK (retention_class IN ('UNCLASSIFIED','CURRENT_ONLY','EVENT_HISTORY','RULE_HISTORY')),
+  detail_retain_until timestamptz,
   audience jsonb NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(audience)='object'),
   UNIQUE (notice_id, source_revision_id)
 );
@@ -131,6 +139,9 @@ CREATE TABLE hanmo_private.event_occurrences (
   occurrence_state text NOT NULL CHECK (occurrence_state IN ('CONFIRMED','CORRECTED','CANCELLED','HISTORICAL_ESTIMATE')),
   starts_at timestamptz,
   ends_at timestamptz,
+  -- 반복 행사 원문이 만료되어도 검증된 실제 학생 마감을 유지합니다.
+  student_deadline timestamptz,
+  administrative_deadline timestamptz,
   CHECK (ends_at IS NULL OR starts_at IS NULL OR ends_at >= starts_at)
 );
 
