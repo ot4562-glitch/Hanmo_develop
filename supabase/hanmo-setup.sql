@@ -1,7 +1,7 @@
--- Hanmo Develop, phase 3: ONE-TIME Supabase bootstrap, v1.
--- Execute once in a NEW, operator-approved Free project via SQL Editor.
--- No real academic data is imported and nothing is publicly published.
--- Fails on repeat: do not use this installer as a migration/upgrade tool.
+-- 한모 3차: Supabase 신규 프로젝트용 단회 설치 SQL, v1.
+-- 운영자가 승인한 새 Free 프로젝트의 SQL Editor에서 한 번만 실행합니다.
+-- 실제 학교 자료를 반입하지 않으며 초기 공개 데이터는 비어 있습니다.
+-- 재실행은 실패합니다. 이 파일을 마이그레이션/업그레이드에 사용하지 마세요.
 BEGIN;
 
 CREATE SCHEMA hanmo_private;
@@ -197,8 +197,8 @@ CREATE TABLE hanmo_private.release_audit (
   detail text
 );
 
--- The ONLY browser-readable Hanmo data table. No raw review, identity,
--- transcripts, grades, or document contents are added by this installer.
+-- 학생 브라우저가 읽을 수 있는 한모 데이터 테이블은 이 테이블뿐입니다.
+-- 비공개 검수·신원·성적·원문 자료는 초기 설치 과정에서 추가하지 않습니다.
 CREATE TABLE public.hanmo_public_snapshots (
   snapshot_id text PRIMARY KEY,
   schema_version integer NOT NULL CHECK (schema_version = 1),
@@ -222,8 +222,8 @@ CREATE POLICY hanmo_approved_active_read ON public.hanmo_public_snapshots
   FOR SELECT TO anon, authenticated
   USING (is_active AND revoked_at IS NULL AND expires_at > now());
 
--- Only SQL Editor operator/database admin may call the following functions.
--- Reviewer names are audit labels, NOT authenticated identity verification.
+-- 아래 발행·철회 함수는 SQL Editor의 운영자/DB 관리자만 호출합니다.
+-- 검수자 표시명은 감사용 문자열이며 인증된 신원의 증명이 아닙니다.
 CREATE FUNCTION hanmo_private.publish_snapshot(p_snapshot_id text, p_operator_label text)
 RETURNS void LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $$
 DECLARE
@@ -292,19 +292,26 @@ BEGIN
   IF NULLIF(btrim(p_reason), '') IS NULL THEN
     RAISE EXCEPTION 'Revocation reason is required';
   END IF;
+  -- 발행과 수동 철회를 동일한 트랜잭션 잠금으로 직렬화합니다.
+  PERFORM pg_catalog.pg_advisory_xact_lock(24031101);
   UPDATE hanmo_private.data_snapshots SET review_state = 'REVOKED'
     WHERE snapshot_id = p_snapshot_id;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Unknown snapshot';
+  END IF;
   UPDATE public.hanmo_public_snapshots SET is_active = false,
     revoked_at = COALESCE(revoked_at, now()) WHERE snapshot_id = p_snapshot_id;
   INSERT INTO hanmo_private.release_audit (snapshot_id, action, operator_label, detail)
     VALUES (p_snapshot_id, 'REVOKE', p_operator_label, p_reason);
 END $$;
 
--- Rights withdrawal or removal of rights verification time immediately hides linked
--- releases, including direct API lookups. This does not prove independent approval.
+-- 출처 사용권 회수 또는 권리 확인 시각 제거 시 관련 공개판본을 무효화합니다.
+-- 직접 API 조회도 차단하지만 이 트리거만으로 독립 검수가 증명되지는 않습니다.
 CREATE FUNCTION hanmo_private.on_rights_change()
-RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $$
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $
 BEGIN
+  -- 발행이 권리 회수를 앞질러 공개판본을 남기지 않도록 잠금을 공유합니다.
+  PERFORM pg_catalog.pg_advisory_xact_lock(24031101);
   IF OLD.rights_status = 'ALLOWED'
     AND (NEW.rights_status <> 'ALLOWED' OR NEW.rights_checked_at IS NULL) THEN
     INSERT INTO hanmo_private.release_audit (snapshot_id, action, operator_label, detail)
@@ -337,7 +344,7 @@ CREATE TRIGGER hanmo_source_rights_gate
   AFTER UPDATE OF rights_status, rights_checked_at ON hanmo_private.data_sources
   FOR EACH ROW EXECUTE FUNCTION hanmo_private.on_rights_change();
 
--- Public releases are immutable except activation and irreversible revocation.
+-- 공개판본은 활성 상태와 비가역적 철회 이외의 내용을 변경할 수 없습니다.
 CREATE FUNCTION hanmo_private.guard_public_release()
 RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $$
 BEGIN
@@ -357,7 +364,7 @@ CREATE TRIGGER hanmo_release_immutability
   BEFORE UPDATE ON public.hanmo_public_snapshots
   FOR EACH ROW EXECUTE FUNCTION hanmo_private.guard_public_release();
 
--- Defense in depth: all non-exposed tables are RLS-enabled, with NO client policies.
+-- 방어 계층: 비공개 테이블 모두 RLS를 활성화하고 클라이언트 정책은 추가하지 않습니다.
 DO $$
 DECLARE row_name text;
 BEGIN
