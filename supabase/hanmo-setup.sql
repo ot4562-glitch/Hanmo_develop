@@ -308,7 +308,7 @@ END $$;
 -- 출처 사용권 회수 또는 권리 확인 시각 제거 시 관련 공개판본을 무효화합니다.
 -- 직접 API 조회도 차단하지만 이 트리거만으로 독립 검수가 증명되지는 않습니다.
 CREATE FUNCTION hanmo_private.on_rights_change()
-RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $$
 BEGIN
   -- 발행이 권리 회수를 앞질러 공개판본을 남기지 않도록 잠금을 공유합니다.
   PERFORM pg_catalog.pg_advisory_xact_lock(24031101);
