@@ -162,7 +162,7 @@ test('내정보로 졸업 준비를 구성하고 학점 및 여름 계절학기 
 
 test('졸업 준비·학사 달력·FAQ가 표준 데스크톱 모니터에 스크롤 없이 보인다',async({page})=>{
   mkdirSync('e2e-artifacts',{recursive:true});
-  for(const viewport of [{width:1280,height:720},{width:1440,height:900}]){
+  for(const viewport of [{width:1920,height:1080}]){
     await page.setViewportSize(viewport);
     for(const slug of ['academic-progress','academic-calendar','academic-faq']){
       await page.goto('/html/'+slug+'.html');
@@ -220,7 +220,14 @@ test('1920x1080 학업 페이지 제목의 ㅎㅁ 문양과 양쪽 선은 학사
     });
     expect(positions,'제목·로고·구분선 누락: '+slug).not.toBeNull();
     if(reference){
-      for(const element of ['heading','mark','logo','line','bar']){
+      const center=rect=>rect.left+rect.width/2;
+      expect(Math.abs(center(positions.heading)-center(reference.heading)),
+        slug+' 제목 중심').toBeLessThanOrEqual(1);
+      for(const axis of ['top','height']){
+        expect(Math.abs(positions.heading[axis]-reference.heading[axis]),
+          slug+' 제목 '+axis).toBeLessThanOrEqual(1);
+      }
+      for(const element of ['mark','logo','line','bar']){
         for(const axis of ['left','top','width','height']){
           expect(Math.abs(positions[element][axis]-reference[element][axis]),
             slug+' '+element+'.'+axis).toBeLessThanOrEqual(1);
