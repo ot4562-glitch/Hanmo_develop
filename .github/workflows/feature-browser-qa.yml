@@ -1,7 +1,7 @@
 name: Feature browser QA (#113-#116)
 on:
   push:
-    branches: [main]
+    branches: [main, 'work/inline-degree-bars-flat-nav-20261123']
   pull_request:
     branches: [main]
     paths:

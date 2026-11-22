@@ -156,7 +156,8 @@ test('내정보로 졸업 준비를 구성하고 학점 및 여름 계절학기 
   await page.reload();
   await expect(page.locator('#degree-earned-general')).toHaveValue('28');
   await page.locator('[data-degree-tab="requirements"]').click();
-  await expect(page.locator('#degree-guidance')).toContainText('확인 필요');
+  await expect(page.locator('#degree-guidance')).not.toContainText('확인 필요');
+  await expect(page.locator('#degree-guidance')).toContainText('졸업시험');
 
 });
 
@@ -278,9 +279,111 @@ test('공식 상담 부서명이 원문 링크이고 상태 설명 문구는 표
   await expect(page.locator('body')).not.toContainText('자가 입력 · 공식 판정 아님');
 });
 
+test('1920×1080에서 학점 진행 막대는 취득·남은 학점 옆에 수평 정렬된다',async({page})=>{
+  await page.setViewportSize({width:1920,height:1080});
+  await page.goto('/html/academic-progress.html');
+  await page.locator('#degree-earned-general').fill('28');
+  await page.locator('#degree-target-general').fill('34');
+  await page.locator('#degree-earned-total').fill('80');
+  await page.locator('#degree-target-total').fill('134');
+  const geometry=await page.evaluate(()=>{
+    const rect=el=>{const r=el.getBoundingClientRect();return {x:r.left,y:r.top,w:r.width,h:r.height};};
+    return {
+      input:rect(document.getElementById('degree-credit-form')),
+      results:rect(document.querySelector('.degree-credit-results')),
+      rows:[...document.querySelectorAll('.degree-credit-row')].map(row=>({
+        name:rect(row.querySelector('.degree-credit-name')),
+        value:rect(row.querySelector('.degree-credit-values')),
+        track:rect(row.querySelector('.hanmo-progress-track')),
+      })),
+    };
+  });
+  expect(Math.abs(geometry.input.y-geometry.results.y)).toBeLessThanOrEqual(3);
+  expect(geometry.rows).toHaveLength(5);
+  for(const row of geometry.rows){
+    const midpoint=rect=>rect.y+rect.h/2;
+    expect(Math.abs(midpoint(row.name)-midpoint(row.track))).toBeLessThan(5);
+    expect(Math.abs(midpoint(row.value)-midpoint(row.track))).toBeLessThan(5);
+    expect(row.track.x).toBeGreaterThan(row.value.x+row.value.w);
+    expect(row.track.w).toBeGreaterThan(60);
+  }
+  await expect(page.locator('#degree-results')).toContainText('6학점 남음');
+  await page.screenshot({path:'e2e-artifacts/degree-horizontal-bars-1920.png',fullPage:false});
+});
+
+test('상단 바의 세 학업 도구가 1920×1080에서 바로 보이는 독립 링크다',async({page})=>{
+  await page.setViewportSize({width:1920,height:1080});
+  const paths=['/index.html','/html/academic-timeline.html','/html/catalog.html',
+    '/html/academic-progress.html','/html/academic-calendar.html','/html/academic-faq.html',
+    '/html/academic-support.html','/html/planner.html','/html/forecast.html',
+    '/html/vsugang.html','/html/developer.html','/html/result.html'];
+  const links=[
+    {name:'학사 달력',end:'/academic-calendar.html'},
+    {name:'학사 FAQ',end:'/academic-faq.html'},
+    {name:'공식 상담',end:'/academic-support.html'}
+  ];
+  for(const path of paths){
+    await page.goto(path);
+    await expect(page.locator('.hanmo-tools')).toHaveCount(0);
+    const bar=page.locator('.hanmo-topbar');
+    const rect=await bar.boundingBox();
+    expect(rect).not.toBeNull();
+    expect(rect.height,'상단 바 한 줄: '+path).toBeLessThanOrEqual(86);
+    for(const link of links){
+      const entry=bar.getByRole('link',{name:link.name});
+      await expect(entry).toBeVisible();
+      await expect(entry).toHaveAttribute('href',new RegExp(link.end.replaceAll('.','\\.')+'
+  await page.goto('/index.html');
+  await expect(page.locator('.hanmo-tools')).toHaveCount(0);
+  await expect(page.getByRole('link',{name:'학사 달력'})).toBeVisible();
+  const runtimeErrors=[];
+  const failedResources=[];
+  page.on('pageerror',error=>runtimeErrors.push(error.message));
+  page.on('response',response=>{
+    if(response.status()>=400)failedResources.push(response.status()+' '+response.url());
+  });
+  await page.getByRole('link',{name:'학사 달력'}).click();
+  await expect(page).toHaveURL(/academic-calendar\.html$/);
+  await page.waitForTimeout(450);
+
+  expect(runtimeErrors).toEqual([]);
+  expect(failedResources).toEqual([]);
+  await expect(page.locator('#calendar-view [role="heading"][aria-level="2"]')).toBeVisible();
+  const days=await page.locator('#calendar-view [role="cell"][data-date]').count();
+  expect(days).toBeGreaterThanOrEqual(28);
+  expect(days).toBeLessThanOrEqual(42);
+  await expect(page.locator('#calendar-status')).toHaveCount(0);
+  await page.screenshot({path:'e2e-artifacts/academic-calendar-month.png',fullPage:false});
+  await page.goto('/html/academic-faq.html');
+  await page.locator('#faq-search-query').fill('계절학기');
+  await expect(page.locator('#faq-topic-list')).not.toContainText('확인 필요');
+  await expect(page.locator('#faq-search-form button[type="submit"]')).toHaveCount(0);
+  await expect(page.locator('#faq-topic-list .hanmo-item')).toHaveCount(1);
+  await expect(page.locator('#faq-topic-list')).toContainText('계절학기');
+  await page.locator('#faq-search-query').fill('없는 질문 123');
+  await expect(page.locator('#faq-topic-list')).toContainText('결과 없음');
+  await page.locator('#faq-search-query').clear();
+  await expect(page.locator('#faq-topic-list .hanmo-item')).toHaveCount(4);
+  await page.goto('/html/academic-support.html');
+  await page.locator('#support-campus').selectOption('GLOBAL');
+  await page.locator('#support-topic').selectOption('SEASONAL');
+  await expect(page.locator('#support-results')).toContainText('031-330-4086');
+  await page.goto('/html/catalog.html');
+  await expect(page.locator('#catalog-campus')).toBeDisabled();
+  await expect(page.locator('#catalog-target-term')).toBeDisabled();
+  await page.goto('/html/forecast.html');
+  await expect(page).toHaveURL(/\/html\/catalog\.html$/);
+});
+));
+      const tag=await entry.evaluate(el=>el.parentElement?.tagName);
+      expect(['NAV','DIV']).toContain(tag);
+    }
+  }
+});
+
 test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색이 안전하게 작동한다',async({page})=>{
   await page.goto('/index.html');
-  await page.locator('.hanmo-tools summary').click();
+  await expect(page.locator('.hanmo-tools')).toHaveCount(0);
   await expect(page.getByRole('link',{name:'학사 달력'})).toBeVisible();
   const runtimeErrors=[];
   const failedResources=[];

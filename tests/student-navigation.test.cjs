@@ -142,6 +142,35 @@ test('학사 화면의 불필요한 공식 상태 문구는 제거하고 부서�
   assert.doesNotMatch(supportScript,/원문에서 담당 업무·번호 재확인/);
 });
 
+test('상단 학업 도구 링크는 모든 공통 상단 바에서 펼치기 없이 직접 표시된다',()=>{
+  const pages=['index.html','html/academic-timeline.html','html/catalog.html','html/planner.html',
+    'html/academic-progress.html','html/academic-calendar.html','html/academic-faq.html',
+    'html/academic-support.html','html/forecast.html','html/vsugang.html',
+    'html/developer.html','html/result.html'];
+  for(const page of pages){
+    const source=fs.readFileSync(path.join(ROOT,page),'utf8');
+    const bar=source.match(/<(?:header|nav) class="hanmo-topbar"[\s\S]*?<\/(?:header|nav)>/)?.[0];
+    assert.ok(bar,'상단 바 없음: '+page);
+    assert.doesNotMatch(bar,/hanmo-tools|학업 도구/,'남은 드롭다운: '+page);
+    const base=page==='index.html'?'./html/':'./';
+    for(const [target,title] of [['academic-calendar','학사 달력'],
+      ['academic-faq','학사 FAQ'],['academic-support','공식 상담']]){
+      assert.match(bar,new RegExp('<a href="'+base.replaceAll('.','\\.')+target+'\\.html"[^>]*>'+title+'<\\/a>'),page+' '+title);
+    }
+  }
+});
+test('FAQ와 졸업 준비의 미검수 상태는 데이터 변경 없이 반복 문구만 숨긴다',()=>{
+  const faq=fs.readFileSync(path.join(ROOT,'js/academic-faq.js'),'utf8');
+  const degree=fs.readFileSync(path.join(ROOT,'js/academic/app/degree-preparation.js'),'utf8');
+  const html=fs.readFileSync(path.join(ROOT,'html/academic-progress.html'),'utf8');
+  const style=fs.readFileSync(path.join(ROOT,'css/academic-progress.css'),'utf8');
+  assert.doesNotMatch(faq,/ · 확인 필요/);
+  assert.doesNotMatch(degree,/목표 확인 필요| · 확인 필요/);
+  assert.doesNotMatch(html,/학교 공식 요건 확인 필요/);
+  assert.match(style,/#degree-credits-panel>\.degree-credit-results\{grid-column:2;grid-row:2/);
+  assert.match(degree,/row\.append\(name,value,track\)/);
+});
+
 test('home restores the original mock registration layout without the academic-entry promo block',()=>{
  const home=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
  assert.match(home,/<nav class="hanmo-topbar"/);
