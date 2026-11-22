@@ -116,8 +116,12 @@ test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색
   await expect(page.getByRole('link',{name:'학사 달력'})).toBeVisible();
   await page.getByRole('link',{name:'학사 달력'}).click();
   await expect(page).toHaveURL(/academic-calendar\.html$/);
-  await expect(page.locator('.academic-calendar-days li:not(.empty)')).toHaveCount(
-    new Date(Date.UTC(new Date().getUTCFullYear(),new Date().getUTCMonth()+1,0)).getUTCDate());
+  await expect(page.locator('.fc-daygrid-day[data-date]')).toHaveCount(
+    new Date(Date.UTC(new Date().getUTCFullYear(),new Date().getUTCMonth()+1,0)).getUTCDate()+
+    new Date(Date.UTC(new Date().getUTCFullYear(),new Date().getUTCMonth(),1)).getUTCDay()+
+    (42-new Date(Date.UTC(new Date().getUTCFullYear(),new Date().getUTCMonth()+1,0)).getUTCDate()-
+      new Date(Date.UTC(new Date().getUTCFullYear(),new Date().getUTCMonth(),1)).getUTCDay())%7);
+  await expect(page.locator('.fc-toolbar-title')).toBeVisible();
   await page.goto('/html/academic-faq.html');
   await page.locator('#faq-search-query').fill('계절학기');
   await page.locator('#faq-search-form button[type="submit"]').click();

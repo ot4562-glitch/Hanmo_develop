@@ -2,7 +2,7 @@
 <html lang="ko">
 <head><script src="../js/pc-only.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>학사 달력 | 한모</title><meta name="description" content="학교 공식 일정을 확인할 달력"><link rel="icon" href="../img/hanmo_color.png">
-<link rel="stylesheet" href="../css/student-ui.css"><script src="../js/academic-calendar.js" defer></script><script src="../js/student-profile-bar.js" defer></script></head>
+<link rel="stylesheet" href="../css/student-ui.css"><link rel="stylesheet" href="../css/academic-calendar-vendor.css"><link rel="stylesheet" href="../css/academic-calendar.css"><script src="../js/academic-calendar.js" defer></script><script src="../js/student-profile-bar.js" defer></script></head>
 <body class="hanmo-ui"><a class="hanmo-skip" href="#main">본문으로 이동</a><header class="hanmo-topbar"><a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모 <span>HUFS 학업 도우미</span></a>
  <nav aria-label="주요 서비스"><a href="./academic-timeline.html">학사 공지</a><a href="./catalog.html">강의 검색</a><a href="./academic-progress.html">졸업 준비</a>
  <details class="hanmo-tools"><summary>학업 도구</summary><div class="hanmo-tools-menu">
@@ -12,8 +12,14 @@
  </div></details>
  <span class="hanmo-profile-summary" data-profile-summary role="status" aria-live="polite" aria-label="브라우저에 저장한 내정보, 학교 로그인 아님">내정보 미설정</span>
  <a class="hanmo-me-link" href="./planner.html">내정보</a></nav></header>
-<main class="hanmo-main" id="main" tabindex="-1"><div class="hanmo-schoolmark"><h2>학사 달력</h2><div class="hanmo-markline" aria-hidden="true"><span></span><img src="../img/hanmo_white.svg" alt=""><span></span></div></div><section class="hanmo-card" aria-labelledby="calendar-title"><h2 id="calendar-title">학사 달력</h2><p>현재 달력은 직접 월을 선택해 볼 수 있는 화면입니다. 학교의 확정 일정·예상 시기·확인 필요를 구분하며, 승인된 일정 스냅샷 연결 전에는 날짜를 추정해 넣지 않습니다.</p>
- <div class="hanmo-actions"><button class="hanmo-btn secondary" type="button" id="calendar-prev">이전 달</button><label class="hanmo-field" for="calendar-month">조회 월<input id="calendar-month" type="month"></label><button class="hanmo-btn secondary" type="button" id="calendar-next">다음 달</button></div>
- <h3 id="calendar-heading" aria-live="polite"></h3><div class="academic-calendar-weekdays" aria-hidden="true"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
- <ol class="academic-calendar-days" id="calendar-days" aria-label="조회한 달의 날짜"></ol>
- <p class="hanmo-status">공식 일정 미연결 · 학사 일정은 학교 교무행정팀 공식 달력에서 확인하세요.</p><a href="https://academic.hufs.ac.kr/academic/index.do" target="_blank" rel="noopener noreferrer">한국외국어대학교 공식 학사일정 열기</a></section></main></body></html>
+<main class="hanmo-main academic-calendar-main" id="main" tabindex="-1">
+  <div class="hanmo-schoolmark"><h2>학사 달력</h2>
+    <div class="hanmo-markline" aria-hidden="true"><span></span><img src="../img/hanmo_white.svg" alt=""><span></span></div>
+  </div>
+  <section class="academic-calendar-surface" aria-label="월간 학사 달력">
+    <div id="calendar-view" aria-label="월간 달력"></div>
+    <div class="academic-calendar-footer"><span id="calendar-status" role="status">공식 일정 미연결</span>
+      <a href="https://academic.hufs.ac.kr/academic/index.do" target="_blank" rel="noopener noreferrer">학교 학사일정</a>
+    </div>
+  </section>
+</main></body></html>
