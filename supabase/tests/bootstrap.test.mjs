@@ -80,12 +80,14 @@ test('공개 전 권리 철회도 모든 연결 후보의 REVOKE 감사 이력�
   assert.match(onRights, /UPDATE hanmo_private\.data_snapshots SET review_state = 'REVOKED'/);
 });
 
-test('검수 전 DRAFT에서만 출처 링크를 편집하며 발행·권리철회와 동시 실행을 직렬화한다', () => {
+test('독립 검수 전 DRAFT에서만 출처 링크를 편집하며 발행·권리철회와 직렬화한다', () => {
   const guard = setup.match(/CREATE FUNCTION hanmo_private\.guard_snapshot_source_links\(\)[\s\S]*?END \$\$;/)?.[0]??'';
   assert.match(guard, /pg_advisory_xact_lock\(24031101\)/);
   assert.match(guard, /FROM hanmo_private\.data_snapshots WHERE snapshot_id = v_snapshot_id FOR UPDATE/);
   assert.match(guard, /v_review_state IS DISTINCT FROM 'DRAFT'/);
   assert.match(guard, /FROM public\.hanmo_public_snapshots WHERE snapshot_id = v_snapshot_id/);
+  assert.match(guard, /FROM hanmo_private\.source_reviews WHERE snapshot_id = v_snapshot_id/);
+  assert.match(guard, /FROM hanmo_private\.review_approvals WHERE snapshot_id = v_snapshot_id/);
   assert.match(setup, /CREATE TRIGGER hanmo_snapshot_sources_guard[\s\S]*?BEFORE INSERT OR UPDATE OR DELETE ON hanmo_private\.snapshot_sources/);
 });
 
