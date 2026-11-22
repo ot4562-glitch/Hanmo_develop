@@ -142,20 +142,17 @@ function renderCourseMode(){
   }
 }
 
-/** 마감된 과목의 register.png를 없애고 대체 검색을 안내한다. */
+/** 마감된 가상 과목의 신청 칸은 문구·그림 없이 비우며 다시 신청할 수 없다. */
 function markCourseFull(courseId){
   closedCourses.add(courseId);
   const row=document.getElementById?.('subject'+courseId);
   const button=row?.querySelector?.('button.register');
   if(button){
-    const label=document.createElement('span');
-    label.className='course-capacity-label';
-    label.textContent='정원 마감';
-    button.replaceWith(label);
+    const cell=button.parentElement;
+    button.remove();
+    if(cell)cell.setAttribute('aria-label','가상 정원 마감');
     if(row.cells?.[10])row.cells[10].textContent='100 / 100';
   }
-  const hint=document.getElementById?.('course-capacity-hint');
-  if(hint)hint.hidden=false;
 }
 
 function formatWaitTime(milliseconds){

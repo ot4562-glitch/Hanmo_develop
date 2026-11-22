@@ -16,7 +16,7 @@ if(root){
     initialView:'dayGridMonth',
     timeZone:'Asia/Seoul',
     firstDay:0,
-    height:'auto',
+    height:'100%',
     fixedWeekCount:false,
     showNonCurrentDates:false,
     dayMaxEvents:3,

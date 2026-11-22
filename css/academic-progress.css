@@ -1,42 +1,59 @@
-/* 졸업 준비: 프로필 한 줄, 학점 입력, 졸업요건만 표시한다. */
-.hanmo-main.progress-main{max-width:1100px;min-height:0;padding:24px 24px 72px;display:grid;gap:20px}
+/* 졸업 준비: 일반 모니터 높이에서 탭·입력·결과를 함께 보는 조밀한 배치. */
+.hanmo-main.progress-main{box-sizing:border-box;max-width:1160px;min-height:0;
+  padding:12px 24px 18px;display:grid;align-content:start;gap:9px}
 .progress-page-heading{text-align:center}
-.progress-page-heading .hanmo-schoolmark{margin:0 auto 10px}
-.progress-page-heading .hanmo-schoolmark h1{margin:0 0 5px;font-size:30px;line-height:1.3}
-.progress-page-heading>a{font-size:12px;color:#c9dce8}
-.degree-preparation{display:grid;gap:15px}
-.degree-profile-line{display:flex;align-items:center;gap:14px;min-width:0;
-  padding:13px 0;border-top:1px solid #375469;border-bottom:1px solid #375469;
-  color:#e4f0f8;font-size:13px;font-weight:650}
+.progress-page-heading .hanmo-schoolmark{margin:0 auto 2px}
+.progress-page-heading .hanmo-schoolmark h1{font-size:25px;line-height:1.2;margin:0 0 4px}
+.degree-preparation{display:grid;gap:10px}
+.degree-profile-line{display:flex;align-items:center;gap:12px;min-width:0;
+  padding:7px 0;border-block:1px solid #375469;color:#e4f0f8;font-size:13px;font-weight:650}
 .degree-profile-line span{white-space:nowrap;overflow-x:auto;min-width:0;scrollbar-width:thin}
-.degree-profile-line a{flex:0 0 auto;margin-left:auto;color:#f4c76c;font-size:13px}
+.degree-profile-line a{flex:0 0 auto;margin-left:auto;color:#f4c76c;font-size:12px}
 .degree-tabs{display:flex;gap:0;border-bottom:1px solid #44677d}
-.degree-tabs button{padding:9px 24px;border:0;border-bottom:2px solid transparent;
-  background:transparent;color:#cedde8;font-weight:750;font:inherit;cursor:pointer}
+.degree-tabs button{padding:7px 23px;border:0;border-bottom:2px solid transparent;
+  background:transparent;color:#cedde8;font:inherit;font-weight:700;cursor:pointer}
 .degree-tabs button[aria-selected="true"]{color:#f4c76c;border-bottom-color:#f4c76c}
-.degree-tabs button:focus-visible,.degree-preparation :is(input,a,button):focus-visible{outline:2px solid #f4c76c;outline-offset:2px}
-.progress-panel h2{font-size:19px;margin:4px 0 8px}
-.degree-caveat{font-size:12px;color:#9fb8ca;margin:4px 0 12px}
-.degree-credit-input-grid{display:grid;grid-template-columns:minmax(115px,1fr) repeat(2,minmax(100px,1fr));
-  gap:8px 13px;align-items:center;max-width:860px;margin:12px 0}
-.degree-credit-input-grid>span{color:#cbdce8;font-weight:700;font-size:13px}
-.degree-credit-input-grid>label{font-weight:650;font-size:13px}
-.degree-credit-input-grid input{box-sizing:border-box;width:100%;min-width:0;min-height:36px;padding:5px 8px;
+.degree-tabs button:focus-visible,.degree-preparation :is(input,a,button):focus-visible{
+  outline:2px solid #f4c76c;outline-offset:2px}
+#degree-credits-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  column-gap:28px;row-gap:3px;align-items:start}
+#degree-credits-panel>h2,#degree-credits-panel>.degree-caveat{grid-column:1 / -1}
+#degree-credits-panel>form{grid-column:1;min-width:0;grid-row:3}
+#degree-credits-panel>.degree-credit-results{grid-column:2;grid-row:3;min-width:0}
+.progress-panel h2{font-size:18px;margin:2px 0 4px}
+.degree-caveat{font-size:12px;color:#9fb8ca;margin:0 0 6px}
+.degree-credit-input-grid{display:grid;grid-template-columns:minmax(90px,1.05fr) repeat(2,minmax(0,1fr));
+  gap:5px 9px;align-items:center;margin:0}
+.degree-credit-input-grid>span{color:#cbdce8;font-weight:700;font-size:12px}
+.degree-credit-input-grid>label{font-weight:650;font-size:12px}
+.degree-credit-input-grid input{box-sizing:border-box;width:100%;min-width:0;min-height:32px;padding:5px 7px;
   border:1px solid #587b91;border-radius:3px;background:#0d293a;color:#f4f7fb;font:inherit}
 .degree-credit-input-grid input::placeholder{color:#8aaabc}
-.degree-preparation .hanmo-actions{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}
-.degree-preparation .hanmo-btn{border-radius:3px;min-height:36px;padding:8px 12px}
+.degree-preparation .hanmo-actions{display:flex;gap:8px;flex-wrap:wrap;margin:9px 0 0}
+.degree-preparation .hanmo-btn{border-radius:3px;min-height:32px;padding:6px 10px;font-size:12px}
 .degree-preparation .hanmo-btn.secondary{background:transparent;border:1px solid #55778e;color:#d7e7ef!important}
-.progress-message{font-size:12px;color:#c2d8e4;min-height:1em;margin:8px 0}
-.degree-credit-row{display:grid;gap:4px;padding:10px 0;border-bottom:1px solid #35536b}
-.degree-credit-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}
-.degree-credit-row .hanmo-progress-track{height:6px;margin:0}
-.degree-warnings{color:#f4cb91;font-size:13px}
-.degree-warnings p{margin:6px 0}
-.degree-requirement{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;padding:13px 0;border-bottom:1px solid #35536b}
+.progress-message{font-size:12px;color:#c2d8e4;min-height:0;margin:5px 0 0;line-height:1.35}
+.progress-message:empty{display:none}
+.degree-credit-row{display:grid;gap:3px;padding:7px 0;border-bottom:1px solid #35536b}
+.degree-credit-head{display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;font-size:12px}
+.degree-credit-row .hanmo-progress-track{height:5px;margin:0}
+.degree-warnings{color:#f4cb91;font-size:11px;line-height:1.35}
+.degree-warnings p{margin:4px 0}
+.degree-requirement{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 14px;padding:10px 0;
+  border-bottom:1px solid #35536b}
 .degree-requirement h3{font-size:14px;font-weight:650;margin:0}
 .degree-requirement a{font-size:12px;color:#e5d3a5;margin-left:auto}
 #degree-requirements-panel[hidden],#degree-credits-panel[hidden]{display:none}
-@media(max-width:580px){.hanmo-main.progress-main{padding:16px 14px 45px}
- .degree-credit-input-grid{grid-template-columns:minmax(80px,1fr) repeat(2,minmax(60px,1fr));gap:6px}
- .degree-profile-line{font-size:12px}}
+@media(max-width:800px){
+  .hanmo-main.progress-main{padding:14px 14px 32px}
+  #degree-credits-panel{grid-template-columns:1fr}
+  #degree-credits-panel>form,#degree-credits-panel>.degree-credit-results{grid-column:1;grid-row:auto}
+}
+@media(max-height:760px) and (min-width:801px){
+ .hanmo-main.progress-main{padding-top:9px;padding-bottom:10px;gap:6px}
+ .degree-preparation{gap:7px}
+ .degree-profile-line{padding-block:5px}
+ .degree-credit-row{padding:5px 0}
+ .degree-credit-input-grid{gap:3px 8px}
+ .degree-credit-input-grid input{min-height:29px;padding-block:3px}
+}

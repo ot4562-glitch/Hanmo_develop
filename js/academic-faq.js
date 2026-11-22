@@ -28,5 +28,6 @@
  }
  form.addEventListener('submit',e=>{e.preventDefault();render();});
  input.addEventListener('input',render);
+ input.addEventListener('search',render);
  render();
 })();

@@ -413,8 +413,7 @@ th {
 #course-mode-nav .course-types input{margin:0;accent-color:#188395;width:13px;height:13px}
 #course-mode-nav .menu-extra{display:flex;align-items:center;justify-content:center;gap:8px;
   flex:0 1 auto;min-width:0}
-#course-mode-nav .menu-extra[hidden],.course-general-warning[hidden],.course-capacity-hint[hidden],
-.course-search-prompt[hidden]{display:none}
+#course-mode-nav .menu-extra[hidden],.course-general-warning[hidden],.course-search-prompt[hidden]{display:none}
 #course-mode-nav .menu-extra label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 #course-mode-nav .menu-extra select{font:inherit;font-weight:400;min-width:82px;max-width:280px;
   padding:1px 4px;height:24px;background:#fff;border:1px solid #8799a7}
@@ -429,8 +428,6 @@ th {
 #course-mode-nav[data-mode="INTEREST"] .search{order:2}
 .course-search-prompt{text-align:center;color:#b8606d;font-size:12px;font-weight:700;margin:35px 0 0}
 .course-general-warning{margin:10px 0 0;color:#b75c68;text-align:center;font-size:12px;font-weight:700}
-.course-capacity-hint{margin:12px 0;color:#b33649;text-align:center;font-size:13px;font-weight:700}
-.course-capacity-label{color:#b33649;font-size:11px;font-weight:700}
 #course-mode-nav :is(input,select,button):focus-visible{outline:2px solid #005e80;outline-offset:2px}
 @media(max-width:1000px){
  #course-mode-nav{gap:6px 8px}

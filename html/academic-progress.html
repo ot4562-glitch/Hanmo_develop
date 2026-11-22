@@ -35,7 +35,6 @@
         <h1>졸업 준비</h1>
         <div class="hanmo-markline" aria-hidden="true"><span></span><img src="../img/hanmo_white.svg" alt=""><span></span></div>
       </div>
-          <a href="https://hufs.ac.kr/" target="_blank" rel="noopener noreferrer">학교 공식 안내</a>
     </div>
     <section class="degree-preparation" aria-label="졸업 준비">
       <div class="degree-profile-line" aria-label="입력한 학생 정보">
@@ -59,10 +58,12 @@
             <label for="degree-earned-total">총 취득학점</label><input id="degree-earned-total" type="number" step="0.5" min="0" max="400" placeholder="비우면 영역 합계"><input id="degree-target-total" type="number" step="0.5" min="0" max="400" aria-label="총 졸업 목표 학점">
           </div>
           <div class="hanmo-actions"><button class="hanmo-btn" type="submit">이 브라우저에 저장</button><button class="hanmo-btn secondary" type="button" id="degree-credit-clear">저장한 학점 지우기</button></div>
+          <p id="degree-credit-message" class="progress-message" role="status" aria-live="polite"></p>
         </form>
-        <p id="degree-credit-message" class="progress-message" role="status" aria-live="polite"></p>
-        <div id="degree-results" aria-live="polite"></div>
-        <div id="degree-warnings" class="degree-warnings" role="status" aria-live="polite"></div>
+        <div class="degree-credit-results">
+          <div id="degree-results" aria-live="polite"></div>
+          <div id="degree-warnings" class="degree-warnings" role="status" aria-live="polite"></div>
+        </div>
       </section>
       <section id="degree-requirements-panel" role="tabpanel" aria-labelledby="degree-requirements-tab" class="progress-panel" hidden>
         <h2>전공별 졸업시험 · 논문 · 외국어 인증</h2>

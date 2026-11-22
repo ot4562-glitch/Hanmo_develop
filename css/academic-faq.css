@@ -1,0 +1,22 @@
+/* FAQ는 검색어 입력과 결과 목록을 데스크톱 한 화면에 함께 배치한다. */
+.academic-faq-main{box-sizing:border-box;min-height:0;max-width:990px;padding:16px 24px 22px}
+.academic-faq-main>.hanmo-schoolmark{margin:0 0 12px}
+.academic-faq-main>.hanmo-schoolmark h2{font-size:26px;line-height:1.3}
+.academic-faq-main>.hanmo-card{padding:12px 0}
+.academic-faq-main .hanmo-card>h2{font-size:19px;margin:0 0 12px}
+.academic-faq-main .hanmo-form{gap:0}
+.academic-faq-main .hanmo-field{gap:6px}
+.academic-faq-main .hanmo-field input{min-height:39px;padding:7px 11px;border-radius:4px}
+.academic-faq-main .hanmo-status{margin:12px 0 8px;min-height:0;font-size:12px}
+.academic-faq-main .hanmo-list{gap:0}
+.academic-faq-main .hanmo-item{display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:10px 0;border-bottom:1px solid #385367}
+.academic-faq-main .hanmo-item:first-child{border-top:1px solid #385367}
+.academic-faq-main .hanmo-item h3{margin:0;font-size:14px}
+.academic-faq-main .hanmo-item a{flex:0 0 auto;font-size:12px}
+@media(max-width:800px){.academic-faq-main{padding:14px 16px 25px}}
+@media(max-height:760px) and (min-width:801px){
+  .academic-faq-main{padding:10px 24px 12px}
+  .academic-faq-main>.hanmo-schoolmark{margin-bottom:7px}
+  .academic-faq-main .hanmo-item{padding-block:7px}
+}
