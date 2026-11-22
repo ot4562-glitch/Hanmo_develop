@@ -221,7 +221,9 @@ CREATE TABLE public.hanmo_public_snapshots (
   revoked_at timestamptz,
   is_active boolean NOT NULL DEFAULT false,
   payload jsonb NOT NULL CHECK (jsonb_typeof(payload) = 'object'),
-  CHECK (expires_at > published_at)
+  CHECK (expires_at > published_at),
+  -- 철회된 판본은 운영자 직접 UPDATE로도 활성화할 수 없습니다.
+  CHECK (revoked_at IS NULL OR NOT is_active)
 );
 CREATE UNIQUE INDEX hanmo_one_active_snapshot
   ON public.hanmo_public_snapshots ((true)) WHERE is_active;
@@ -232,6 +234,56 @@ GRANT SELECT ON public.hanmo_public_snapshots TO anon, authenticated;
 CREATE POLICY hanmo_approved_active_read ON public.hanmo_public_snapshots
   FOR SELECT TO anon, authenticated
   USING (is_active AND revoked_at IS NULL AND expires_at > now());
+
+-- REVOKED 상태는 복구할 수 없으며, 같은 ID의 재활성화는 감사 이력으로도 차단합니다.
+CREATE FUNCTION hanmo_private.guard_snapshot_revocation()
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    IF OLD.review_state = 'REVOKED' THEN
+      RAISE EXCEPTION 'Revoked snapshot cannot be deleted or reused';
+    END IF;
+    RETURN OLD;
+  END IF;
+  IF OLD.review_state = 'REVOKED' AND NEW.review_state <> 'REVOKED' THEN
+    RAISE EXCEPTION 'Revoked snapshot cannot return to READY or DRAFT';
+  END IF;
+  RETURN NEW;
+END $;
+CREATE TRIGGER hanmo_snapshot_revocation_guard
+  BEFORE UPDATE OR DELETE ON hanmo_private.data_snapshots
+  FOR EACH ROW EXECUTE FUNCTION hanmo_private.guard_snapshot_revocation();
+
+-- 검수 완료 후 출처를 바꾸면 기존 승인에 미검수 출처를 끼워 넣을 수 있습니다.
+-- 발행·철회와 같은 잠금을 이용해 DRAFT의 출처 변경만 허용합니다.
+CREATE FUNCTION hanmo_private.guard_snapshot_source_links()
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $
+DECLARE
+  v_snapshot_id text;
+BEGIN
+  PERFORM pg_catalog.pg_advisory_xact_lock(24031101);
+  IF TG_OP = 'DELETE' THEN
+    v_snapshot_id := OLD.snapshot_id;
+  ELSE
+    v_snapshot_id := NEW.snapshot_id;
+  END IF;
+  IF TG_OP = 'UPDATE' AND NEW.snapshot_id IS DISTINCT FROM OLD.snapshot_id THEN
+    RAISE EXCEPTION 'Source links cannot be moved between snapshots';
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM hanmo_private.data_snapshots
+    WHERE snapshot_id = v_snapshot_id AND review_state = 'DRAFT'
+  ) OR EXISTS (
+    SELECT 1 FROM public.hanmo_public_snapshots WHERE snapshot_id = v_snapshot_id
+  ) THEN
+    RAISE EXCEPTION 'Source links are immutable after review or publication';
+  END IF;
+  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;
+  RETURN NEW;
+END $;
+CREATE TRIGGER hanmo_snapshot_sources_guard
+  BEFORE INSERT OR UPDATE OR DELETE ON hanmo_private.snapshot_sources
+  FOR EACH ROW EXECUTE FUNCTION hanmo_private.guard_snapshot_source_links();
 
 -- 아래 발행·철회 함수는 SQL Editor의 운영자/DB 관리자만 호출합니다.
 -- 검수자 표시명은 감사용 문자열이며 인증된 신원의 증명이 아닙니다.
@@ -245,6 +297,10 @@ BEGIN
   SELECT * INTO v_snapshot
     FROM hanmo_private.data_snapshots WHERE snapshot_id = p_snapshot_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'Unknown snapshot'; END IF;
+  IF EXISTS (
+    SELECT 1 FROM hanmo_private.release_audit
+    WHERE snapshot_id = p_snapshot_id AND action = 'REVOKE'
+  ) THEN RAISE EXCEPTION 'Revoked snapshot ID cannot be republished'; END IF;
   IF v_snapshot.review_state <> 'READY' OR v_snapshot.valid_until <= now() THEN
     RAISE EXCEPTION 'Snapshot is not ready and valid';
   END IF;
@@ -331,8 +387,8 @@ BEGIN
     FROM hanmo_private.snapshot_sources ss
       JOIN hanmo_private.source_revisions sr
         ON sr.source_revision_id = ss.source_revision_id
-      JOIN public.hanmo_public_snapshots pub ON pub.snapshot_id = ss.snapshot_id
-    WHERE sr.source_id = NEW.source_id AND pub.revoked_at IS NULL;
+    WHERE sr.source_id = NEW.source_id;
+    -- 공개 전 후보까지 REVOKE 이력을 남겨 동일 ID의 우회 재발행을 거부합니다.
     UPDATE hanmo_private.data_snapshots SET review_state = 'REVOKED'
       WHERE snapshot_id IN (
         SELECT ss.snapshot_id FROM hanmo_private.snapshot_sources ss
@@ -368,6 +424,7 @@ BEGIN
     OR NEW.expires_at IS DISTINCT FROM OLD.expires_at
     OR NEW.payload IS DISTINCT FROM OLD.payload
     OR (OLD.revoked_at IS NOT NULL AND NEW.revoked_at IS DISTINCT FROM OLD.revoked_at)
+    OR (NEW.revoked_at IS NOT NULL AND NEW.is_active)
   THEN RAISE EXCEPTION 'Published snapshot contents and revocations are immutable'; END IF;
   RETURN NEW;
 END $$;
