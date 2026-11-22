@@ -18,7 +18,7 @@
 |---|---|
 | **비공개 데이터 구조** | 출처·사용권·원문 판본, 과목/개설/분반 및 관측 분반 수, 교수·담당, **공지 보존 분류/상세 확인 기한**, 반복행사의 **학생/행정 마감**, 학사요건, 수집 작업, 후보 스냅샷/근거 연결, 독립 검수/승인, 감사 로그 |
 | **공개 API 테이블** | `public.hanmo_public_snapshots` — 하나의 활성·유효·비철회 스냅샷만 조회 가능 |
-| **보안** | 내부 `hanmo_private` 스키마 비노출, RLS, 익명 쓰기 거부, 비공개 관리 함수, 권리 상태 철회 시 공개 스냅샷 자동 무효화 |
+| **보안** | 내부 `hanmo_private` 스키마 비노출, RLS, 익명 쓰기 거부, 비공개 관리 함수, 권리 철회 시 미공개 후보·공개 스냅샷 영구 철회, READY 이후 출처 링크 수정 차단, 비공개 함수 실행 권한 제한 |
 | **배포** | 하지 않음 — 프로젝트 생성, 학사자료 업로드, 실제 연결, 권한 검증 및 운영 승인 별도 |
 
 공개 페이로드는 `schemaVersion=1`에 대응하며 내부 후보 `payload`에 `notices`, `offerings`, `faq` 배열이 있어야 합니다. 게시/개설/FAQ는 반드시 **동일 `snapshot_id`·`manifest_sha256`** 아래 배포합니다. 가상자료나 이미 #95에서 삭제한 과거 참고 공지 JSON을 별도 검수 없이 승인 자료로 승격하지 마세요.
@@ -47,10 +47,10 @@
 ## 최초 승인 데이터 및 갱신 (운영 승인 후 별도 작업)
 
 - 권한 확인된 출처만 `hanmo_private.data_sources`에 등록하고 `rights_status = 'ALLOWED'` 및 확인일을 남깁니다. 학교 회신 전에는 자동 수집·실제 공지/강좌 반입을 실행하지 않습니다.
-- `source_revisions`와 `snapshot_sources`로 원문 판본을 연결합니다. `data_snapshots`에는 실제 데이터에서 생성한 **정확한 SHA-256**, `schema_version=1`, `review_state='READY'`, 유효기한 및 정규화된 페이로드를 기록합니다.
-- 독립 검수/승인 **별도 기록**을 `source_reviews` / `review_approvals`에 등록합니다. 서로 다른 ID만 적는 것으로 실제 권한 분리와 신원이 입증되지는 않습니다. 이를 실제 인수 시험으로 검증해야 합니다.
+- `data_snapshots`는 **먼저 `review_state='DRAFT'`로 생성**하고, 그 상태에서만 `source_revisions`/`snapshot_sources`로 출처 판본을 연결·수정합니다. 실제 원문에서 계산한 정확한 SHA-256, `schema_version=1`, 유효기한과 검수할 정규화 페이로드를 등록합니다.
+- **출처 연결을 끝낸 다음** 독립 검수/승인 별도 기록을 `source_reviews` / `review_approvals`에 등록하고, 검수 완료 후에만 스냅샷 상태를 `READY`로 전환합니다. **READY 이후 출처 연결 추가·수정·삭제는 거부**되므로 수정이 필요하면 새 스냅샷 ID로 처음부터 다시 검수합니다. 서로 다른 ID만 적는 것으로 실제 신원/권한 분리가 입증되지는 않습니다.
 - 위 조건을 충족한 경우에만 **DB 관리자 세션**에서 `SELECT hanmo_private.publish_snapshot('승인된_snapshot_id','실제_운영자_식별자');`를 실행합니다. 이미 공개된 다른 안전한 판본으로 돌아갈 때도 같은 함수로 권리/검수/철회 여부를 다시 확인합니다.
-- 출처 권리 철회 또는 권리 확인일이 제거(`NULL`)되면 관련 공개 판본은 자동 무효화됩니다. 재허용 시에도 기존 철회판본을 되살리지 말고 새 검수·승인 판본을 발행해야 합니다. 필요시 관리자 세션에서 `SELECT hanmo_private.revoke_snapshot('snapshot_id','운영자','철회 이유');`를 실행합니다. 철회 판본은 다시 활성화할 수 없습니다.
+- 출처 권리 철회 또는 권리 확인일이 제거(`NULL`)되면 **공개된 판본뿐 아니라 해당 출처에 연결된 미공개 후보도 `REVOKED`로 영구 철회**되며, `release_audit`에 REVOKE 이력을 기록합니다. 재허용되더라도 이전 스냅샷 ID는 `READY`로 복원·삭제 후 재사용·재발행할 수 없습니다. 새로운 스냅샷 ID로 출처·페이로드·검수·승인을 다시 준비해야 합니다. 필요시 관리자 세션에서 `SELECT hanmo_private.revoke_snapshot('snapshot_id','운영자','철회 이유');`를 실행합니다. **직접 SQL로 철회판본의 `is_active`를 다시 켜는 것도 금지**됩니다.
 
 ## Free($0) 운영·복구
 
@@ -91,7 +91,7 @@ FROM hanmo_private.data_snapshots ORDER BY payload_bytes DESC;
 node --test supabase/tests/bootstrap.test.mjs
 ```
 
-이 Node 검사는 SQL 패키지의 **정적 보안·수명주기 필드 게이트**만 점검합니다. 현재 SQL은 행별 자동 TTL·정리/압축·부분 조회, 실제 인적 독립 승인, 실운영 용량 적합성을 검증하지 못합니다. 실제 PostgreSQL 적용/쿼리, 익명 REST 요청 거부, 데이터 접근 권한, 인덱스/용량, 수동 백업 복원은 **운영자 환경에서 반드시 추가 검증**해야 합니다. 특히 **발행과 권리 회수·수동 철회의 동시 실행**, 존재하지 않는 스냅샷 ID 철회 시 오류, 재승인·중복 철회의 동작은 실제 DB 트랜잭션으로 검증합니다. 3차는 파일 설치만으로 완료가 아닙니다.
+위 Node 검사는 SQL의 **정적 보안·수명주기 필드 게이트**를 확인합니다. [Supabase bootstrap CI](../.github/workflows/supabase-bootstrap-ci.yml)는 별도의 **일회용 PostgreSQL 16 서비스**에서 SQL 전체 설치·권한 검사와 [철회/출처 링크 회귀](../supabase/tests/bootstrap-runtime.sql)를 실제 실행합니다. 이는 실제 Supabase Dashboard 프로젝트의 RLS·Data API·운영 접근 검증을 대신하지 않습니다. 현재 설치 SQL은 행별 자동 TTL·정리/압축·부분 조회, 실제 인적 독립 승인, 실운영 용량 적합성을 검증하지 못합니다. 익명 REST 거부, 실제 운영자 권한, 인덱스/용량, 수동 백업 복원과 **발행·권리회수·수동철회의 동시 실행**은 운영자 승인 환경에서 별도로 검증해야 합니다. 3차는 파일 설치만으로 완료가 아닙니다.
 
 - [#64](https://github.com/ot4562-glitch/Hanmo_develop/issues/64): SQL 상세 스키마·RLS/물리 검증 — 담당 김채윤
 - [#65](https://github.com/ot4562-glitch/Hanmo_develop/issues/65): GitHub Pages 읽기 어댑터·안전한 정적 대체
