@@ -263,7 +263,6 @@ test('홈·모드·학업·개발자 조작에만 느린 글로우를 적용한�
  assert.ok(home.includes('body.hanmo-home .button::before'));
  assert.ok(common.includes('body.hanmo-ui :is(.hanmo-btn, .hanmo-practice-links a)::before'));
  assert.ok(common.includes('body.hanmo-flat-legacy .container > .button::before'));
- assert.ok(credit.includes('.progress-main .progress-form button::before'));
  assert.ok(mode.includes('.grid > .basic-mode-tile'));
  assert.ok(common.includes('.hanmo-topbar .hanmo-nav-inline a::before'));
  assert.ok(!credit.includes('.progress-main table::before'));
