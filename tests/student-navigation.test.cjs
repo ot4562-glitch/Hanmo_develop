@@ -252,11 +252,13 @@ test('홈·모드·학업·개발자 조작에만 느린 글로우를 적용한�
  const home=fs.readFileSync(path.join(ROOT,'css/home-fit.css'),'utf8');
  const common=fs.readFileSync(path.join(ROOT,'css/hanmo-components.css'),'utf8');
  const credit=fs.readFileSync(path.join(ROOT,'css/academic-progress.css'),'utf8');
- for(const css of [mode,home,common,credit]){
-   assert.ok(css.includes('radial-gradient'));
-   assert.ok(css.includes('transition: opacity 1.08s'));
-   assert.ok(css.includes('prefers-reduced-motion'));
- }
+ for(const css of [mode,home,common]){
+    assert.ok(css.includes('radial-gradient'));
+    assert.ok(css.includes('transition: opacity 1.08s'));
+    assert.ok(css.includes('prefers-reduced-motion'));
+  }
+  assert.doesNotMatch(credit,/radial-gradient|\.progress-main \.progress-form button::before/,
+    '졸업 준비의 신규 미니멀 조작에는 별도 글로우를 두지 않는다');
  assert.ok(common.includes('--hm-glow-ease'));
  assert.ok(home.includes('body.hanmo-home .button::before'));
  assert.ok(common.includes('body.hanmo-ui :is(.hanmo-btn, .hanmo-practice-links a)::before'));

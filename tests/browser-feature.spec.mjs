@@ -172,18 +172,15 @@ test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색
   await page.getByRole('link',{name:'학사 달력'}).click();
   await expect(page).toHaveURL(/academic-calendar\.html$/);
   await page.waitForTimeout(450);
-  const calendarState=await page.locator('#calendar-view').evaluate(el=>({
-    html:el.innerHTML.slice(0,2600),children:el.children.length,
-    scripts:[...document.scripts].map(s=>s.src).filter(x=>x.includes('calendar')),
-  }));
-  console.log('CALENDAR_DEBUG',JSON.stringify({runtimeErrors,failedResources,calendarState}));
+
   expect(runtimeErrors).toEqual([]);
   expect(failedResources).toEqual([]);
-  await expect(page.locator('.fc-toolbar-title')).toBeVisible();
-  const days=await page.locator('.fc-daygrid-day[data-date]').count();
+  await expect(page.locator('#calendar-view [role="heading"][aria-level="2"]')).toBeVisible();
+  const days=await page.locator('#calendar-view [role="cell"][data-date]').count();
   expect(days).toBeGreaterThanOrEqual(28);
   expect(days).toBeLessThanOrEqual(42);
-  await expect(page.locator('.fc-event')).toHaveCount(0);
+  await expect(page.locator('#calendar-status')).toContainText('공식 일정 미연결');
+  await page.screenshot({path:'e2e-artifacts/academic-calendar-month.png',fullPage:false});
   await page.goto('/html/academic-faq.html');
   await page.locator('#faq-search-query').fill('계절학기');
   await page.locator('#faq-search-form button[type="submit"]').click();

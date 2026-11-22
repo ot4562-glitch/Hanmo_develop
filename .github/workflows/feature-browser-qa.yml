@@ -33,11 +33,6 @@ jobs:
         run: npm install --ignore-scripts --no-audit --no-fund
       - name: Install pinned browser test runner for isolated QA
         run: npm install --no-save --ignore-scripts --no-audit --no-fund @playwright/test@1.65.1
-      - name: Extract lockfile for reproducible dependency update
-        run: |
-          echo HANMO_LOCK_BEGIN
-          base64 package-lock.json
-          echo HANMO_LOCK_END
       - name: Build static site
         run: npm run build
       - name: Install Chromium

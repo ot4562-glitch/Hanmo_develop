@@ -1,37 +1,24 @@
-/* FullCalendar 무료 월간 보기를 한모의 평면 남색 테마에 맞춘다. */
+/* FullCalendar v7 내부 CSS 클래스에 의존하지 않는 한모 월간 달력 테마 */
 .academic-calendar-main{max-width:1130px;min-height:0;padding-block:22px 70px}
 .academic-calendar-main .hanmo-schoolmark{margin:0 0 24px}
 .academic-calendar-surface{border-top:1px solid #3b576c;padding-top:18px}
-.academic-calendar-main .fc{
-  --fc-page-bg-color:transparent;--fc-neutral-bg-color:rgba(29,55,71,.4);
-  --fc-border-color:#345064;--fc-today-bg-color:rgba(242,200,108,.10);
-  --fc-button-bg-color:transparent;--fc-button-border-color:#57788f;
-  --fc-button-text-color:#e4edf3;--fc-button-hover-bg-color:#214052;
-  --fc-button-hover-border-color:#7a9aa8;--fc-button-active-bg-color:#2e5063;
-  --fc-event-bg-color:#a8c8db;--fc-event-border-color:#a8c8db;
-  --fc-event-text-color:#092033;--fc-neutral-text-color:#cbdde8;
-  color:#f0f5f8;font-family:inherit;font-size:13px;
-}
-.academic-calendar-main .fc .fc-toolbar{margin-bottom:20px;gap:16px;flex-wrap:wrap}
-.academic-calendar-main .fc .fc-toolbar-title{font-size:23px;font-weight:750;letter-spacing:-.02em}
-.academic-calendar-main .fc .fc-button{font:inherit;border-radius:3px;box-shadow:none;padding:7px 11px}
-.academic-calendar-main .fc .fc-button:focus-visible{outline:3px solid #f4c76c;outline-offset:2px}
-.academic-calendar-main .fc .fc-col-header-cell{background:rgba(21,46,63,.64);font-size:13px}
-.academic-calendar-main .fc .fc-col-header-cell-cushion{padding:10px 3px;text-decoration:none;color:#dbe9f0}
-.academic-calendar-main .fc .fc-daygrid-day-frame{min-height:86px}
-.academic-calendar-main .fc .fc-daygrid-day-number{padding:9px 10px;text-decoration:none;color:#e7edf3}
-.academic-calendar-main .fc .fc-day-today .fc-daygrid-day-number{color:#f4c76c;font-weight:800}
-.academic-calendar-main .fc .fc-day-other .fc-daygrid-day-number{color:#8096a6}
-.academic-calendar-main .fc .fc-daygrid-day-events{margin-inline:5px}
-.academic-calendar-main .fc .fc-daygrid-day:hover{background:rgba(59,92,114,.17)}
-.academic-calendar-main .fc .fc-scrollgrid{border:1px solid #345064;border-radius:0}
-.academic-calendar-footer{display:flex;justify-content:space-between;gap:14px;align-items:center;
-  padding:13px 0;border-bottom:1px solid #345064;font-size:12px;color:#9fbacb}
+#calendar-view{color:#f0f5f8;font-family:inherit;font-size:13px}
+#calendar-view > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+#calendar-view [role="heading"][aria-level="2"]{font-size:23px;font-weight:750;letter-spacing:-.02em}
+#calendar-view button{font:inherit;cursor:pointer;color:#e4edf3;background:transparent;border:1px solid #57788f;padding:6px 11px;border-radius:3px;min-height:34px}
+#calendar-view button:hover:not(:disabled){background:#214052;border-color:#7a9aa8}
+#calendar-view button:disabled{opacity:.4;cursor:default}
+#calendar-view button:focus-visible{outline:3px solid #f4c76c;outline-offset:2px}
+#calendar-view [role="table"]{border:1px solid #345064}
+#calendar-view [role="columnheader"]{background:rgba(21,46,63,.65);color:#dbe9f0;border-color:#345064;font-weight:700}
+#calendar-view [role="cell"][data-date]{border-color:#345064;background:transparent;transition:background .15s}
+#calendar-view [role="cell"][data-date]:hover{background:rgba(59,92,114,.18)}
+#calendar-view [role="cell"][data-date] [role="presentation"]{color:#e7edf3}
+#calendar-view [role="cell"][data-date] [aria-hidden="true"]{color:#e7edf3}
+#calendar-view [role="cell"][data-date][aria-current="date"]{background:rgba(242,200,108,.10)}
+#calendar-view [role="cell"][data-date][aria-current="date"] [aria-hidden="true"]{color:#f4c76c;font-weight:800}
+.academic-calendar-footer{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid #345064;font-size:12px;color:#9fbacb}
 .academic-calendar-footer a{color:#f4d39a}
-@media(max-width:700px){
- .academic-calendar-main{padding-inline:12px}
- .academic-calendar-main .fc .fc-toolbar-title{font-size:18px}
- .academic-calendar-main .fc .fc-daygrid-day-frame{min-height:56px}
- .academic-calendar-main .fc .fc-button{padding:5px 7px}
- .academic-calendar-main .fc .fc-daygrid-day-number{padding:5px}
-}
+@media(max-width:700px){.academic-calendar-main{padding-inline:12px}
+#calendar-view [role="heading"][aria-level="2"]{font-size:18px}
+#calendar-view button{padding:5px 7px;min-height:30px}}
