@@ -18,7 +18,7 @@
   if(!selected.length){const n=document.createElement('p');n.textContent='결과 없음 · 공식 안내 확인';list.append(n);}
   for(const t of selected){
    const item=document.createElement('article');item.className='hanmo-item';
-   const name=document.createElement('h3');name.textContent=t.name+' · 확인 필요';
+   const name=document.createElement('h3');name.textContent=t.name;
    const a=document.createElement('a');a.href=t.url;a.target='_blank';a.rel='noopener noreferrer';
    a.textContent='공식 안내에서 확인';
    item.append(name,a);list.append(item);

@@ -19,7 +19,7 @@
   column-gap:28px;row-gap:3px;align-items:start}
 #degree-credits-panel>h2{grid-column:1 / -1}
 #degree-credits-panel>form{grid-column:1;min-width:0;grid-row:2}
-#degree-credits-panel>.degree-credit-results{grid-column:2;grid-row:3;min-width:0}
+#degree-credits-panel>.degree-credit-results{grid-column:2;grid-row:2;min-width:0}
 .progress-panel h2{font-size:18px;margin:2px 0 4px}
 .degree-caveat{font-size:12px;color:#9fb8ca;margin:0 0 6px}
 .degree-credit-input-grid{display:grid;grid-template-columns:minmax(90px,1.05fr) repeat(2,minmax(0,1fr));
@@ -34,9 +34,11 @@
 .degree-preparation .hanmo-btn.secondary{background:transparent;border:1px solid #55778e;color:#d7e7ef!important}
 .progress-message{font-size:12px;color:#c2d8e4;min-height:0;margin:5px 0 0;line-height:1.35}
 .progress-message:empty{display:none}
-.degree-credit-row{display:grid;gap:3px;padding:7px 0;border-bottom:1px solid #35536b}
-.degree-credit-head{display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;font-size:12px}
-.degree-credit-row .hanmo-progress-track{height:5px;margin:0}
+.degree-credit-row{display:grid;grid-template-columns:minmax(110px,1.05fr) minmax(170px,1.8fr) minmax(95px,1fr);
+  align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #35536b;font-size:12px}
+.degree-credit-name{font-weight:650}
+.degree-credit-values{white-space:nowrap}
+.degree-credit-row .hanmo-progress-track{width:100%;height:7px;margin:0}
 .degree-warnings{color:#f4cb91;font-size:11px;line-height:1.35}
 .degree-warnings p{margin:4px 0}
 .degree-requirement{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 14px;padding:10px 0;
@@ -56,4 +58,13 @@
  .degree-credit-row{padding:5px 0}
  .degree-credit-input-grid{gap:3px 8px}
  .degree-credit-input-grid input{min-height:29px;padding-block:3px}
+}
+
+@media(max-width:1130px){
+  .degree-credit-row{grid-template-columns:minmax(105px,1fr) minmax(165px,1.5fr) minmax(80px,.8fr)}
+}
+@media(max-width:520px){
+  .degree-credit-row{grid-template-columns:minmax(0,1fr) minmax(0,1.6fr)}
+  .degree-credit-row .hanmo-progress-track{grid-column:1/-1}
+  .degree-credit-values{white-space:normal;text-align:right}
 }

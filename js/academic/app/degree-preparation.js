@@ -62,7 +62,7 @@ function syncProfile(){
   });
   for(const entry of items){
     const row=document.createElement('article');row.className='degree-requirement';
-    const title=document.createElement('h3');title.textContent=entry.scope+' · '+entry.title+' · 확인 필요';
+    const title=document.createElement('h3');title.textContent=entry.scope+' · '+entry.title;
     const link=document.createElement('a');link.href=entry.sourceUrl;
     link.rel='noopener noreferrer';link.target='_blank';link.textContent='공식 확인';
     row.append(title,link);guidance.append(row);
@@ -86,14 +86,15 @@ function renderCredits(){
   const calc=calculateDegreeCredits({...readInputs(),kind:degreeKind(profile())});
   for(const metric of calc.metrics){
     const row=document.createElement('div');row.className='degree-credit-row';
-    const header=document.createElement('div');header.className='degree-credit-head';
-    header.append(text(metric.label),text(metric.target===null?'목표 확인 필요':
-      metric.earned+'/'+metric.target+'학점 · '+metric.remaining+'학점 남음'+
-      (metric.excess?' · '+metric.excess+'학점 초과':'')));
+    const name=text(metric.label);name.className='degree-credit-name';
+    const value=text(metric.target===null
+      ?metric.earned+'학점 취득 · 목표 —'
+      :metric.earned+'학점 취득 · '+metric.remaining+'학점 남음'+
+        (metric.excess?' · '+metric.excess+'학점 초과':''));value.className='degree-credit-values';
     const track=document.createElement('div');track.className='hanmo-progress-track';
     const fill=document.createElement('div');fill.className='hanmo-progress-fill';
     fill.style.width=(metric.ratio??0)+'%';track.append(fill);
-    row.append(header,track);results.append(row);
+    row.append(name,value,track);results.append(row);
   }
   for(const warning of calc.warnings){
     const line=document.createElement('p');line.textContent=warning;warnings.append(line);
