@@ -218,12 +218,15 @@ body.hanmo-ui .hanmo-field :is(input, select):not(:disabled):focus-visible {
 .hanmo-topbar .hanmo-me-link{border-bottom-color:transparent}
 .hanmo-topbar .hanmo-me-link[aria-current="page"]{border-bottom-color:#f4c76c}
 .hanmo-topbar{background:#00111b;-webkit-backdrop-filter:none;backdrop-filter:none}
-.hanmo-topbar .hanmo-tools{position:relative;z-index:15;flex:0 0 auto}
-.hanmo-topbar .hanmo-tools summary{cursor:pointer;font-weight:700;color:#ebeff2;padding:7px 9px;font-size:13px;list-style-position:inside}
-.hanmo-topbar .hanmo-tools[open] summary{color:#f4c76c;background:#17384d}
-.hanmo-topbar .hanmo-tools-menu{position:absolute;right:0;top:100%;min-width:155px;background:#082435;border:1px solid #51768a;display:grid;padding:5px;box-shadow:0 8px 22px #00111ba6}
-.hanmo-topbar .hanmo-tools-menu a{display:block;padding:8px 10px}
 .academic-calendar-days,.academic-calendar-weekdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;padding:0;list-style:none;margin:8px 0}
 .academic-calendar-weekdays span{text-align:center;font-weight:700;color:#f4c76c}
 .academic-calendar-days li{border:1px solid #4b6676;min-height:52px;padding:8px;background:#0e2839}
 .academic-calendar-days li.empty{background:transparent;border-color:transparent}
+
+/* 1920×1080 기준에서 학업 링크를 펼쳐 한 줄로 배치하고 긴 학생 정보는 줄인다. */
+@media(min-width:1600px){
+  .hanmo-topbar{padding-inline:max(24px,calc((100% - 1640px)/2));flex-wrap:nowrap}
+  .hanmo-topbar nav,.hanmo-topbar .hanmo-nav-inline{flex:1 1 auto;flex-wrap:nowrap;gap:4px 6px}
+  .hanmo-topbar .hanmo-profile-summary{min-width:0;max-width:340px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
