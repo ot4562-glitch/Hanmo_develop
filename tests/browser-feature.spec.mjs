@@ -299,7 +299,7 @@ test('1920×1080에서 학점 진행 막대는 취득·남은 학점 옆에 수�
     };
   });
   expect(Math.abs(geometry.input.y-geometry.results.y)).toBeLessThanOrEqual(3);
-  expect(geometry.rows).toHaveLength(5);
+  expect(geometry.rows).toHaveLength(4); // 단일전공 기본 프로필에서는 이중전공 항목을 제외한다.
   for(const row of geometry.rows){
     const midpoint=rect=>rect.y+rect.h/2;
     expect(Math.abs(midpoint(row.name)-midpoint(row.track))).toBeLessThan(5);
