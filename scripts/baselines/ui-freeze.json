@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "baselineCommit": "da30a87510f1cdac282600fa4e914da2585a6031",
-  "purpose": "Current protected PC UI after user-approved 1920x1080 academic heading alignment, visible FullCalendar month grid, clickable support department labels and deletion of redundant notice text. Original registration imitation stays protected.",
+  "purpose": "Approved sitewide direct academic navigation and degree credit bars aligned with earned/remaining values at 1920x1080; unverified data remains unapproved, original practice/selectZone screens preserved.",
   "files": [
     {
       "path": "css/academic-calendar.css",
@@ -13,7 +13,7 @@
     },
     {
       "path": "css/academic-progress.css",
-      "sha": "42100ad610cca5b35574aa48b139679e25414050"
+      "sha": "baf3e60a198971f9683f09a02500961882e8d516"
     },
     {
       "path": "css/developer.css",
@@ -25,7 +25,7 @@
     },
     {
       "path": "css/hanmo-components.css",
-      "sha": "617f6f722682e0bb01e76ca263d23c41e90628e8"
+      "sha": "de040a7e82b1adf9302d67dbf4572b0768bdfa96"
     },
     {
       "path": "css/hanmo-flat.css",
@@ -81,35 +81,35 @@
     },
     {
       "path": "html/academic-calendar.html",
-      "sha": "fc94592ebe78b9f86b36a93dafce29ff47eb8a30"
+      "sha": "0a861c6612cda7509a5439ae3a878d31bcc30016"
     },
     {
       "path": "html/academic-faq.html",
-      "sha": "0d0a0f7c92ce919b384334866da4be7957684a0d"
+      "sha": "f876b1b3ccdcefdb75522271aaf1ff53105f9680"
     },
     {
       "path": "html/academic-progress.html",
-      "sha": "b42e4b53e906f576540a97d2d7fbeef5778e609b"
+      "sha": "fc3e4ec04630fd71b7d518bf7ad392a97bf6684c"
     },
     {
       "path": "html/academic-support.html",
-      "sha": "47b93f054fec094189bbc004dab2f42a0df5d830"
+      "sha": "4513968308e242fd712b8837781f26eb5f6c52b6"
     },
     {
       "path": "html/academic-timeline.html",
-      "sha": "ceaa7fffe4fcf88a011bb08ce37324ba02ff3b27"
+      "sha": "69950e47d1ca33f7cbb8caf92672f4362d5108d0"
     },
     {
       "path": "html/catalog.html",
-      "sha": "74584f3c8a71de7a4623627528104aaa24b74bc2"
+      "sha": "ee47c1ef5622b0a1e7fc79c94946626b3363d50a"
     },
     {
       "path": "html/developer.html",
-      "sha": "ef037fb70adfb8c624959c4bae64ecd328773d3d"
+      "sha": "949dbcefc274eb3ea9b26f8e8d7057990002765f"
     },
     {
       "path": "html/forecast.html",
-      "sha": "7782d3250413751c77c79f6e4a77830c85d9d870"
+      "sha": "16daa9e5955ce3f4c2c54fa1892236bed26d6634"
     },
     {
       "path": "html/incident-404.html",
@@ -121,7 +121,7 @@
     },
     {
       "path": "html/planner.html",
-      "sha": "9e3cb2ffd4a15b225d275a60060a5b96d1d2572d"
+      "sha": "cacd3fc388fdd8c58d025efcef522d8dfc19ca13"
     },
     {
       "path": "html/practice.html",
@@ -129,7 +129,7 @@
     },
     {
       "path": "html/result.html",
-      "sha": "1fed0cd8dd6cf473c8d82b42d4c6ddc53cd46a6b"
+      "sha": "3f300a18644988aa79b137e58a51e5f8d9e98548"
     },
     {
       "path": "html/selectZone.html",
@@ -137,7 +137,7 @@
     },
     {
       "path": "html/vsugang.html",
-      "sha": "6826768a21808bbcf1d07d3fe081f7c8bf4d55be"
+      "sha": "7725ee5a61b8b59dd67709298b22d7b8fb21f0e1"
     },
     {
       "path": "img/background.svg",
@@ -185,7 +185,7 @@
     },
     {
       "path": "index.html",
-      "sha": "dfe4334f403f300b45ab2cf788077065fbf71a3e"
+      "sha": "5c6406a22cccadfc00898659f6cd6a93c85aa759"
     },
     {
       "path": "js/academic-data-source.js",
@@ -193,7 +193,7 @@
     },
     {
       "path": "js/academic-faq.js",
-      "sha": "e7ba0f9f72bc239c537b0b1969ab604d2f931822"
+      "sha": "849f9095f9d830109c198cbe1e27e113ff90527c"
     },
     {
       "path": "js/academic-support.js",
