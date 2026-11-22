@@ -194,6 +194,83 @@ test('졸업 준비·학사 달력·FAQ가 표준 데스크톱 모니터에 스�
   }
 });
 
+test('1920x1080 학업 페이지 제목의 ㅎㅁ 문양과 양쪽 선은 학사 공지 위치를 따른다',async({page})=>{
+  await page.setViewportSize({width:1920,height:1080});
+  const paths=['academic-timeline','academic-calendar','academic-faq','academic-progress',
+    'academic-support','catalog','planner'];
+  let reference=null;
+  mkdirSync('e2e-artifacts',{recursive:true});
+  for(const slug of paths){
+    await page.goto('/html/'+slug+'.html');
+    const positions=await page.evaluate(()=>{
+      const rect=element=>{
+        const r=element.getBoundingClientRect();
+        return {left:r.left,top:r.top,width:r.width,height:r.height};
+      };
+      const schoolmark=document.querySelector('.hanmo-schoolmark');
+      if(!schoolmark)return null;
+      const heading=schoolmark.querySelector('h1,h2');
+      const mark=schoolmark.querySelector('.hanmo-markline');
+      const logo=mark?.querySelector('img');
+      const line=mark?.querySelector('span');
+      const bar=document.querySelector('.hanmo-topbar');
+      if(!heading||!mark||!logo||!line||!bar)return null;
+      return {heading:rect(heading),mark:rect(mark),logo:rect(logo),
+        line:rect(line),bar:rect(bar)};
+    });
+    expect(positions,'제목·로고·구분선 누락: '+slug).not.toBeNull();
+    if(reference){
+      for(const element of ['heading','mark','logo','line','bar']){
+        for(const axis of ['left','top','width','height']){
+          expect(Math.abs(positions[element][axis]-reference[element][axis]),
+            slug+' '+element+'.'+axis).toBeLessThanOrEqual(1);
+        }
+      }
+    }else reference=positions;
+  }
+});
+
+test('1920x1080 달력은 날짜행이 접히지 않고 모든 날짜가 보인다',async({page})=>{
+  await page.setViewportSize({width:1920,height:1080});
+  await page.goto('/html/academic-calendar.html');
+  const rows=page.locator('#calendar-view [role="row"][aria-label^="주 "]');
+  const count=await rows.count();
+  expect(count).toBeGreaterThanOrEqual(4);
+  expect(count).toBeLessThanOrEqual(6);
+  for(let index=0;index<count;index++){
+    const row=rows.nth(index);
+    await expect(row).toBeVisible();
+    const rect=await row.boundingBox();
+    expect(rect,'달력 주차 행이 접히면 안 됨').not.toBeNull();
+    expect(rect.height).toBeGreaterThan(55);
+    expect(rect.y+rect.height).toBeLessThanOrEqual(1079);
+  }
+  await expect(page.locator('#calendar-view [role="cell"][data-date]').first()).toBeVisible();
+  const scrollHeight=await page.evaluate(()=>document.documentElement.scrollHeight);
+  expect(scrollHeight).toBeLessThanOrEqual(1081);
+  await expect(page.locator('#calendar-status')).toHaveCount(0);
+  await page.screenshot({path:'e2e-artifacts/calendar-restored-1920x1080.png',fullPage:false});
+});
+
+test('공식 상담 부서명이 원문 링크이고 상태 설명 문구는 표시하지 않는다',async({page})=>{
+  await page.goto('/html/academic-support.html');
+  const headingLink=page.locator('#support-results h3 a');
+  await expect(headingLink).toHaveText('서울 학사종합지원센터');
+  await expect(headingLink).toHaveAttribute('href','https://haksa.hufs.ac.kr/haksa/index.do');
+  await expect(page.locator('#support-results a[href^="tel:"]')).toHaveText('02-2173-2130');
+  await expect(page.locator('#support-status')).toHaveCount(0);
+  await expect(page.locator('#support-results')).not.toContainText('원문 재확인');
+  await page.locator('#support-campus').selectOption('GLOBAL');
+  await page.locator('#support-topic').selectOption('SEASONAL');
+  await expect(headingLink).toHaveText('글로벌 학사종합지원센터 · 계절학기');
+  await expect(page.locator('#support-results a[href^="tel:"]')).toHaveText('031-330-4086');
+  await page.goto('/html/academic-faq.html');
+  await expect(page.locator('#faq-status')).toHaveCount(0);
+  await expect(page.locator('#faq-topic-list .hanmo-item')).toHaveCount(4);
+  await page.goto('/html/academic-progress.html');
+  await expect(page.locator('body')).not.toContainText('자가 입력 · 공식 판정 아님');
+});
+
 test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색이 안전하게 작동한다',async({page})=>{
   await page.goto('/index.html');
   await page.locator('.hanmo-tools summary').click();
@@ -214,7 +291,7 @@ test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색
   const days=await page.locator('#calendar-view [role="cell"][data-date]').count();
   expect(days).toBeGreaterThanOrEqual(28);
   expect(days).toBeLessThanOrEqual(42);
-  await expect(page.locator('#calendar-status')).toContainText('공식 일정 미연결');
+  await expect(page.locator('#calendar-status')).toHaveCount(0);
   await page.screenshot({path:'e2e-artifacts/academic-calendar-month.png',fullPage:false});
   await page.goto('/html/academic-faq.html');
   await page.locator('#faq-search-query').fill('계절학기');

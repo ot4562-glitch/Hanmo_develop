@@ -126,6 +126,22 @@ test('모든 텍스트 검색은 입력 즉시 갱신하며 FAQ에 실행 버튼
   assert.match(courses,/query\.addEventListener\('input',render\)/);
 });
 
+test('학사 화면의 불필요한 공식 상태 문구는 제거하고 부서명 링크를 쓴다',()=>{
+  const html=page=>fs.readFileSync(path.join(ROOT,'html',page+'.html'),'utf8');
+  const calendar=html('academic-calendar');
+  const faq=html('academic-faq');
+  const progress=html('academic-progress');
+  const support=html('academic-support');
+  assert.doesNotMatch(calendar,/공식 일정 미연결|id="calendar-status"/);
+  assert.doesNotMatch(faq,/id="faq-status"|공식 답변 미연결/);
+  assert.doesNotMatch(progress,/자가 입력 · 공식 판정 아님/);
+  assert.doesNotMatch(support,/id="support-status"/);
+  const supportScript=fs.readFileSync(path.join(ROOT,'js/academic-support.js'),'utf8');
+  assert.match(supportScript,/h\.append\(department\)/);
+  assert.match(supportScript,/department\.href=item\.source/);
+  assert.doesNotMatch(supportScript,/원문에서 담당 업무·번호 재확인/);
+});
+
 test('home restores the original mock registration layout without the academic-entry promo block',()=>{
  const home=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
  assert.match(home,/<nav class="hanmo-topbar"/);
