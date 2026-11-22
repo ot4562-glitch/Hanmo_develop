@@ -1,9 +1,9 @@
 /* 졸업 준비: 일반 모니터 높이에서 탭·입력·결과를 함께 보는 조밀한 배치. */
 .hanmo-main.progress-main{box-sizing:border-box;max-width:1160px;min-height:0;
-  padding:12px 24px 18px;display:grid;align-content:start;gap:9px}
+  padding:34px 24px 18px;display:grid;align-content:start;gap:9px}
 .progress-page-heading{text-align:center}
-.progress-page-heading .hanmo-schoolmark{margin:0 auto 2px}
-.progress-page-heading .hanmo-schoolmark h1{font-size:25px;line-height:1.2;margin:0 0 4px}
+.progress-page-heading .hanmo-schoolmark{margin:12px 0 32px}
+.progress-page-heading .hanmo-schoolmark h1{font-size:30px;line-height:1.35;margin:0 0 5px;font-weight:700}
 .degree-preparation{display:grid;gap:10px}
 .degree-profile-line{display:flex;align-items:center;gap:12px;min-width:0;
   padding:7px 0;border-block:1px solid #375469;color:#e4f0f8;font-size:13px;font-weight:650}
@@ -17,8 +17,8 @@
   outline:2px solid #f4c76c;outline-offset:2px}
 #degree-credits-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   column-gap:28px;row-gap:3px;align-items:start}
-#degree-credits-panel>h2,#degree-credits-panel>.degree-caveat{grid-column:1 / -1}
-#degree-credits-panel>form{grid-column:1;min-width:0;grid-row:3}
+#degree-credits-panel>h2{grid-column:1 / -1}
+#degree-credits-panel>form{grid-column:1;min-width:0;grid-row:2}
 #degree-credits-panel>.degree-credit-results{grid-column:2;grid-row:3;min-width:0}
 .progress-panel h2{font-size:18px;margin:2px 0 4px}
 .degree-caveat{font-size:12px;color:#9fb8ca;margin:0 0 6px}
@@ -50,7 +50,7 @@
   #degree-credits-panel>form,#degree-credits-panel>.degree-credit-results{grid-column:1;grid-row:auto}
 }
 @media(max-height:760px) and (min-width:801px){
- .hanmo-main.progress-main{padding-top:9px;padding-bottom:10px;gap:6px}
+ .hanmo-main.progress-main{padding-bottom:10px;gap:6px}
  .degree-preparation{gap:7px}
  .degree-profile-line{padding-block:5px}
  .degree-credit-row{padding:5px 0}

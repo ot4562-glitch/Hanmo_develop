@@ -4,7 +4,6 @@
  const form=document.getElementById('faq-search-form');
  if(!form)return;
  const input=document.getElementById('faq-search-query');
- const status=document.getElementById('faq-status');
  const list=document.getElementById('faq-topic-list');
  const topics=[
   {name:'학점·수강',tokens:['학점','수강','성적','강좌'],url:'https://haksa.hufs.ac.kr/haksa/index.do'},
@@ -16,7 +15,6 @@
   list.replaceChildren();
   const q=input.value.trim().toLocaleLowerCase('ko');
   const selected=topics.filter(t=>!q||t.tokens.some(x=>x.toLocaleLowerCase('ko').includes(q)||q.includes(x.toLocaleLowerCase('ko'))));
-  status.textContent=selected.length+'개 확인 경로 · 공식 답변 미연결';
   if(!selected.length){const n=document.createElement('p');n.textContent='결과 없음 · 공식 안내 확인';list.append(n);}
   for(const t of selected){
    const item=document.createElement('article');item.className='hanmo-item';

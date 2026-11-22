@@ -5,7 +5,6 @@
  if(!campus)return;
  const topic=document.getElementById('support-topic');
  const list=document.getElementById('support-results');
- const status=document.getElementById('support-status');
  const academic='https://haksa.hufs.ac.kr/haksa/index.do';
  const oneStop='https://dep.hufs.ac.kr/onestop/13394/subview.do';
  const entries={
@@ -23,13 +22,19 @@
  function render(){
   list.replaceChildren();
   const item=entries[campus.value]?.[topic.value];
-  if(!item){status.textContent='문의 정보를 확인할 수 없습니다.';return;}
-  status.textContent='공식 연락처 · 원문 재확인';
+  if(!item){
+    const missing=document.createElement('p');
+    missing.textContent='문의 정보를 확인할 수 없습니다.';
+    list.append(missing);return;
+  }
   const card=document.createElement('article');card.className='hanmo-item';
-  const h=document.createElement('h3');h.textContent=item.name;
+  const h=document.createElement('h3');
+  const department=document.createElement('a');
+  department.href=item.source;department.target='_blank';department.rel='noopener noreferrer';
+  department.textContent=item.name;
+  h.append(department);
   const phone=document.createElement('a');phone.href='tel:'+item.telephone;phone.textContent=item.telephone;
-  const source=document.createElement('a');source.href=item.source;source.target='_blank';source.rel='noopener noreferrer';source.textContent='원문에서 담당 업무·번호 재확인';
-  card.append(h,phone,source);list.append(card);
+  card.append(h,phone);list.append(card);
  }
  campus.addEventListener('change',render);topic.addEventListener('change',render);
  render();
