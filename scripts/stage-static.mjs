@@ -4,7 +4,7 @@ import {resolve,join} from 'node:path';
 const root=resolve(import.meta.dirname,'..');
 const dist=join(root,'dist');
 const build=join(root,'.build');
-const bundles=['student-forecast.js','student-entry.js','academic-progress.js','degree-preparation.js'];
+const bundles=['student-forecast.js','student-entry.js','degree-preparation.js'];
 const exists=async p=>{try{return(await stat(p)).isFile()}catch{return false}};
 for(const bundle of bundles)
   if(!await exists(join(build,bundle)))throw Error('Missing generated academic JS bundle: '+bundle);
@@ -24,7 +24,7 @@ for(const bundle of bundles)
 for(const name of [
  'index.html','html/planner.html','html/forecast.html','html/catalog.html',
  'html/academic-timeline.html','html/academic-progress.html',
- 'html/vsugang.html','sitemap.xml','js/student-forecast.js','js/student-entry.js','js/academic-progress.js','data/academic-source-config.json',
+ 'html/vsugang.html','sitemap.xml','js/student-forecast.js','js/student-entry.js','js/degree-preparation.js','data/academic-source-config.json',
 ])if(!await exists(join(dist,name)))throw Error('Missing public student asset '+name);
 if(await exists(join(dist,'CNAME')))throw Error('CNAME leaked into QA artifact');
 const rootEntries=await readdir(dist);

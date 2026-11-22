@@ -92,9 +92,10 @@ test('내정보로 졸업 준비를 구성하고 학점 및 여름 계절학기 
   await page.locator('#planner-profile button[type="submit"]').click();
   await expect(page.locator('#planner-message')).toContainText('저장');
   await page.goto('/html/academic-progress.html');
-  await expect(page.locator('#degree-major')).toHaveValue('경제학전공');
-  await expect(page.locator('#degree-kind')).toHaveValue('DOUBLE');
-  await expect(page.locator('#degree-band')).toContainText('24학번');
+  await expect(page.locator('#degree-context-summary'))
+    .toHaveText(/2024학번 · 서울캠퍼스 · 이중전공 · 경제학전공 · 영어학전공/);
+  await expect(page.locator('#degree-advanced')).toHaveCount(0);
+  await expect(page.locator('#record-form')).toHaveCount(0);
   await page.locator('#degree-earned-general').fill('28');
   await page.locator('#degree-target-general').fill('34');
   await page.locator('#degree-earned-total').fill('80');
@@ -106,15 +107,7 @@ test('내정보로 졸업 준비를 구성하고 학점 및 여름 계절학기 
   await expect(page.locator('#degree-earned-general')).toHaveValue('28');
   await page.locator('[data-degree-tab="requirements"]').click();
   await expect(page.locator('#degree-guidance')).toContainText('확인 필요');
-  await page.locator('#degree-advanced summary').click();
-  await page.locator('#record-course').fill('ECON101');
-  await page.locator('#record-credits').fill('3');
-  await page.locator('#record-term').fill('2025-S');
-  await page.locator('#record-form button[type="submit"]').click();
-  await expect(page.locator('#record-rows')).toContainText('2025-S');
-  await page.reload();
-  await page.locator('#degree-advanced summary').click();
-  await expect(page.locator('#record-rows')).toContainText('2025-S');
+
 });
 
 test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색이 안전하게 작동한다',async({page})=>{

@@ -104,10 +104,10 @@ test('academic entry handoff and three A/B/C plans integrate into existing pages
   assert.ok(planner.includes('id="'+id+'"'),id);
  assert.ok(planner.includes('../js/student-entry.js'));
  assert.ok(notices.includes('id="notice-context"'));
- for(const id of ['record-form','record-rows','credit-overview','scenario-choice',
-  'plan-form','scenario-comparison','plan-term','plan-course'])
+ for(const id of ['degree-context-summary','degree-credit-form','degree-guidance','degree-credits-panel','degree-requirements-panel'])
   assert.ok(progress.includes('id="'+id+'"'),id);
- assert.ok(progress.includes('../js/academic-progress.js'));
+ assert.doesNotMatch(progress,/degree-advanced|record-form|plan-form|scenario-choice|academic-progress\.js|student-progress\.js/);
+ assert.ok(progress.includes('../js/degree-preparation.js'));
  assert.ok(progress.includes('../css/academic-progress.css'));
  assert.doesNotMatch(progress,/class="planner-sidebar"|type="file"|<textarea/);
  const plannerNav=fs.readFileSync(path.join(ROOT,'html/planner.html'),'utf8');
