@@ -1,7 +1,7 @@
 name: Feature browser QA (#113-#116)
 on:
   push:
-    branches: [main, 'work/direct-selectzone-calendar-minimal-20261122']
+    branches: [main, 'work/direct-rebased-selectzone-20261122']
   pull_request:
     branches: [main]
     paths:

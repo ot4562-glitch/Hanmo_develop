@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "vitest run js/academic/core js/academic/views",
-    "build": "esbuild js/academic/app/student-forecast.js js/academic/app/student-entry.js js/academic/app/academic-progress.js js/academic/app/degree-preparation.js --bundle --platform=browser --format=iife --target=es2022 --minify --keep-names --outdir=.build && node scripts/stage-static.mjs",
+    "build": "esbuild js/academic/app/student-forecast.js js/academic/app/student-entry.js js/academic/app/degree-preparation.js js/academic/app/academic-calendar.js --bundle --platform=browser --format=iife --target=es2022 --minify --keep-names --outdir=.build && node scripts/stage-static.mjs",
     "smoke": "node scripts/check-static-pages.mjs && node --test tests/academic-data-source.test.cjs tests/student-navigation.test.cjs tests/student-profile.test.cjs tests/home-fit.test.cjs tests/vsugang-fit.test.cjs",
     "check": "npm run check:boundaries && npm run check:syntax && npm run check:types && npm run test && npm run check:legacy && npm run build && npm run smoke",
     "check:legacy": "node --test tests/device-gate.test.cjs tests/legacy-baseline.test.cjs tests/scenario-settings.test.cjs tests/incident-404.test.cjs tests/waiting-settings.test.cjs",
@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "papaparse": "5.7.0",
-    "zod": "4.6.7"
+    "zod": "4.6.7",
+    "fullcalendar": "7.1.5",
+    "temporal-polyfill": "1.0.8"
   },
   "devDependencies": {
     "@types/node": "22.20.5",
