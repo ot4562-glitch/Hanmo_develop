@@ -1,7 +1,7 @@
 name: Repository checks
 on:
   push:
-    branches: [main, 'work/fit-academic-views-live-search-20261122']
+    branches: [main]
   pull_request:
     paths:
       - 'index.html'
