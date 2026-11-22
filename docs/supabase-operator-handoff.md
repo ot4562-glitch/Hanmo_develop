@@ -18,7 +18,7 @@
 |---|---|
 | **비공개 데이터 구조** | 출처·사용권·원문 판본, 과목/개설/분반 및 관측 분반 수, 교수·담당, **공지 보존 분류/상세 확인 기한**, 반복행사의 **학생/행정 마감**, 학사요건, 수집 작업, 후보 스냅샷/근거 연결, 독립 검수/승인, 감사 로그 |
 | **공개 API 테이블** | `public.hanmo_public_snapshots` — 하나의 활성·유효·비철회 스냅샷만 조회 가능 |
-| **보안** | 내부 `hanmo_private` 스키마 비노출, RLS, 익명 쓰기 거부, 비공개 관리 함수, 권리 철회 시 미공개 후보·공개 스냅샷 영구 철회, READY 이후 출처 링크 수정 차단, 비공개 함수 실행 권한 제한 |
+| **보안** | 내부 `hanmo_private` 스키마 비노출, RLS, 익명 쓰기 거부, 비공개 관리 함수, 권리 철회 시 미공개 후보·공개 스냅샷 영구 철회, **첫 검수/승인 기록 생성 시점부터** 출처 링크 수정 차단, 비공개 함수 실행 권한 제한 |
 | **배포** | 하지 않음 — 프로젝트 생성, 학사자료 업로드, 실제 연결, 권한 검증 및 운영 승인 별도 |
 
 공개 페이로드는 `schemaVersion=1`에 대응하며 내부 후보 `payload`에 `notices`, `offerings`, `faq` 배열이 있어야 합니다. 게시/개설/FAQ는 반드시 **동일 `snapshot_id`·`manifest_sha256`** 아래 배포합니다. 가상자료나 이미 #95에서 삭제한 과거 참고 공지 JSON을 별도 검수 없이 승인 자료로 승격하지 마세요.
@@ -48,7 +48,7 @@
 
 - 권한 확인된 출처만 `hanmo_private.data_sources`에 등록하고 `rights_status = 'ALLOWED'` 및 확인일을 남깁니다. 학교 회신 전에는 자동 수집·실제 공지/강좌 반입을 실행하지 않습니다.
 - `data_snapshots`는 **먼저 `review_state='DRAFT'`로 생성**하고, 그 상태에서만 `source_revisions`/`snapshot_sources`로 출처 판본을 연결·수정합니다. 실제 원문에서 계산한 정확한 SHA-256, `schema_version=1`, 유효기한과 검수할 정규화 페이로드를 등록합니다.
-- **출처 연결을 끝낸 다음** 독립 검수/승인 별도 기록을 `source_reviews` / `review_approvals`에 등록하고, 검수 완료 후에만 스냅샷 상태를 `READY`로 전환합니다. **READY 이후 출처 연결 추가·수정·삭제는 거부**되므로 수정이 필요하면 새 스냅샷 ID로 처음부터 다시 검수합니다. 서로 다른 ID만 적는 것으로 실제 신원/권한 분리가 입증되지는 않습니다.
+- **출처 연결을 끝낸 다음** 독립 검수/승인 별도 기록을 `source_reviews` / `review_approvals`에 등록하고, 검수 완료 후에만 스냅샷 상태를 `READY`로 전환합니다. **검수/승인 기록이 하나라도 생성된 이후에는 DRAFT 상태여도 출처 연결 추가·수정·삭제가 거부**됩니다(READY와 공개 이후도 동일). 출처를 바꿔야 한다면 새 스냅샷 ID로 근거·해시부터 재검수합니다. 서로 다른 ID만 적는 것으로 실제 신원/권한 분리가 입증되지는 않습니다.
 - 위 조건을 충족한 경우에만 **DB 관리자 세션**에서 `SELECT hanmo_private.publish_snapshot('승인된_snapshot_id','실제_운영자_식별자');`를 실행합니다. 이미 공개된 다른 안전한 판본으로 돌아갈 때도 같은 함수로 권리/검수/철회 여부를 다시 확인합니다.
 - 출처 권리 철회 또는 권리 확인일이 제거(`NULL`)되면 **공개된 판본뿐 아니라 해당 출처에 연결된 미공개 후보도 `REVOKED`로 영구 철회**되며, `release_audit`에 REVOKE 이력을 기록합니다. 재허용되더라도 이전 스냅샷 ID는 `READY`로 복원·삭제 후 재사용·재발행할 수 없습니다. 새로운 스냅샷 ID로 출처·페이로드·검수·승인을 다시 준비해야 합니다. 필요시 관리자 세션에서 `SELECT hanmo_private.revoke_snapshot('snapshot_id','운영자','철회 이유');`를 실행합니다. **직접 SQL로 철회판본의 `is_active`를 다시 켜는 것도 금지**됩니다.
 
@@ -98,4 +98,4 @@ node --test supabase/tests/bootstrap.test.mjs
 - [#66](https://github.com/ot4562-glitch/Hanmo_develop/issues/66): 권리 승인 후 수집·정규화·검수 연동
 - [#67](https://github.com/ot4562-glitch/Hanmo_develop/issues/67): 실환경·정정/철회·장애 복구·제품 회귀 인수
 
-**기준 문서:** [docs/architecture.md §7](../docs/architecture.md#7-3차--supabase-설계인계-및-실제-제품-연계). 1차 학업 코어와 2차 시뮬레이터의 JavaScript/JSDoc 계약을 유지하며, 원본 `html/practice.html`, `html/selectZone.html`은 수정하지 않습니다.
+**기준 문서:** [docs/architecture.md §7](../docs/architecture.md#7-3차--supabase-설계인계-및-실제-제품-연계). 1차 학업 코어와 2차 시뮬레이터의 JavaScript/JSDoc 계약을 유지하며, `html/practice.html`의 원본 흐름과 `html/selectZone.html`의 **승인된 합성 CAPACITY 수정 외 기존 신청/대기 동작**을 보호합니다.
