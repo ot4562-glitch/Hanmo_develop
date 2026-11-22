@@ -10,7 +10,18 @@ permissions:
 jobs:
   static-bootstrap:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 12
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: hanmo_ci_only
+          POSTGRES_DB: hanmo_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d hanmo_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -20,3 +31,27 @@ jobs:
           node-version: '22'
       - name: Check SQL installer invariants
         run: node --test supabase/tests/bootstrap.test.mjs
+      - name: Execute installer and security regressions on isolated PostgreSQL 16
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGDATABASE: hanmo_ci
+          PGPASSWORD: hanmo_ci_only
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq postgresql-client
+          fi
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE anon NOLOGIN;
+          CREATE ROLE authenticated NOLOGIN;
+          CREATE ROLE service_role NOLOGIN;
+          SQL
+          psql -v ON_ERROR_STOP=1 -f supabase/hanmo-setup.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/hanmo-verify.sql | tee /tmp/hanmo-supabase-verify.log
+          if grep -E '[[:space:]]\|[[:space:]]*FAIL' /tmp/hanmo-supabase-verify.log; then
+            echo '::error::Installer verification returned FAIL'
+            exit 1
+          fi
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/bootstrap-runtime.sql
