@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
   "baselineCommit": "da30a87510f1cdac282600fa4e914da2585a6031",
-  "purpose": "Conservative PC UI after user-approved desktop-fit graduation/calendar/FAQ, live FAQ text search, and empty BASIC-only synthetic-capacity cell. Prior protected practice screens remain unchanged.",
+  "purpose": "Current protected PC UI after user-approved 1920x1080 academic heading alignment, visible FullCalendar month grid, clickable support department labels and deletion of redundant notice text. Original registration imitation stays protected.",
   "files": [
     {
       "path": "css/academic-calendar.css",
-      "sha": "6f1d42a1d8ac6abdf9399fb2a2af756e0c4e395b"
+      "sha": "e79b1e6a46d5469b108f189adbd1a6784dd78d54"
     },
     {
       "path": "css/academic-faq.css",
-      "sha": "04fc76e3057e0d9332f9ca7479af9c2337063e2f"
+      "sha": "a96c1b5821be3ab1d47c98b85e332f212b7633d0"
     },
     {
       "path": "css/academic-progress.css",
-      "sha": "9b24a3cb45c31a59b28a696255d60ef60ac0220d"
+      "sha": "42100ad610cca5b35574aa48b139679e25414050"
     },
     {
       "path": "css/developer.css",
@@ -81,19 +81,19 @@
     },
     {
       "path": "html/academic-calendar.html",
-      "sha": "9cff69d9022dd7da275af5cacdcb38f664da230a"
+      "sha": "fc94592ebe78b9f86b36a93dafce29ff47eb8a30"
     },
     {
       "path": "html/academic-faq.html",
-      "sha": "9f039a9ffe3db7356a91dda459fcc22332635ecb"
+      "sha": "0d0a0f7c92ce919b384334866da4be7957684a0d"
     },
     {
       "path": "html/academic-progress.html",
-      "sha": "2a72cf29006650b3411fc6fa44107ed222cb55be"
+      "sha": "b42e4b53e906f576540a97d2d7fbeef5778e609b"
     },
     {
       "path": "html/academic-support.html",
-      "sha": "483dd11a18cca48b0d5cb49401784637394d002a"
+      "sha": "47b93f054fec094189bbc004dab2f42a0df5d830"
     },
     {
       "path": "html/academic-timeline.html",
@@ -193,11 +193,11 @@
     },
     {
       "path": "js/academic-faq.js",
-      "sha": "1d699d42967a2b5d08d1e580b086d226d9e8fd69"
+      "sha": "e7ba0f9f72bc239c537b0b1969ab604d2f931822"
     },
     {
       "path": "js/academic-support.js",
-      "sha": "c2429648ad9e3791aed227efe598dae01228785d"
+      "sha": "0ae81b35b85bca404c3a824862d38b48cae0ea0d"
     },
     {
       "path": "js/capacity-settings.js",
