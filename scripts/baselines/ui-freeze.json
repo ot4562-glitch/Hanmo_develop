@@ -1,15 +1,19 @@
 {
   "schemaVersion": 1,
   "baselineCommit": "da30a87510f1cdac282600fa4e914da2585a6031",
-  "purpose": "PC UI baseline after approved SelectZone centered fields/required selections, one random BASIC-only closed course, minimal one-line graduation profile and MIT FullCalendar. Preserve unrelated verified main changes.",
+  "purpose": "Conservative PC UI after user-approved desktop-fit graduation/calendar/FAQ, live FAQ text search, and empty BASIC-only synthetic-capacity cell. Prior protected practice screens remain unchanged.",
   "files": [
     {
       "path": "css/academic-calendar.css",
-      "sha": "4137582eb9453c9fccfc72a82dd3b8b9de73c6f5"
+      "sha": "6f1d42a1d8ac6abdf9399fb2a2af756e0c4e395b"
+    },
+    {
+      "path": "css/academic-faq.css",
+      "sha": "04fc76e3057e0d9332f9ca7479af9c2337063e2f"
     },
     {
       "path": "css/academic-progress.css",
-      "sha": "b6d899bf0dd0fd135377ea8cadd2aa6d88f42f23"
+      "sha": "9b24a3cb45c31a59b28a696255d60ef60ac0220d"
     },
     {
       "path": "css/developer.css",
@@ -57,7 +61,7 @@
     },
     {
       "path": "css/practice.css",
-      "sha": "77fb056ac8279498dfa6ddbfdd173b2790810558"
+      "sha": "a8e7c84689f43eee09e5e448f9ea032f382a80bc"
     },
     {
       "path": "css/result.css",
@@ -81,11 +85,11 @@
     },
     {
       "path": "html/academic-faq.html",
-      "sha": "0066e5be08274122877d9b7901aec235cfafee81"
+      "sha": "9f039a9ffe3db7356a91dda459fcc22332635ecb"
     },
     {
       "path": "html/academic-progress.html",
-      "sha": "0483de124f7fcff74a0e0fe0aa9247df6397037e"
+      "sha": "2a72cf29006650b3411fc6fa44107ed222cb55be"
     },
     {
       "path": "html/academic-support.html",
@@ -129,7 +133,7 @@
     },
     {
       "path": "html/selectZone.html",
-      "sha": "7b084181aef64c82e3ff11f11745b662387e0b42"
+      "sha": "99670bdd304e9f3b241ddd4b300b59ca29e19012"
     },
     {
       "path": "html/vsugang.html",
@@ -189,7 +193,7 @@
     },
     {
       "path": "js/academic-faq.js",
-      "sha": "db7ae648b628c51fcce91d3bd389745a1d2a0ad9"
+      "sha": "1d699d42967a2b5d08d1e580b086d226d9e8fd69"
     },
     {
       "path": "js/academic-support.js",
@@ -237,7 +241,7 @@
     },
     {
       "path": "js/selectZone.js",
-      "sha": "c85e70d8384c1c613aaa23c0b0a54e372390fb21"
+      "sha": "42448419491c866ea43c6d11a084001bece87d78"
     },
     {
       "path": "js/student-catalog.js",
