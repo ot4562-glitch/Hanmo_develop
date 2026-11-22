@@ -16,8 +16,9 @@ const exists=async(path)=>{try{return (await stat(path)).isFile();}catch{return 
 const must=async(name)=>{if(!await exists(join(dist,name)))throw Error('Missing staged asset '+name);};
 for(const name of [
   'index.html','css/student-ui.css','js/student-forecast.js',
-  'js/student-preferences.js','js/student-notices.js','js/student-catalog.js','js/student-progress.js',
-  'js/student-entry.js','js/academic-progress.js','css/academic-progress.css',
+  'js/student-preferences.js','js/student-notices.js','js/student-catalog.js',
+  'js/student-entry.js','js/degree-preparation.js','css/academic-progress.css',
+ 'js/academic-calendar.js','css/academic-calendar.css','css/academic-calendar-vendor.css',
   'js/student-profile-bar.js','css/hanmo-flat.css',
   'js/home-fit.js','css/home-fit.css',
   'js/vsugang-fit.js','css/vsugang-fit.css',

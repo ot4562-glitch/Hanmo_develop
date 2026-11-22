@@ -73,23 +73,23 @@
 							<label><input type="radio" name="course-mode" value="FOUNDATION">기초</label>
 						</fieldset>
 						<div class="menu-extra" data-course-filter="MAJOR" hidden>
-							<label>학과선택 <select aria-label="학과선택"><option value="">---Select---</option><option value="SEOUL">서울캠퍼스 가상 전공</option><option value="GLOBAL">글로벌캠퍼스 가상 전공</option></select></label>
+							<label>학과선택 <select aria-label="학과선택"><option value="">***Select***</option><option value="SEOUL">서울캠퍼스 가상 전공</option><option value="GLOBAL">글로벌캠퍼스 가상 전공</option></select></label>
 							<label>학년 <select aria-label="전공 학년"><option>1학년</option><option>2학년</option><option>3학년</option><option>4학년</option></select></label>
 						</div>
 						<div class="menu-extra" data-course-filter="GENERAL" hidden>
-							<label>교양과목 <select aria-label="교양과목"><option value="">---Select---</option><option value="GENERAL">교양 가상 강좌</option></select></label>
-							<label>조회구분 <select aria-label="교양 조회구분"><option>신청가능과목</option><option>전체과목</option></select></label>
+							<label>교양과목 <select aria-label="교양과목"><option value="">***Select***</option><option value="GENERAL">교양 가상 강좌</option></select></label>
+							<label>조회구분 <select aria-label="교양 조회구분"><option value="">***Select***</option><option value="AVAILABLE">신청가능과목</option><option value="ALL">전체과목</option></select></label>
 							<label>학년 <select aria-label="교양 학년"><option>1학년</option><option>2학년</option><option>3학년</option><option>4학년</option></select></label>
 						</div>
 						<div class="menu-extra" data-course-filter="FOUNDATION" hidden>
 							<label>이수영역 <select aria-label="기초 이수영역"><option>［글로벌］(모든영역 공통)기초 인문영역</option><option>［서울］기초 교양영역</option></select></label>
-							<label>조회구분 <select aria-label="기초 조회구분"><option>신청가능과목</option><option>전체과목</option></select></label>
+							<label>조회구분 <select aria-label="기초 조회구분"><option value="">***Select***</option><option value="AVAILABLE">신청가능과목</option><option value="ALL">전체과목</option></select></label>
 						</div>
 						<button class="search" type="button" onclick="pyoDisplay()">Search</button>
 					</nav>
-					<p class="course-general-warning" id="course-general-warning" hidden>※ 교양교과목 수강신청 시 종합정보시스템의 '교양영역별 취득현황'을 확인 후 신청바람.</p>
-					<p class="course-search-prompt" id="course-search-prompt" role="status">----- [Search] 버튼을 눌러 개설강좌를 조회하세요! -----</p>
-					<p class="course-capacity-hint" id="course-capacity-hint" role="status" hidden>가상 정원 마감입니다. 전공·교양·기초 동그라미를 선택한 뒤 Search로 대체 과목을 조회하세요.</p>
+					<p class="course-general-warning" id="course-general-warning" hidden>*** 교양교과목 수강신청 시 종합정보시스템의 '교양영역별 취득현황'을 확인 후 신청바람. ***</p>
+					<p class="course-search-prompt" id="course-search-prompt" role="status">***** [Search] 버튼을 눌러 개설강좌를 조회하세요! *****</p>
+					<p class="course-capacity-hint" id="course-capacity-hint" role="status" hidden>정원 마감 · 전공·교양·기초에서 대체과목 조회</p>
 					<section class='vsugangTable'>
 						<div class='waiting unvisible'>
 							<img class='waitingLogo' src='../img/hanmo_color.png'/>

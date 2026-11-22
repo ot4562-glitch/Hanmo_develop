@@ -1,5 +1,7 @@
 name: Feature browser QA (#113-#116)
 on:
+  push:
+    branches: [main, 'work/direct-selectzone-calendar-minimal-20261122']
   pull_request:
     branches: [main]
     paths:
@@ -7,6 +9,9 @@ on:
       - 'js/selectZone.js'
       - 'html/academic-progress.html'
       - 'js/academic/app/degree-preparation.js'
+      - 'js/academic/app/academic-calendar.js'
+      - 'css/academic-calendar.css'
+      - 'package.json'
       - 'tests/browser-feature.spec.mjs'
       - 'tests/playwright-feature.config.mjs'
       - 'scripts/serve-feature-preview.mjs'
