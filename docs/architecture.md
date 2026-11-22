@@ -100,7 +100,7 @@ index.html — 기존 한모 홈(학기 제목, NOTICE, 이용 시간, 비공식
 /html/academic-timeline.html — 공지 안내/공식 원문 링크
 /html/forecast.html — 이전 개설 전망 URL 호환용, 강의 검색으로 이동
 /html/catalog.html — 검수된 강의 검색·학기별 개설 근거/미검수 UNKNOWN 동시 표시
-/html/academic-progress.html — 졸업 준비 [학점]/[졸업요건]·내정보 자동 구성·로컬 저장; 기존 과목 기록과 학기 A/B/C는 '자세히'에서 사용
+/html/academic-progress.html — 졸업 준비 [학점]/[졸업요건]·내정보 1줄 표시·로컬 학점 저장(과목 기록/학기 계획 상세 UI 삭제)
 /css/student-ui.css, hanmo-* · hanmo-flat.css — 공통 스타일과 평평한 학업 섹션
 /js/academic/ — JavaScript/JSDoc 전용 코어·계약·테스트
 
@@ -154,7 +154,7 @@ TypeScript 소스 0개를 유지; 4차는 실제 데이터·권리·PC/보안 �
 | **홈** | 학기 제목·학교 문양·NOTICE·이용 가능/제한 시간·비공식 안내 및 **수강신청 연습하기/새로고침/개발자 소개** 버튼 유지. **09:58~10:10에도 연습 버튼을 숨기지 않고 모드 선택 화면까지 진입**, 실제 practice의 기존 시간 제한은 유지. 대형 학업 홍보 카드 제거. 상단 바가 사라지지 않도록 홈 본문을 PC 뷰포트에 맞추고 홈 세로 스크롤 없음 | `index.html`, `css/home-fit.css`, `js/home-fit.js` |
 | **공통 상단 바** | 한모 브랜드→홈 / 학사 공지 / 강의 검색(개설 전망 통합) / 졸업 준비 / 학업 도구(학사 달력·FAQ·공식 상담) / 프로필 요약 / 내정보(맨 오른쪽). 내정보 노란 밑줄은 현재 페이지에서만 표시하고 상단 바를 불투명하게 처리 | `css/hanmo-components.css`, `js/student-profile-bar.js` |
 | **내정보** | 캠퍼스·주전공·이중/부전공·입학년도 선택을 이 브라우저에만 저장. 입학년도는 현재 KST 연도+1까지만 허용하며 가짜 학교 로그인·학번 조회를 제공하지 않음 | `html/planner.html`, `js/student-preferences.js` |
-| **학업 페이지** | 남색 계열·사이드바 없는 학업 페이지. `졸업 준비` 학점/요건 탭 및 이전 입력 기록 자세히 접기, `강의 검색` 내 전망 상태 구분, 달력·FAQ·공식 상담 탐색 화면. 실자료 미연결에서는 검색·판정 금지 | `html/academic-progress.html`, `html/catalog.html`, `html/academic-calendar.html`, `html/academic-faq.html`, `html/academic-support.html` |
+| **학업 페이지** | 남색 계열·사이드바 없는 학업 페이지. `졸업 준비` 학점/요건 탭과 프로필 1줄 표시, `강의 검색` 내 전망 상태 구분, 달력·FAQ·공식 상담 탐색 화면. 실자료 미연결에서는 검색·판정 금지 | `html/academic-progress.html`, `html/catalog.html`, `html/academic-calendar.html`, `html/academic-faq.html`, `html/academic-support.html` |
 | **모의신청 모드** | BASIC 돌발상황에서 RECONNECT와 CAPACITY를 각각 예/아니오로 선택(모두 기본 OFF), 기존 강의 신청/접속 대기 기본값과 TIME/SELECT 흐름 유지 | `html/vsugang.html`, `js/scenario-settings.js`, `js/capacity-settings.js` |
 | **합성 연습** | 실제 BASIC practice→selectZone 전환 시 1회 정적 가상 404 페이지. 왼쪽 메뉴는 비활성 시각 요소로만 유지하고 Chrome 실제 새로고침으로 정상 selectZone 복구; 브라우저 뒤로가기는 지원·안내하지 않음. 화면 안의 복구 버튼은 없음. 실제 학교 네트워크 오류/신청 결과와 비연동, OFF는 원본 진입 | `js/scenario-settings.js`, `js/hanmoSys.js`, `html/incident-404.html`, `js/incident-404.js`, `css/incident-404.css` |
 | **원본·접근 제한** | 사용자 승인에 따라 `selectZone.html`/`selectZone.js`/`practice.css`에 조건 UI·정원 마감 합성 기능만 제한적으로 변경. **`practice.html`/`practice.js`와 실제 연습 시간/원본 대기/신청 확인창 보존**. PC 전용 유지 | `html/selectZone.html`, `js/selectZone.js`, `js/pc-only.js` |
@@ -176,7 +176,11 @@ TypeScript 소스 0개를 유지; 4차는 실제 데이터·권리·PC/보안 �
 - **전공 변경 What-if:** 주전공 변경, 이중전공 신청/변경/포기, 부전공 전환, 전공심화 경로에 따른 전후 부족 요건과 수강 계획을 비교합니다. 변경은 가정일 뿐 실제 전공 배정, 지원 자격, 합격이나 학칙 적용 변경을 단정하지 않습니다.
 - **장기 경로:** 남은 요건, 학기별 최대학점, 과목 선후수, 같은 학기 실제 개설 가능성, 대체 과목과 학적 변경을 고려해 2~4학기 계획 A/B/C와 졸업 지연 위험을 비교합니다. **현재 한 학기 제약 검사 코어와 구별되는 신규 최적화 기능**이며 공식 강의·교과과정 정본 없이는 조건부 시나리오로만 표시합니다.
 
-**#113·#114 졸업 준비 구현 계약:** 저장된 `내정보`의 학번(~2024/2025~)·캠퍼스·주전공·이중/부전공으로 두 탭을 자동 구성하고 페이지에서만 선택을 바꿀 수 있습니다. 교양·본전공·이중전공/부전공·기타·총 취득 및 목표를 분리하며, 각 영역 초과와 전체 합계 불일치를 알립니다. 공식 RulePack이 아직 검수되지 않았으므로 `졸업요건`(졸업시험·논문·외국어 인증)과 미입력 목표 학점은 **'확인 필요'**입니다. 입력 학점·기존 과목 기록·A/B/C 계획은 브라우저에만 보관하며 1·2·여름(S)·겨울(W) 학기를 입력할 수 있습니다. 기존 과목/계획 상세 기능은 접어서 유지하고 학점 숫자로 공식 졸업 판정을 하지 않습니다. [#113](https://github.com/ot4562-glitch/Hanmo_develop/issues/113) · [#114](https://github.com/ot4562-glitch/Hanmo_develop/issues/114) · [#115](https://github.com/ot4562-glitch/Hanmo_develop/issues/115)
+**#113·#114 졸업 준비 구현 계약:** 저장된 `내정보`의 학번(~2024/2025~)·캠퍼스·주전공·이중/부전공으로 두 탭을 자동 구성하고 페이지에서만 선택을 바꿀 수 있습니다. 교양·본전공·이중전공/부전공·기타·총 취득 및 목표를 분리하며, 각 영역 초과와 전체 합계 불일치를 알립니다. 공식 RulePack이 아직 검수되지 않았으므로 `졸업요건`(졸업시험·논문·외국어 인증)과 미입력 목표 학점은 **'확인 필요'**입니다. 학점 입력은 브라우저 로컬 저장에 한정하고, 과목 기록·학기 계획·계획 비교는 학생 화면과 사용되지 않는 렌더러에서 삭제했습니다. 입력 학점으로 공식 졸업 판정을 하지 않습니다. 계절학기(S/W) 정규화 코어의 단위 테스트는 유지합니다. [#113](https://github.com/ot4562-glitch/Hanmo_develop/issues/113) · [#114](https://github.com/ot4562-glitch/Hanmo_develop/issues/114) · [#115](https://github.com/ot4562-glitch/Hanmo_develop/issues/115)
+
+**모의신청 Search 조건 정합성:** 관심강좌·전공·교양·기초를 중앙 정렬하고 라디오 변경만으로는 조회하지 않습니다. 학과·교양과목·조회구분이 `***Select***`이면 Search를 중단하고 해당 값을 선택하라는 웹 알림을 보여줍니다. 안내의 강조 테두리는 `***` 표기를 유지합니다.
+
+**학사 달력 오픈소스:** GPL-3.0 프로젝트에 MIT 허용 라이선스의 [FullCalendar 7](https://fullcalendar.io/docs/vanilla-js) 무료 DayGrid만 번들로 사용합니다. 외부 CDN 로드와 Premium Scheduler를 사용하지 않고, 행사 데이터는 공식 검수 전에는 빈 배열로 둡니다. 학생 화면은 설명형 문단보다 월간 보기와 단문 상태·원문 링크를 우선합니다.
 
 ### 4.2 학칙 원문 승인·판본 관리·학생별 개정 영향
 
@@ -282,7 +286,7 @@ TypeScript 소스 0개를 유지; 4차는 실제 데이터·권리·PC/보안 �
 
 ## 5. 2차 — 기존 모의수강신청 실전 시나리오
 
-BASIC 오른쪽 아래 **돌발상황**은 `RECONNECT`(1회 가상 404)와 `CAPACITY`(첫 합성 신청의 정원 마감) 두 예/아니오를 각각 기본 OFF로 제공합니다. CAPACITY가 ON이면 마감된 강좌 신청 버튼이 사라지고, Search를 누르기 전 라디오만으로 관심강좌·전공·교양·기초의 조회 조건을 바꿀 수 있습니다. Search를 누르면 전공·교양·기초는 합성 대체과목만 보여줍니다. 실제 강의 정원·신청 서버·실학사 자료와 연결하지 않으며, RECONNECT/접속 대기/원본 신청 버튼의 기본 동작을 보호합니다. [#116](https://github.com/ot4562-glitch/Hanmo_develop/issues/116)
+BASIC 오른쪽 아래 **돌발상황**은 `RECONNECT`(1회 가상 404)와 `CAPACITY`(BASIC에서 임의의 한 합성 관심강좌 정원 마감) 두 예/아니오를 각각 기본 OFF로 제공합니다. CAPACITY가 ON이면 마감된 강좌 신청 버튼이 사라지고, Search를 누르기 전 라디오만으로 관심강좌·전공·교양·기초의 조회 조건을 바꿀 수 있습니다. Search를 누르면 전공·교양·기초는 합성 대체과목만 보여줍니다. 실제 강의 정원·신청 서버·실학사 자료와 연결하지 않으며, RECONNECT/접속 대기/원본 신청 버튼의 기본 동작을 보호합니다. [#116](https://github.com/ot4562-glitch/Hanmo_develop/issues/116)
 
 **접속 대기 시간 세부 설정 (사용자 결정, PR #109):** 필수 SETTING의 기존 단일 접속 대기 예/아니오를 **'강의 신청에 적용할까요?' (예/아니오, 기본 예)**와 **'수강신청 페이지 접속 시에 적용할까요?' (예/아니오, 기본 아니오)**로 분리합니다. 설정 UI에는 구현 파일 이름·괄호를 노출하지 않습니다. 두 값은 독립적으로 저장·복원합니다. 기존 브라우저 저장 키 `waitingValue`는 강의 신청/기존 검색 대기 설정용으로 그대로 유지하여 이전 사용자 선택을 마이그레이션 없이 읽고, 신규 `waitingEntryValue`는 페이지 접속 대기 설정이며 이전 설정값이 없으면 아니오로 취급합니다. 페이지 접속 대기는 신청 페이지에 들어가는 BASIC·SELECT에서만 기존 합성 대기창 `waitingFunc()`를 재사용합니다. 대기 중 왼쪽 메뉴·검색·신청을 비활성화하고, 대기 취소 시 연습 화면으로 돌아가며 완료 후 정상적으로 사용할 수 있습니다. 시간 측정에서 두 대기 유형에 걸린 합성 대기 초를 제외합니다.
 
@@ -299,7 +303,7 @@ BASIC 오른쪽 아래 **돌발상황**은 `RECONNECT`(1회 가상 404)와 `CAPA
 
 ### 5.1 제거된 과목 실패와 기본 연습 보호
 
-마지막 과목 신청 실패(`LAST_VALID`)는 계속 제거합니다. 별도 승인된 CAPACITY는 **가상의 첫 신청에 한해 버튼 제거**를 시연하며, 전공·교양·기초의 합성 목록만 제공하고 학교 실제 개설/정원/대체과목 여부는 확인하지 않습니다. 외부 학업 DB/학교 수강신청 서비스에 어떤 사건도 전송하지 않고 OFF·TIME·SELECT에서 원본 신청/결과·대기 흐름을 보호합니다. [#116](https://github.com/ot4562-glitch/Hanmo_develop/issues/116)
+마지막 과목 신청 실패(`LAST_VALID`)는 계속 제거합니다. 별도 승인된 CAPACITY는 **BASIC 진입마다 관심강좌 중 임의의 한 과목의 신청 버튼을 제거**하며, 전공·교양·기초의 합성 목록만 제공하고 학교 실제 개설/정원/대체과목 여부는 확인하지 않습니다. 외부 학업 DB/학교 수강신청 서비스에 어떤 사건도 전송하지 않고 OFF·TIME·SELECT에서 원본 신청/결과·대기 흐름을 보호합니다. [#116](https://github.com/ot4562-glitch/Hanmo_develop/issues/116)
 
 ### 5.2 전환 시점의 가상 404·실제 브라우저 복구 (RECONNECT)
 

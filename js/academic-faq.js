@@ -16,15 +16,14 @@
   list.replaceChildren();
   const q=input.value.trim().toLocaleLowerCase('ko');
   const selected=topics.filter(t=>!q||t.tokens.some(x=>x.toLocaleLowerCase('ko').includes(q)||q.includes(x.toLocaleLowerCase('ko'))));
-  status.textContent=selected.length+'개 공식 확인 경로 · 검수된 학사 FAQ 답변은 아직 연결되지 않았습니다.';
-  if(!selected.length){const n=document.createElement('p');n.textContent='관련 검수 자료가 없습니다. 학교 공식 안내에서 확인해 주세요.';list.append(n);}
+  status.textContent=selected.length+'개 확인 경로 · 공식 답변 미연결';
+  if(!selected.length){const n=document.createElement('p');n.textContent='결과 없음 · 공식 안내 확인';list.append(n);}
   for(const t of selected){
    const item=document.createElement('article');item.className='hanmo-item';
    const name=document.createElement('h3');name.textContent=t.name+' · 확인 필요';
-   const p=document.createElement('p');p.textContent='학번·캠퍼스·학과별 적용 여부와 정확한 근거는 공식 페이지에서 확인하세요.';
    const a=document.createElement('a');a.href=t.url;a.target='_blank';a.rel='noopener noreferrer';
    a.textContent='공식 안내에서 확인';
-   item.append(name,p,a);list.append(item);
+   item.append(name,a);list.append(item);
   }
  }
  form.addEventListener('submit',e=>{e.preventDefault();render();});

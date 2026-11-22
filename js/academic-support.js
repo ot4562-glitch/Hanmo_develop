@@ -24,13 +24,12 @@
   list.replaceChildren();
   const item=entries[campus.value]?.[topic.value];
   if(!item){status.textContent='문의 정보를 확인할 수 없습니다.';return;}
-  status.textContent='공개된 부서 연락처 · 공식 출처 확인일 2026-11-22';
+  status.textContent='공식 연락처 · 원문 재확인';
   const card=document.createElement('article');card.className='hanmo-item';
   const h=document.createElement('h3');h.textContent=item.name;
   const phone=document.createElement('a');phone.href='tel:'+item.telephone;phone.textContent=item.telephone;
   const source=document.createElement('a');source.href=item.source;source.target='_blank';source.rel='noopener noreferrer';source.textContent='원문에서 담당 업무·번호 재확인';
-  const p=document.createElement('p');p.textContent='학번 및 전공에 따라 담당 창구가 다를 수 있습니다. 개인정보를 사이트에 입력할 필요가 없습니다.';
-  card.append(h,phone,p,source);list.append(card);
+  card.append(h,phone,source);list.append(card);
  }
  campus.addEventListener('change',render);topic.addEventListener('change',render);
  render();
