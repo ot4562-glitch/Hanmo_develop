@@ -332,50 +332,9 @@ test('상단 바의 세 학업 도구가 1920×1080에서 바로 보이는 독�
     for(const link of links){
       const entry=bar.getByRole('link',{name:link.name});
       await expect(entry).toBeVisible();
-      await expect(entry).toHaveAttribute('href',new RegExp(link.end.replaceAll('.','\\.')+'
-  await page.goto('/index.html');
-  await expect(page.locator('.hanmo-tools')).toHaveCount(0);
-  await expect(page.getByRole('link',{name:'학사 달력'})).toBeVisible();
-  const runtimeErrors=[];
-  const failedResources=[];
-  page.on('pageerror',error=>runtimeErrors.push(error.message));
-  page.on('response',response=>{
-    if(response.status()>=400)failedResources.push(response.status()+' '+response.url());
-  });
-  await page.getByRole('link',{name:'학사 달력'}).click();
-  await expect(page).toHaveURL(/academic-calendar\.html$/);
-  await page.waitForTimeout(450);
-
-  expect(runtimeErrors).toEqual([]);
-  expect(failedResources).toEqual([]);
-  await expect(page.locator('#calendar-view [role="heading"][aria-level="2"]')).toBeVisible();
-  const days=await page.locator('#calendar-view [role="cell"][data-date]').count();
-  expect(days).toBeGreaterThanOrEqual(28);
-  expect(days).toBeLessThanOrEqual(42);
-  await expect(page.locator('#calendar-status')).toHaveCount(0);
-  await page.screenshot({path:'e2e-artifacts/academic-calendar-month.png',fullPage:false});
-  await page.goto('/html/academic-faq.html');
-  await page.locator('#faq-search-query').fill('계절학기');
-  await expect(page.locator('#faq-topic-list')).not.toContainText('확인 필요');
-  await expect(page.locator('#faq-search-form button[type="submit"]')).toHaveCount(0);
-  await expect(page.locator('#faq-topic-list .hanmo-item')).toHaveCount(1);
-  await expect(page.locator('#faq-topic-list')).toContainText('계절학기');
-  await page.locator('#faq-search-query').fill('없는 질문 123');
-  await expect(page.locator('#faq-topic-list')).toContainText('결과 없음');
-  await page.locator('#faq-search-query').clear();
-  await expect(page.locator('#faq-topic-list .hanmo-item')).toHaveCount(4);
-  await page.goto('/html/academic-support.html');
-  await page.locator('#support-campus').selectOption('GLOBAL');
-  await page.locator('#support-topic').selectOption('SEASONAL');
-  await expect(page.locator('#support-results')).toContainText('031-330-4086');
-  await page.goto('/html/catalog.html');
-  await expect(page.locator('#catalog-campus')).toBeDisabled();
-  await expect(page.locator('#catalog-target-term')).toBeDisabled();
-  await page.goto('/html/forecast.html');
-  await expect(page).toHaveURL(/\/html\/catalog\.html$/);
-});
-));
-      const tag=await entry.evaluate(el=>el.parentElement?.tagName);
+      const href=await entry.getAttribute('href');
+      expect(href.endsWith(link.end),'상단 링크: '+path+' '+link.name).toBe(true);
+      const tag=await entry.evaluate(element=>element.parentElement?.tagName);
       expect(['NAV','DIV']).toContain(tag);
     }
   }
@@ -405,6 +364,7 @@ test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색
   await page.screenshot({path:'e2e-artifacts/academic-calendar-month.png',fullPage:false});
   await page.goto('/html/academic-faq.html');
   await page.locator('#faq-search-query').fill('계절학기');
+  await expect(page.locator('#faq-topic-list')).not.toContainText('확인 필요');
   await expect(page.locator('#faq-search-form button[type="submit"]')).toHaveCount(0);
   await expect(page.locator('#faq-topic-list .hanmo-item')).toHaveCount(1);
   await expect(page.locator('#faq-topic-list')).toContainText('계절학기');
