@@ -163,12 +163,22 @@ test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색
   await page.goto('/index.html');
   await page.locator('.hanmo-tools summary').click();
   await expect(page.getByRole('link',{name:'학사 달력'})).toBeVisible();
+  const runtimeErrors=[];
+  const failedResources=[];
+  page.on('pageerror',error=>runtimeErrors.push(error.message));
+  page.on('response',response=>{
+    if(response.status()>=400)failedResources.push(response.status()+' '+response.url());
+  });
   await page.getByRole('link',{name:'학사 달력'}).click();
   await expect(page).toHaveURL(/academic-calendar\.html$/);
-  const runtimeErrors=[];
-  page.on('pageerror',error=>runtimeErrors.push(error.message));
   await page.waitForTimeout(450);
+  const calendarState=await page.locator('#calendar-view').evaluate(el=>({
+    html:el.innerHTML.slice(0,2600),children:el.children.length,
+    scripts:[...document.scripts].map(s=>s.src).filter(x=>x.includes('calendar')),
+  }));
+  console.log('CALENDAR_DEBUG',JSON.stringify({runtimeErrors,failedResources,calendarState}));
   expect(runtimeErrors).toEqual([]);
+  expect(failedResources).toEqual([]);
   await expect(page.locator('.fc-toolbar-title')).toBeVisible();
   const days=await page.locator('.fc-daygrid-day[data-date]').count();
   expect(days).toBeGreaterThanOrEqual(28);

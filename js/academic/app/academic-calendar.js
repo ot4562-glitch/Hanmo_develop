@@ -22,7 +22,7 @@ if(root){
     dayMaxEvents:3,
     navLinks:false,
     headerToolbar:{left:'prev,next today',center:'title',right:''},
-    buttonText:{today:'오늘'},
+    buttons:{today:{text:'오늘'}},
     events:[],
     titleFormat:{year:'numeric',month:'long'},
   });
