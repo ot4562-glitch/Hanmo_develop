@@ -82,6 +82,7 @@ function createHarness(seed={}) {
   const location={href:'/',replace(v){events.navigations.push(v);}};
   const sandbox={
     document:doc,localStorage,sessionStorage,location,Date:Clock,
+    Math:Object.assign(Object.create(Math),{random:()=>Number(seed.random??0)}),
     navigator:{userAgent:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/157'},
     alert:x=>events.alert.push(x),
     confirm:x=>{events.confirm.push(x);return true;},
@@ -171,18 +172,29 @@ test('SELECT starts with expected synthetic rows and global inline click handler
   assert.equal(typeof h.expr('pyoDisplay'),'function');
   assert.match(h.get('practiceMode').innerText,/BASIC/);
 });
-test('CAPACITY 선택형 정원 마감은 BASIC 첫 과목만 마감하고 다른 과목은 신청할 수 있다',()=>{
-  const h=createHarness({practiceSetter:1,psubjectValue:3,subjectValue:2,
-    waitingValue:'no',capacityActive:'yes'});
-  h.load('selectZone.js');
-  h.expr('registerClick(1)');
-  assert.equal(h.expr('closedCourses.has(1)'),true);
-  assert.equal(h.expr('count'),0);
-  h.expr('registerClick(1)');
-  assert.equal(h.expr('count'),0);
-  h.expr('registerClick(2)');
-  assert.equal(h.expr('count'),1);
-  assert.match(h.events.alert[0],/정원 초과/);
+test('BASIC CAPACITY는 처음 클릭한 과목이 아니라 임의로 뽑은 딱 한 과목을 마감한다',()=>{
+  for(const [random,expected] of [[0,1],[0.45,2],[0.99,3]]){
+    const h=createHarness({practiceSetter:1,psubjectValue:3,subjectValue:2,
+      waitingValue:'no',capacityActive:'yes',random});
+    h.load('selectZone.js');
+    assert.equal(h.expr('capacityFullCourseId'),expected);
+    assert.equal(h.expr('closedCourses.size'),1);
+    assert.equal(h.expr('closedCourses.has('+expected+')'),true);
+    h.expr('registerClick('+expected+')');
+    assert.equal(h.expr('count'),0);
+    const available=expected===1?2:1;
+    h.expr('registerClick('+available+')');
+    assert.equal(h.expr('count'),1);
+  }
+});
+test('SELECT 모드와 BASIC 옵션 OFF에는 CAPACITY가 영향을 주지 않는다',()=>{
+  for(const setting of [{practiceSetter:3,capacityActive:'yes'},{practiceSetter:1,capacityActive:'no'}]){
+    const h=createHarness({...setting,psubjectValue:3,subjectValue:2,waitingValue:'no',random:0.9});
+    h.load('selectZone.js');
+    assert.equal(h.expr('closedCourses.size'),0);
+    h.expr('registerClick(1)');
+    assert.equal(h.expr('count'),1);
+  }
 });
 test('원본 모의신청 선택 UI에는 네 라디오와 각 Search 전 조건이 있다',()=>{
   const html=fs.readFileSync(path.join(ROOT,'html/selectZone.html'),'utf8');
@@ -192,6 +204,8 @@ test('원본 모의신청 선택 UI에는 네 라디오와 각 Search 전 조건
     assert.match(html,new RegExp('data-course-filter="'+filter+'" hidden'));
   assert.match(html,/course-general-warning/);
   assert.match(html,/course-search-prompt/);
+  assert.match(html,/\*\*\*Select\*\*\*/);
+  assert.doesNotMatch(html,/---Select---|----- \[Search\]/);
 });
 test('successful registration stores one synthetic course and prevents duplicates',()=>{
   const h=createHarness({practiceSetter:1,psubjectValue:3,subjectValue:2,waitingValue:'no'});

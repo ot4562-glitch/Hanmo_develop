@@ -404,15 +404,20 @@ th {
 }
 
 
-/* 첨부된 원본 화면처럼 Search 전에는 라디오 선택만으로 검색 조건이 바뀐다. */
-#course-mode-nav{justify-content:flex-start;align-items:center;gap:8px;flex-wrap:wrap;padding:5px 10px;min-height:28px;box-sizing:border-box}
-#course-mode-nav .course-types{display:flex;align-items:center;gap:11px;flex:0 0 auto;padding:0;margin:0;border:0;min-inline-size:0}
-#course-mode-nav .course-types label{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;cursor:pointer}
+/* 라디오 선택 후 조회조건 전체를 한 덩어리로 가운데 배치한다. */
+#course-mode-nav{display:flex;justify-content:center;align-items:center;align-content:center;gap:6px 12px;
+  flex-wrap:wrap;padding:5px 10px;min-height:30px;box-sizing:border-box}
+#course-mode-nav .course-types{display:flex;justify-content:center;align-items:center;gap:10px;
+  flex:0 0 auto;padding:0;margin:0;border:0;min-inline-size:0}
+#course-mode-nav .course-types label{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;cursor:pointer}
 #course-mode-nav .course-types input{margin:0;accent-color:#188395;width:13px;height:13px}
-#course-mode-nav .menu-extra{display:flex;align-items:center;gap:12px;flex:1 1 auto;min-width:0}
-#course-mode-nav .menu-extra[hidden],.course-general-warning[hidden],.course-capacity-hint[hidden],.course-search-prompt[hidden]{display:none}
-#course-mode-nav .menu-extra label{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
-#course-mode-nav .menu-extra select{font:inherit;font-weight:400;min-width:82px;max-width:300px;padding:1px 3px;height:24px;background:#fff;border:1px solid #8799a7}
+#course-mode-nav .menu-extra{display:flex;align-items:center;justify-content:center;gap:8px;
+  flex:0 1 auto;min-width:0}
+#course-mode-nav .menu-extra[hidden],.course-general-warning[hidden],.course-capacity-hint[hidden],
+.course-search-prompt[hidden]{display:none}
+#course-mode-nav .menu-extra label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+#course-mode-nav .menu-extra select{font:inherit;font-weight:400;min-width:82px;max-width:280px;
+  padding:1px 4px;height:24px;background:#fff;border:1px solid #8799a7}
 #course-mode-nav .menu-extra[data-course-filter="MAJOR"] select:first-child{min-width:125px}
 #course-mode-nav .search{flex:0 0 80px;margin:0}
 #course-mode-nav .course-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
@@ -427,4 +432,8 @@ th {
 .course-capacity-hint{margin:12px 0;color:#b33649;text-align:center;font-size:13px;font-weight:700}
 .course-capacity-label{color:#b33649;font-size:11px;font-weight:700}
 #course-mode-nav :is(input,select,button):focus-visible{outline:2px solid #005e80;outline-offset:2px}
-@media(max-width:1100px){#course-mode-nav .menu-extra{flex-wrap:wrap;gap:6px}#course-mode-nav .menu-extra select{max-width:180px}}
+@media(max-width:1000px){
+ #course-mode-nav{gap:6px 8px}
+ #course-mode-nav .menu-extra{flex-wrap:wrap;gap:5px}
+ #course-mode-nav .menu-extra select{max-width:190px}
+}

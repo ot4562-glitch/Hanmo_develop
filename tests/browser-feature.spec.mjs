@@ -30,6 +30,13 @@ test('관심강좌·전공·교양·기초 선택은 Search 전 메뉴만 바꾸
       await expect(page.locator('[data-course-filter="'+mode+'"]')).toBeVisible();
     await page.screenshot({path:'e2e-artifacts/selectzone-'+mode+'.png',fullPage:false});
   }
+  page.once('dialog',async dialog=>{
+    expect(dialog.message()).toBe('조회구분을 선택해주세요.');
+    await dialog.accept();
+  });
+  await page.locator('button.search').click();
+  await expect(page.locator('.table')).toBeHidden();
+  await page.locator('select[aria-label="기초 조회구분"]').selectOption('AVAILABLE');
   await page.locator('button.search').click();
   await expect(page.locator('.table')).toBeVisible();
   await expect(page.locator('[data-synthetic-alternative="true"]')).toHaveCount(6);
@@ -55,12 +62,18 @@ test('BASIC 정원 마감 ON에서 첫 register를 제거하고 합성 대체과
   await expect(page).toHaveURL(/\/html\/selectZone\.html$/);
   await page.locator('button.search').click();
   await expect(page.locator('.table')).toBeVisible();
-  await page.locator('button.register').first().click();
-  await expect(page.locator('.course-capacity-label')).toBeVisible();
+  await expect(page.locator('.course-capacity-label')).toHaveCount(1);
   await expect(page.locator('.course-capacity-hint')).toBeVisible();
   await expect(page.locator('button.register')).toHaveCount(2);
   await page.locator('input[name="course-mode"][value="MAJOR"]').check();
   await expect(page.locator('.table')).toBeHidden();
+  page.once('dialog',async dialog=>{
+    expect(dialog.message()).toBe('학과를 선택해주세요.');
+    await dialog.accept();
+  });
+  await page.locator('button.search').click();
+  await expect(page.locator('.table')).toBeHidden();
+  await page.locator('select[aria-label="학과선택"]').selectOption('SEOUL');
   await page.locator('button.search').click();
   // 원본 관심강좌 행은 숨긴 채 보존하므로 표시 중인 합성 대체과목만 집계한다.
   await expect(page.locator('[data-synthetic-alternative="true"] button.register')).toHaveCount(6);
