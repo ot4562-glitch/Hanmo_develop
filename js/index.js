@@ -1,7 +1,6 @@
 // 홈 화면은 알림과 이용 가능 상태만 다룬다. BASIC/TIME/SELECT의 실제 연습 로직은 각 연습 페이지에 있다.
 // 모든 시각은 사용자 브라우저의 로컬 시간을 기준으로 한다.
 const $NOTICELIST=document.getElementsByClassName('noticeList')[0];
-const $SUGANGBUTTON=document.getElementsByClassName('button')[0];
 const $GANEUNG=document.getElementsByClassName('ganeung')[0];
 const $JEHAN=document.getElementsByClassName('jehan')[0];
 const $ADFIT=document.getElementsByClassName('adfit')[0];
@@ -34,11 +33,11 @@ function check(){
     $PHONECONTAINER.style.display='flex';
     $ADFIT.style.display='none';
   }
-  // 기존 모의수강신청의 이용 제한 시간(09:58~10:10)을 유지한다.
+  // 제한 시간 안내는 유지하되 선택 화면으로 가는 버튼은 항상 표시합니다.
+  // 실제 모의신청 진입 제한은 하위 연습 화면에서 유지합니다.
   if((nowTime.getHours()===9&&nowTime.getMinutes()>=58)
     ||(nowTime.getHours()===10&&nowTime.getMinutes()<=10)){
-    $SUGANGBUTTON.classList.add('noDisplay');
-    $SUGANGBUTTON.classList.remove('display');
+    // 버튼 대신 상태 안내만 변경합니다.
     $GANEUNG.classList.remove('thisTime');
     $JEHAN.classList.add('thisTime');
   }

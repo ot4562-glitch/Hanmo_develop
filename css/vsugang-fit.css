@@ -46,35 +46,6 @@ body.hanmo-vsugang .settingPanel{
 .incident-option-group small{display:block;margin-top:5px}
 .incident-option-actions{display:flex;justify-content:flex-end;gap:8px}
 .settingPanel :is(button,input):focus-visible{outline:3px solid #ffcf76;outline-offset:2px}
-/* 가상 연습 화면과 스크롤 동작을 정의한다. */
-#incident-practice[hidden],#incident-practice [hidden]{display:none!important}
-#incident-practice{box-sizing:border-box;width:min(1050px,calc(100% - 36px));margin:32px auto 65px;
- background:#071b29;border:1px solid #496c83;border-radius:16px;padding:25px 30px;color:#f5f8fa;
- font-size:15px;line-height:1.65;position:relative}
-#incident-practice *{box-sizing:border-box}
-#incident-practice button{cursor:pointer;min-height:44px;border:1px solid #507c94;border-radius:9px;
- background:#123b51;color:#f8f8f8;font-family:inherit;font-size:14px;font-weight:700;line-height:1.35;padding:10px 17px}
-#incident-practice button:hover{background:#225a73}
-#incident-practice button:focus-visible,#incident-practice input:focus-visible{outline:3px solid #ffcb73;outline-offset:3px}
-.hanmo-incident-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;
- border-bottom:1px solid #43667c;padding-bottom:15px;margin-bottom:16px;flex-wrap:wrap}
-.hanmo-incident-heading h2{font-size:27px;font-weight:750;margin:0}
-.hanmo-incident-warning{padding:12px 16px;border-left:4px solid #f4c76c;
- background:#2a2417;color:#ffdea6;font-size:13px;margin:15px 0 24px}
-.hanmo-incident-feedback{font-size:14px;padding:14px 18px;background:#143249;border-radius:9px;
- border:1px solid #3f718e;min-height:56px}
-.hanmo-incident-feedback[data-result="error"]{background:#3b241e;border-color:#b67861;color:#ffdbc8}
-.hanmo-incident-feedback[data-result="success"]{background:#143c2f;border-color:#639580;color:#d7f4e5}
-.hanmo-example-404{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;
- align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;
- background:#06121ff7;color:#fff}
-.hanmo-example-404 h2{font-size:clamp(27px,4vw,44px);font-weight:800;margin:0}
-.hanmo-example-404 p{max-width:630px;line-height:1.8;color:#d0e0eb;margin:0}
-.hanmo-example-404>div{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
-@media(max-width:700px){#incident-practice{padding:19px 15px}}
-body.hanmo-vsugang main:has(#incident-practice:not([hidden])) .f-dirt-down,
-body.hanmo-vsugang main:has(#incident-practice:not([hidden])) .f-dirt-up{display:none}
-body.hanmo-vsugang #incident-practice:not([hidden]){box-sizing:border-box;width:min(1050px,calc(100% - 16px));max-height:100%;height:100%;margin:0 auto;overflow-y:auto;overscroll-behavior:contain}
 /* 높은 확대율에서는 본문만 스크롤한다. */
 body.hanmo-vsugang.vsugang-compact-scroll>main{display:block;overflow-y:auto;overscroll-behavior:contain}
 body.hanmo-vsugang.vsugang-compact-scroll .f-dirt-down{position:relative;top:auto;left:auto;width:min(600px,100%);max-width:100%;margin:0 auto 20px;transform:none}
@@ -83,4 +54,4 @@ body.hanmo-vsugang.vsugang-compact-scroll .grid{width:100%;grid-template-columns
 body.hanmo-vsugang.vsugang-compact-scroll .grid > :is(div,button) > :is(h2,.mode-tile-title){font-size:clamp(20px,4vw,32px)}
 body.hanmo-vsugang.vsugang-compact-scroll .grid :is(p,.mode-tile-description){display:none}
 body.hanmo-vsugang.vsugang-compact-scroll .f-dirt-up{display:none}
-body.hanmo-vsugang.vsugang-compact-scroll main:has(#incident-practice:not([hidden])){overflow:hidden}
+

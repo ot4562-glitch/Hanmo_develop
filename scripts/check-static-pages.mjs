@@ -10,7 +10,7 @@ const studentPages=[
 const htmlRoutes=[
   'index.html',...studentPages,
   'html/vsugang.html','html/practice.html','html/selectZone.html',
-  'html/result.html','html/developer.html',
+  'html/result.html','html/developer.html','html/incident-404.html',
 ];
 const exists=async(path)=>{try{return (await stat(path)).isFile();}catch{return false;}};
 const must=async(name)=>{if(!await exists(join(dist,name)))throw Error('Missing staged asset '+name);};
@@ -21,6 +21,7 @@ for(const name of [
   'js/student-profile-bar.js','css/hanmo-flat.css',
   'js/home-fit.js','css/home-fit.css',
   'js/vsugang-fit.js','css/vsugang-fit.css',
+  'js/incident-404.js','css/incident-404.css',
   'data/academic-source-config.json','js/academic-data-source.js','html/pc-only.html','js/pc-only.js',
   ...htmlRoutes,
 ])await must(name);
@@ -128,21 +129,27 @@ if(!menu.includes('<body class="hanmo-vsugang">')||
 const fitStyles=await readFile(join(dist,'css/vsugang-fit.css'),'utf8');
 if(!fitStyles.includes('vsugang-compact-scroll')||
    !fitStyles.includes('--vsugang-topbar-bottom')||
-   !fitStyles.includes('#incident-practice:not([hidden])'))
+   !fitStyles.includes('#scenario-settings[open]'))
   throw Error('Missing viewport and settings accessibility protection');
-for(const id of ['scenario-settings','incident-practice','incident-404',
- 'incident-404-refresh','incident-404-back']){
- if(!menu.includes('id="'+id+'"'))throw Error('Missing in-menu incident UI: '+id);
+for(const id of ['scenario-settings','incident-options']){
+  if(!menu.includes('id="'+id+'"'))throw Error('Missing incident setting: '+id);
 }
-for(const file of ['js/scenario-settings.js','css/vsugang-fit.css'])
- await must(file);
-if((menu.match(/data-scenario-toggle=/g)||[]).length!==2||
-   (menu.match(/data-scenario-off=/g)||[]).length!==2)
- throw Error('Two independent yes/no radio pairs are required');
-for(const preset of ['LAST_VALID','RECONNECT']){
- if(!menu.includes('name="incident-'+preset+'" value="no" data-scenario-off="'+preset+'" checked'))
-   throw Error('Incident setting must default to No: '+preset);
-}
+for(const file of ['js/scenario-settings.js','js/incident-404.js','css/incident-404.css'])
+  await must(file);
+if((menu.match(/data-scenario-toggle=/g)||[]).length!==1||
+  (menu.match(/data-scenario-off=/g)||[]).length!==1)
+  throw Error('Only RECONNECT yes/no controls may exist');
+if(!menu.includes('name="incident-RECONNECT" value="no" data-scenario-off="RECONNECT" checked'))
+  throw Error('RECONNECT must default to No');
+if(/LAST_VALID|incident-practice|incident-404-refresh|incident-404-back/.test(menu))
+  throw Error('Removed in-menu failure/timer UI is still present');
+const broken=await readFile(join(dist,'html/incident-404.html'),'utf8');
+if(!broken.includes('class="navigation"')||
+  !broken.includes('inert')||
+  !broken.includes('src="../js/incident-404.js"')||
+  (broken.match(/<button\b[^>]*disabled/g)||[]).length!==6||
+  /<button\b[^>]*onclick=|<a\b[^>]*href=/.test(broken))
+  throw Error('Synthetic 404 must keep a non-interactive sidebar and no page recovery controls');
 if(/LAST_CONFLICT|data-base-course|data-alt-course|incident-search|incident-candidates|대체과목 검색/.test(menu))
  throw Error('Deferred substitute/conflict UI must be absent');
 if(/학업 플래너로 이동|scenario-all-on|scenario-all-off/.test(menu))
@@ -164,4 +171,4 @@ for(const p of htmlRoutes){
     throw Error('Dead standalone scenario link from '+p);
 }
 console.log('Student preview smoke: '+studentPages.length+' student pages, '+
-  linkCount+' links, '+ariaCount+' ARIA references; two independent incidents are OFF-by-default settings within vsugang.html.');
+  linkCount+' links, '+ariaCount+' ARIA references; only optional transition 404 is OFF by default; sidebar stays inert until browser reload/back.');

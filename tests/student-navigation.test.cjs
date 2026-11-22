@@ -22,24 +22,21 @@ test('index contains only academic links and no duplicate simulation entry',()=>
  assert.ok(!src.includes('scenario-workshop.html'), 'dead standalone page link');
  assert.ok(!src.includes('href="./degree-rescue/'), 'no academic UI link to old folder');
 });
-test('two opt-in incidents default OFF, without substitute search or conflict UI',()=>{
+test('BASIC의 선택형 404만 남고 메뉴 안의 가상 실패/오류 UI는 제거한다',()=>{
  const html=fs.readFileSync(path.join(ROOT,'html/vsugang.html'),'utf8');
  assert.match(html,/id="scenario-settings"/);
- assert.match(html,/id="incident-practice"/);
- assert.match(html,/id="incident-404"/);
- assert.equal((html.match(/data-scenario-toggle="/g)||[]).length,2);
- assert.equal((html.match(/data-scenario-off="/g)||[]).length,2);
- for(const key of ['LAST_VALID','RECONNECT'])
-  assert.ok(html.includes('name="incident-'+key+'" value="no" data-scenario-off="'+key+'" checked'));
- assert.doesNotMatch(html,/LAST_CONFLICT|data-base-course|data-alt-course|incident-search|incident-candidates/);
- assert.doesNotMatch(html,/data-scenario-toggle="[^"]+"\s+checked/);
+ assert.equal((html.match(/data-scenario-toggle="/g)||[]).length,1);
+ assert.equal((html.match(/data-scenario-off="/g)||[]).length,1);
+ assert.ok(html.includes('name="incident-RECONNECT" value="no" data-scenario-off="RECONNECT" checked'));
+ assert.doesNotMatch(html,/LAST_VALID|incident-practice|incident-404-refresh|incident-404-back/);
  assert.equal(fs.existsSync(path.join(ROOT,'html/scenario-workshop.html')),false);
  assert.equal(fs.existsSync(path.join(ROOT,'html/scenario-lab.html')),false);
  for(const page of student){
-  const body=fs.readFileSync(path.join(ROOT,'html',page+'.html'),'utf8');
-  assert.ok(!body.includes('vsugang.html#scenario-settings'),page);
+   const body=fs.readFileSync(path.join(ROOT,'html',page+'.html'),'utf8');
+   assert.ok(!body.includes('vsugang.html#scenario-settings'),page);
  }
 });
+
 
 test('academic public assets are still under html; engine remains independently typechecked',()=>{
  const stage=fs.readFileSync(path.join(ROOT,'scripts/stage-static.mjs'),'utf8');
@@ -69,19 +66,26 @@ test('new views preserve original Hanmo palette, watermark and shared layers',()
  }
  const originalMenu=fs.readFileSync(path.join(ROOT,'html/vsugang.html'),'utf8');
  assert.match(originalMenu,/class='titleContainer'/);
- assert.match(originalMenu,/id="incident-practice"/);
+ assert.match(originalMenu,/id="scenario-settings"/);
  assert.match(originalMenu,/href="\.\.\/css\/vsugang-fit\.css"/);
 });
 
-test('in-page incident workflow keeps default OFF and original practice contracts',()=>{
-  const source=fs.readFileSync(path.join(ROOT,'js/scenario-settings.js'),'utf8');
-  const menu=fs.readFileSync(path.join(ROOT,'html/vsugang.html'),'utf8');
-  assert.match(menu,/<button id="incident-options"[^>]*aria-controls="scenario-settings"/);
-  assert.match(menu,/<dialog id="scenario-settings"[^>]*>[\s\S]*data-scenario-toggle=/);
-  assert.doesNotMatch(menu.match(/class='settingSection'[\s\S]*?<\/section>/)?.[0]??'',/data-scenario-toggle/);
-  assert.ok(source.includes('sessionStorage'),'reload recovery must have short-lived scoped state');
-  assert.ok(!source.includes('fetch(')&&!source.includes('XMLHttpRequest('));
+test('모드 메뉴에서만 옵션을 켜고 실제 practice→selectZone 전환에서 404를 주입한다',()=>{
+ const source=fs.readFileSync(path.join(ROOT,'js/scenario-settings.js'),'utf8');
+ const router=fs.readFileSync(path.join(ROOT,'js/hanmoSys.js'),'utf8');
+ const menu=fs.readFileSync(path.join(ROOT,'html/vsugang.html'),'utf8');
+ const error=fs.readFileSync(path.join(ROOT,'html/incident-404.html'),'utf8');
+ assert.match(menu,/<button id="incident-options"[^>]*aria-controls="scenario-settings"/);
+ assert.match(menu,/<dialog id="scenario-settings"[^>]*>[\s\S]*data-scenario-toggle=/);
+ assert.doesNotMatch(menu.match(/class='settingSection'[\s\S]*?<\/section>/)?.[0]??'',/data-scenario-toggle/);
+ assert.match(source,/TRANSITION_KEY/);
+ assert.match(router,/page==='practice\.html'&&entry\.phase==='armed'/);
+ assert.match(router,/location\.assign\('\.\/incident-404\.html'\)/);
+ assert.match(error,/src="\.\.\/js\/incident-404\.js"/);
+ assert.doesNotMatch(error,/<button[^>]*onclick=|id="incident-404-refresh"/);
+ assert.ok(!source.includes('fetch(')&&!router.includes('XMLHttpRequest('));
 });
+
 
 test('planner uses the shared top navigation instead of four duplicate feature cards',()=>{
  const body=fs.readFileSync(path.join(ROOT,'html/planner.html'),'utf8');
@@ -132,6 +136,8 @@ test('home restores the original mock registration layout without the academic-e
    './html/forecast.html','./html/catalog.html','./html/academic-progress.html','./html/planner.html'];
  assert.deepEqual([...bar.matchAll(/<a[^>]+href="([^"]+)"/g)].map(x=>x[1]),allowed);
  assert.match(home,/onclick="location\.href='\.\/html\/vsugang\.html'"/);
+ const homeScript=fs.readFileSync(path.join(ROOT,'js/index.js'),'utf8');
+ assert.doesNotMatch(homeScript,/\$SUGANGBUTTON\.classList\.(?:add|remove)\(/,'practice entry must stay visible during restriction notice');
  assert.match(home,/onclick="location\.reload\(\)"/);
  for(const page of student){
    const html=fs.readFileSync(path.join(ROOT,'html',page+'.html'),'utf8');
@@ -174,11 +180,11 @@ test('vsugang menu fits under the navigation while settings and incident remain 
    '../js/vsugang-fit.js','BASIC MODE','TIME MODE','SELECT','SETTING'])
   assert.ok(html.includes(expected),'missing mode-menu contract '+expected);
  for(const expected of ['height:100dvh','--vsugang-fit-scale','--vsugang-topbar-bottom',
-   'vsugang-compact-scroll','overflow-y:auto','#incident-practice:not([hidden])'])
+   'vsugang-compact-scroll','overflow-y:auto','#scenario-settings[open]'])
   assert.ok(css.includes(expected),'missing viewport protection '+expected);
  assert.ok(js.includes('landing.scrollHeight'));
  assert.ok(js.includes('main.clientHeight'));
- assert.equal((html.match(/data-scenario-off="/g)||[]).length,2);
+ assert.equal((html.match(/data-scenario-off="/g)||[]).length,1);
 });
 
 test('every non-imitation topbar puts the editable self-declared student summary before rightmost 내정보',()=>{

@@ -110,7 +110,7 @@
 						</div>
 						<button id="incident-options" type="button" aria-haspopup="dialog" aria-controls="scenario-settings" aria-labelledby="incident-options-title" aria-describedby="incident-options-description">
 							<span class="mode-tile-title" id="incident-options-title">돌발상황</span>
-							<span class="mode-tile-description" id="incident-options-description">BASIC MODE에서 연습할 돌발상황을 선택해요.</span>
+							<span class="mode-tile-description" id="incident-options-description">BASIC MODE의 페이지 전환 404를 연습해요.</span>
 						</button>
 						<div style='grid-area: t' onclick='goPractice(2)'>
 							<h2>
@@ -141,19 +141,12 @@
   <form class="settingPanel" method="dialog">
     <h2 id="scenario-settings-title">BASIC 모드 돌발상황</h2>
     <div class="incident-option-group">
-      <div id="incident-failure-label">마지막 과목 신청 실패</div>
-      <fieldset aria-labelledby="incident-failure-label">
-        <label><input type="radio" name="incident-LAST_VALID" value="yes" data-scenario-toggle="LAST_VALID"> <span>예</span></label>
-        <label><input type="radio" name="incident-LAST_VALID" value="no" data-scenario-off="LAST_VALID" checked> <span>아니오</span></label>
-      </fieldset>
-    </div>
-    <div class="incident-option-group">
       <div id="incident-reconnect-label">가상 404·접속 끊김</div>
       <fieldset aria-labelledby="incident-reconnect-label">
         <label><input type="radio" name="incident-RECONNECT" value="yes" data-scenario-toggle="RECONNECT"> <span>예</span></label>
         <label><input type="radio" name="incident-RECONNECT" value="no" data-scenario-off="RECONNECT" checked> <span>아니오</span></label>
       </fieldset>
-      <small>시작 후 0~6초 사이 404 예시 화면 표시</small>
+      <small>BASIC에서 수강신청 화면으로 이동할 때 1회 가상 404가 표시됩니다.</small>
     </div>
     <div class="incident-option-actions">
       <button class="settingButton" type="submit" value="cancel">취소</button>
@@ -161,20 +154,7 @@
     </div>
   </form>
 </dialog>
-<section id="incident-practice" class="hanmo-incident-practice" aria-label="가상 돌발상황 모의수강신청" tabindex="-1" hidden>
-  <div class="hanmo-incident-heading">
-    <h2 id="incident-mode">BASIC MODE · 가상 돌발상황</h2>
-    <button id="incident-exit" type="button">모드 선택으로 돌아가기</button>
-  </div>
-  <p class="hanmo-incident-warning">모의 연습 · 실제 수강신청과 무관</p>
-  <p id="incident-feedback" class="hanmo-incident-feedback" role="status" aria-live="polite">연습을 시작하세요.</p>
-  <section id="incident-404" class="hanmo-example-404" role="alertdialog" aria-modal="true" aria-labelledby="incident-404-title" aria-describedby="incident-404-desc" hidden>
-    <h2 id="incident-404-title">404 예시화면 입니다</h2>
-    <p id="incident-404-desc">이 화면은 가상 예시이며 실제 인터넷 연결을 끊지 않습니다. 새로고침 또는 뒤로가기를 선택하면 지금까지의 모의신청을 이어서 진행합니다.</p>
-    <div><button id="incident-404-refresh" type="button">새로고침</button>
-      <button id="incident-404-back" type="button">뒤로가기</button></div>
-  </section>
-</section>
+
 			<section class='f-dirt-up'>
 				<section class='adfit'>
 					<ins class="kakao_ad_area" style="display:none;" data-ad-unit = "DAN-b3RfXepcKF3cMeyf" data-ad-width = "728" data-ad-height = "90"></ins>

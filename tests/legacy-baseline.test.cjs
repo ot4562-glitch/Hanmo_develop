@@ -294,7 +294,7 @@ test('home renders semester/notice and shows PC-only message when device is unsu
   assert.match(h.get('title').innerText,/2026-2학기/);
   assert.equal(h.get('phoneContainer').style.display,'flex');
   assert.equal(h.get('container').style.display,'none');
-  assert.equal(h.get('button').classList.contains('noDisplay'),true);
+  assert.equal(h.get('button').classList.contains('noDisplay'),false);
 });
 
 test('each actual HTML page loads classic scripts in order without global collisions',()=>{
@@ -323,66 +323,35 @@ test('each actual HTML page loads classic scripts in order without global collis
 
 
 /**
- * #71: 모드 메뉴의 원본 경로를 비교한다. 돌발상황은 사용자가 선택하기 전까지 두 옵션 모두 꺼져 있다.
- * 이 검사는 Node VM에서 실행하며 실제 브라우저의 SELECT 키보드 동작은 별도 확인한다.
+ * BASIC/TIME/SELECT의 원래 진입 경로를 보존하고, 404는 선택한 BASIC에만 추가합니다.
+ * 실제 SELECT 키보드·대기창 Windows QA는 별도입니다.
  */
-test('current incident options OFF preserve all BASIC/TIME/SELECT menu routes and storage',()=>{
-  const kinds=['LAST_VALID','RECONNECT'];
+test('404 OFF keeps all original BASIC/TIME/SELECT routes and storage',()=>{
   const page=fs.readFileSync(path.join(ROOT,'html/vsugang.html'),'utf8');
-  for(const kind of kinds){
-    assert.match(page,new RegExp('data-scenario-toggle="'+kind+'"'));
-    assert.match(page,new RegExp('data-scenario-off="'+kind+'"'));
-  }
-  for(const file of ['practice.html','selectZone.html','result.html']){
-    const html=fs.readFileSync(path.join(ROOT,'html',file),'utf8');
-    assert.doesNotMatch(html,/src=["'][^"']*scenario-settings\.js/);
-  }
-
-  function observed(mode,withMenuOverlay){
-    const h=createHarness({psubjectValue:3,subjectValue:2,waitingValue:'no'});
-    h.get('psugangVal').value='3';
-    h.get('vsugangVal').value='2';
-    h.load('vsugang.js');
-
-    if(withMenuOverlay){
-      const ids=new Map();
-      for(const id of ['incident-options','scenario-settings','incident-practice','incident-feedback',
-        'incident-mode','incident-404','incident-exit','incident-404-refresh',
-        'incident-404-back'])ids.set(id,element());
-      ids.get('incident-practice').hidden=true;
-      ids.get('incident-404').hidden=true;
-      const radio=(attribute,value,checked)=>{
-        const input=element('input');
-        input.checked=checked;
-        input.getAttribute=name=>name===attribute?value:null;
-        return input;
-      };
-      const yes=kinds.map(kind=>radio('data-scenario-toggle',kind,false));
-      const no=kinds.map(kind=>radio('data-scenario-off',kind,true));
-      h.doc.getElementById=id=>ids.get(id)??null;
-      h.doc.querySelectorAll=selector=>selector==='[data-scenario-toggle]'?yes:
-        selector==='[data-scenario-off]'?no:[];
-      h.load('scenario-settings.js');
-      assert.deepEqual(JSON.parse(h.expr('JSON.stringify(HanmoScenarioSettings.PRESETS)')),kinds);
-      assert.deepEqual(JSON.parse(h.expr('JSON.stringify(HanmoScenarioSettings.selected([]))')),[]);
-      assert.ok(no.every(input=>input.checked));
-      assert.ok(yes.every(input=>!input.checked));
-      assert.equal(ids.get('incident-practice').hidden,true);
-    }
-
-    h.expr('goPractice('+mode+')');
-    return {
-      route:h.location.href,
-      settings:[...h.map].sort(([a],[b])=>a.localeCompare(b)),
-      alerts:[...h.events.alert],
-    };
+  assert.match(page,/data-scenario-toggle="RECONNECT"/);
+  assert.match(page,/data-scenario-off="RECONNECT"/);
+  assert.doesNotMatch(page,/LAST_VALID|incident-practice|incident-404-refresh|delayMs/);
+  for(const name of ['practice.html','selectZone.html','result.html']){
+    const html=fs.readFileSync(path.join(ROOT,'html',name),'utf8');
+    assert.doesNotMatch(html,/scenario-settings\.js|incident-404\.js/);
   }
   for(const mode of [1,2,3]){
-    const original=observed(mode,false);
-    const disabled=observed(mode,true);
-    assert.deepEqual(disabled,original,'OFF parity in mode '+mode);
-    assert.equal(original.route,'practice.html');
-    assert.ok(original.settings.some(([name,value])=>name==='practiceSetter'&&value===String(mode)));
-    assert.equal(original.alerts.length,0);
+    const h=createHarness({psubjectValue:3,subjectValue:2,waitingValue:'no'});
+    h.load('vsugang.js');
+    h.expr('goPractice('+mode+')');
+    assert.equal(h.location.href,'practice.html');
+    assert.equal(h.map.get('practiceSetter'),String(mode));
+    assert.equal(h.events.alert.length,0);
   }
+});
+
+test('mode-selection page stays reachable during restricted time while practice remains gated',()=>{
+  const h=createHarness({deviceInfo:true});
+  h.location.href='/html/vsugang.html';
+  h.load('hanmoSys.js');
+  assert.equal(h.location.href,'/html/vsugang.html');
+  const practice=createHarness({deviceInfo:true});
+  practice.location.href='/html/practice.html';
+  practice.load('hanmoSys.js');
+  assert.equal(practice.location.href,'/');
 });

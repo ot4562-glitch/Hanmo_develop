@@ -7,7 +7,7 @@
     "build": "esbuild js/academic/app/student-forecast.js js/academic/app/student-entry.js js/academic/app/academic-progress.js --bundle --platform=browser --format=iife --target=es2022 --minify --keep-names --outdir=.build && node scripts/stage-static.mjs",
     "smoke": "node scripts/check-static-pages.mjs && node --test tests/academic-data-source.test.cjs tests/student-navigation.test.cjs tests/student-profile.test.cjs tests/home-fit.test.cjs tests/vsugang-fit.test.cjs",
     "check": "npm run check:boundaries && npm run check:syntax && npm run check:types && npm run test && npm run check:legacy && npm run build && npm run smoke",
-    "check:legacy": "node --test tests/device-gate.test.cjs tests/legacy-baseline.test.cjs tests/scenario-settings.test.cjs",
+    "check:legacy": "node --test tests/device-gate.test.cjs tests/legacy-baseline.test.cjs tests/scenario-settings.test.cjs tests/incident-404.test.cjs",
     "check:protected": "node scripts/assert-protected.mjs",
     "check:boundaries": "node scripts/assert-ui-freeze.mjs && node scripts/assert-language-boundary.mjs && node scripts/assert-korean-comments.mjs && node --test tests/korean-comment-policy.test.cjs",
     "check:syntax": "node scripts/check-js-syntax.mjs",
