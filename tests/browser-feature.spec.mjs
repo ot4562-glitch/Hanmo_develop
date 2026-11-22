@@ -92,7 +92,8 @@ test('CAPACITY는 SELECT 모드에서 저장 플래그가 있어도 비활성이
 
 test('BASIC 정원 마감 ON에서 임의의 한 register를 제거하고 합성 대체과목을 신청한다',async({page})=>{
   await page.addInitScript(()=>{Math.random=()=>0.65;});
-  page.on('dialog',dialog=>{void dialog.accept();});
+  const dialogs=[];
+  page.on('dialog',dialog=>{dialogs.push(dialog.message());void dialog.accept();});
   await page.goto('/html/vsugang.html');
   await page.getByRole('button',{name:'모의신청 설정 열기'}).click();
   await page.locator('.psugangVal').fill('3');
@@ -118,11 +119,8 @@ test('BASIC 정원 마감 ON에서 임의의 한 register를 제거하고 합성
   await expect(page.locator('button.register')).toHaveCount(2);
   await page.locator('input[name="course-mode"][value="MAJOR"]').check();
   await expect(page.locator('.table')).toBeHidden();
-  page.once('dialog',async dialog=>{
-    expect(dialog.message()).toBe('학과를 선택해주세요.');
-    await dialog.accept();
-  });
   await page.locator('button.search').click();
+  expect(dialogs.at(-1)).toBe('학과를 선택해주세요.');
   await expect(page.locator('.table')).toBeHidden();
   await page.locator('select[aria-label="학과선택"]').selectOption('SEOUL');
   await page.locator('button.search').click();
@@ -167,6 +165,10 @@ test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색
   await expect(page.getByRole('link',{name:'학사 달력'})).toBeVisible();
   await page.getByRole('link',{name:'학사 달력'}).click();
   await expect(page).toHaveURL(/academic-calendar\.html$/);
+  const runtimeErrors=[];
+  page.on('pageerror',error=>runtimeErrors.push(error.message));
+  await page.waitForTimeout(450);
+  expect(runtimeErrors).toEqual([]);
   await expect(page.locator('.fc-toolbar-title')).toBeVisible();
   const days=await page.locator('.fc-daygrid-day[data-date]').count();
   expect(days).toBeGreaterThanOrEqual(28);
