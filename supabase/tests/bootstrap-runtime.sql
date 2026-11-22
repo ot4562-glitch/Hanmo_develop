@@ -36,6 +36,24 @@ INSERT INTO hanmo_private.review_approvals
 SELECT snapshot_id,'ci-reviewer','ci-approver',manifest_sha256,'APPROVED'
 FROM hanmo_private.data_snapshots;
 
+-- DRAFT 상태에서도 최초 검수/승인 기록이 생긴 뒤에는 출처를 바꿀 수 없습니다.
+DO $check$
+BEGIN
+  BEGIN
+    INSERT INTO hanmo_private.snapshot_sources(snapshot_id,source_revision_id)
+      VALUES ('ci-published','ci-rev-b');
+    RAISE EXCEPTION 'TEST FAILURE: reviewed DRAFT accepted new source';
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM NOT LIKE '%Source links are immutable%' THEN RAISE; END IF;
+  END;
+  BEGIN
+    DELETE FROM hanmo_private.snapshot_sources
+      WHERE snapshot_id='ci-never-published' AND source_revision_id='ci-rev-b';
+    RAISE EXCEPTION 'TEST FAILURE: reviewed DRAFT deleted source';
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM NOT LIKE '%Source links are immutable%' THEN RAISE; END IF;
+  END;
+END $check$;
 UPDATE hanmo_private.data_snapshots SET review_state='READY'
 WHERE snapshot_id IN ('ci-published','ci-never-published');
 
