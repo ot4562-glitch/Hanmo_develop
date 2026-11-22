@@ -237,7 +237,7 @@ CREATE POLICY hanmo_approved_active_read ON public.hanmo_public_snapshots
 
 -- REVOKED 상태는 복구할 수 없으며, 같은 ID의 재활성화는 감사 이력으로도 차단합니다.
 CREATE FUNCTION hanmo_private.guard_snapshot_revocation()
-RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $$
 BEGIN
   IF TG_OP = 'DELETE' THEN
     IF OLD.review_state = 'REVOKED' THEN
@@ -249,7 +249,7 @@ BEGIN
     RAISE EXCEPTION 'Revoked snapshot cannot return to READY or DRAFT';
   END IF;
   RETURN NEW;
-END $;
+END $$;
 CREATE TRIGGER hanmo_snapshot_revocation_guard
   BEFORE UPDATE OR DELETE ON hanmo_private.data_snapshots
   FOR EACH ROW EXECUTE FUNCTION hanmo_private.guard_snapshot_revocation();
@@ -257,7 +257,7 @@ CREATE TRIGGER hanmo_snapshot_revocation_guard
 -- 검수 완료 후 출처를 바꾸면 기존 승인에 미검수 출처를 끼워 넣을 수 있습니다.
 -- 발행·철회와 같은 잠금을 이용해 DRAFT의 출처 변경만 허용합니다.
 CREATE FUNCTION hanmo_private.guard_snapshot_source_links()
-RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $$
 DECLARE
   v_snapshot_id text;
   v_review_state text;
@@ -281,7 +281,7 @@ BEGIN
   END IF;
   IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;
   RETURN NEW;
-END $;
+END $$;
 CREATE TRIGGER hanmo_snapshot_sources_guard
   BEFORE INSERT OR UPDATE OR DELETE ON hanmo_private.snapshot_sources
   FOR EACH ROW EXECUTE FUNCTION hanmo_private.guard_snapshot_source_links();
