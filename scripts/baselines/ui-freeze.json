@@ -1,11 +1,15 @@
 {
   "schemaVersion": 1,
   "baselineCommit": "da30a87510f1cdac282600fa4e914da2585a6031",
-  "purpose": "Current conservative PC UI; user explicitly approved #113-#116 navigation/degree/limited capacity changes. New UI edits still require approval and regression evidence.",
+  "purpose": "Current PC UI baseline after user-authorized SelectZone alignment/required selectors, BASIC-only random full course, minimal graduation profile and MIT FullCalendar month view; edits still need regression verification.",
   "files": [
     {
+      "path": "css/academic-calendar.css",
+      "sha": "52c07ebfef998f08695a5fa31b407c03c25ceffa"
+    },
+    {
       "path": "css/academic-progress.css",
-      "sha": "b88fa7f3fe978ff36f1ae921d22d5e90a27f41b6"
+      "sha": "b6d899bf0dd0fd135377ea8cadd2aa6d88f42f23"
     },
     {
       "path": "css/developer.css",
@@ -53,7 +57,7 @@
     },
     {
       "path": "css/practice.css",
-      "sha": "51de382874de29e54a106dad4e757c7835adf351"
+      "sha": "77fb056ac8279498dfa6ddbfdd173b2790810558"
     },
     {
       "path": "css/result.css",
@@ -73,19 +77,19 @@
     },
     {
       "path": "html/academic-calendar.html",
-      "sha": "6e2deded9de95e8240a4668fb8764eb714b62b19"
+      "sha": "9cff69d9022dd7da275af5cacdcb38f664da230a"
     },
     {
       "path": "html/academic-faq.html",
-      "sha": "8324abbcb576a3df77883f17009ecb47a45003fa"
+      "sha": "0066e5be08274122877d9b7901aec235cfafee81"
     },
     {
       "path": "html/academic-progress.html",
-      "sha": "fb35c87d89b4eb74c2fbedf5e2b76432ee02d157"
+      "sha": "0483de124f7fcff74a0e0fe0aa9247df6397037e"
     },
     {
       "path": "html/academic-support.html",
-      "sha": "32a731b4b43ab59fd11f9ad24bda1b8353677245"
+      "sha": "483dd11a18cca48b0d5cb49401784637394d002a"
     },
     {
       "path": "html/academic-timeline.html",
@@ -93,7 +97,7 @@
     },
     {
       "path": "html/catalog.html",
-      "sha": "6a883fa0aca563731e78ce3e4fe2addca8654d4d"
+      "sha": "74584f3c8a71de7a4623627528104aaa24b74bc2"
     },
     {
       "path": "html/developer.html",
@@ -125,11 +129,11 @@
     },
     {
       "path": "html/selectZone.html",
-      "sha": "bc4d189735823c8eb09d21da8adc9d3a85fde9b3"
+      "sha": "7b084181aef64c82e3ff11f11745b662387e0b42"
     },
     {
       "path": "html/vsugang.html",
-      "sha": "edd8c5c557fbffb667395bdbb057063f5365d35f"
+      "sha": "6826768a21808bbcf1d07d3fe081f7c8bf4d55be"
     },
     {
       "path": "img/background.svg",
@@ -180,20 +184,16 @@
       "sha": "dfe4334f403f300b45ab2cf788077065fbf71a3e"
     },
     {
-      "path": "js/academic-calendar.js",
-      "sha": "196c41afae75d40d4809139a8f9d790ed13d2489"
-    },
-    {
       "path": "js/academic-data-source.js",
       "sha": "dba1d9b3160f3b6e65fc988b6262fd374069bea1"
     },
     {
       "path": "js/academic-faq.js",
-      "sha": "77f00ba85abb27c3f64d04af60a97a2d19fe9ce6"
+      "sha": "db7ae648b628c51fcce91d3bd389745a1d2a0ad9"
     },
     {
       "path": "js/academic-support.js",
-      "sha": "07c9647575a812b904bd603bf48a6eccb4ef2e24"
+      "sha": "c2429648ad9e3791aed227efe598dae01228785d"
     },
     {
       "path": "js/capacity-settings.js",
@@ -237,7 +237,7 @@
     },
     {
       "path": "js/selectZone.js",
-      "sha": "057b374fa62b9d0f2cf6238605669622f743efea"
+      "sha": "c85e70d8384c1c613aaa23c0b0a54e372390fb21"
     },
     {
       "path": "js/student-catalog.js",
@@ -254,10 +254,6 @@
     {
       "path": "js/student-profile-bar.js",
       "sha": "70ac52364d854b85422a711238f16752fc546bac"
-    },
-    {
-      "path": "js/student-progress.js",
-      "sha": "f0c168b615903b835d6560d96d32e84416c0eab0"
     },
     {
       "path": "js/vsugang-fit.js",
