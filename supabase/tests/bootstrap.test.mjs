@@ -64,6 +64,46 @@ test('verify query checks read privileges, RLS and anonymous visibility', () => 
 });
 
 
+test('철회한 후보 스냅샷은 상태 복원·삭제·같은 ID의 재발행이 차단된다', () => {
+  assert.match(setup, /CREATE TRIGGER hanmo_snapshot_revocation_guard[\s\S]*?BEFORE UPDATE OR DELETE ON hanmo_private\.data_snapshots/);
+  assert.match(setup, /OLD\.review_state = 'REVOKED' AND NEW\.review_state <> 'REVOKED'/);
+  assert.match(setup, /OLD\.review_state = 'REVOKED'[\s\S]*?Revoked snapshot cannot be deleted/);
+  assert.match(setup, /SELECT 1 FROM hanmo_private\.release_audit[\s\S]*?snapshot_id = p_snapshot_id AND action = 'REVOKE'/);
+  assert.match(setup, /RAISE EXCEPTION 'Revoked snapshot ID cannot be republished'/);
+});
+
+test('공개 전 권리 철회도 모든 연결 후보의 REVOKE 감사 이력을 남긴다', () => {
+  const onRights = setup.match(/CREATE FUNCTION hanmo_private\.on_rights_change\(\)[\s\S]*?END \$\$;/)?.[0]??'';
+  assert.match(onRights, /INSERT INTO hanmo_private\.release_audit[\s\S]*?SELECT DISTINCT ss\.snapshot_id/);
+  assert.match(onRights, /JOIN hanmo_private\.source_revisions sr[\s\S]*?WHERE sr\.source_id = NEW\.source_id;/);
+  assert.doesNotMatch(onRights, /JOIN public\.hanmo_public_snapshots pub/);
+  assert.match(onRights, /UPDATE hanmo_private\.data_snapshots SET review_state = 'REVOKED'/);
+});
+
+test('검수 전 DRAFT에서만 출처 링크를 편집하며 발행·권리철회와 동시 실행을 직렬화한다', () => {
+  const guard = setup.match(/CREATE FUNCTION hanmo_private\.guard_snapshot_source_links\(\)[\s\S]*?END \$\$;/)?.[0]??'';
+  assert.match(guard, /pg_advisory_xact_lock\(24031101\)/);
+  assert.match(guard, /FROM hanmo_private\.data_snapshots WHERE snapshot_id = v_snapshot_id FOR UPDATE/);
+  assert.match(guard, /v_review_state IS DISTINCT FROM 'DRAFT'/);
+  assert.match(guard, /FROM public\.hanmo_public_snapshots WHERE snapshot_id = v_snapshot_id/);
+  assert.match(setup, /CREATE TRIGGER hanmo_snapshot_sources_guard[\s\S]*?BEFORE INSERT OR UPDATE OR DELETE ON hanmo_private\.snapshot_sources/);
+});
+
+test('공개 철회된 판본의 is_active 재설정은 트리거와 CHECK 제약으로 이중 차단한다', () => {
+  assert.match(setup, /CHECK \(revoked_at IS NULL OR NOT is_active\)/);
+  assert.match(setup, /NEW\.revoked_at IS NOT NULL AND NEW\.is_active/);
+});
+
+test('검증 SQL은 비공개 발행·철회 및 모든 관리 함수의 역할별 실행 권한을 검사한다', () => {
+  for(const role of ['anon','authenticated','service_role']){
+    assert.match(verify, new RegExp('private_revoke_not_executable_by_'+role));
+    assert.match(verify, new RegExp(role+'_denied_all_private_functions'));
+    assert.match(verify, new RegExp("has_function_privilege\\('"+role+"', p\\.oid, 'EXECUTE'\\)"));
+  }
+  assert.match(verify,/revoked_snapshot_state_guard_installed/);
+  assert.match(verify,/reviewed_source_links_guard_installed/);
+});
+
 test('역사적 강의 개설은 분반 상세와 독립적으로 관측 수를 남길 수 있다', () => {
   const offering = setup.match(/CREATE TABLE hanmo_private\.course_offerings \(([\s\S]*?)\n\);/)?.[1];
   const section = setup.match(/CREATE TABLE hanmo_private\.sections \(([\s\S]*?)\n\);/)?.[1];
