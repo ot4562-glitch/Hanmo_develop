@@ -274,8 +274,14 @@ BEGIN
   -- 부모 스냅샷을 잠가 DRAFT→READY 변경과 출처 연결 변경을 직렬화합니다.
   SELECT review_state INTO v_review_state
     FROM hanmo_private.data_snapshots WHERE snapshot_id = v_snapshot_id FOR UPDATE;
+  -- DRAFT라도 검수 기록이 한 건이라도 생기면 출처 연결을 잠급니다.
+  -- 검수 후 출처 교체는 기존 manifest 승인 기록을 재사용할 위험이 있으므로 새 스냅샷에서 재검수합니다.
   IF v_review_state IS DISTINCT FROM 'DRAFT' OR EXISTS (
     SELECT 1 FROM public.hanmo_public_snapshots WHERE snapshot_id = v_snapshot_id
+  ) OR EXISTS (
+    SELECT 1 FROM hanmo_private.source_reviews WHERE snapshot_id = v_snapshot_id
+  ) OR EXISTS (
+    SELECT 1 FROM hanmo_private.review_approvals WHERE snapshot_id = v_snapshot_id
   ) THEN
     RAISE EXCEPTION 'Source links are immutable after review or publication';
   END IF;
