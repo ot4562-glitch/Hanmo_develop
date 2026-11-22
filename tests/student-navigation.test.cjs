@@ -114,6 +114,18 @@ test('academic entry handoff and three A/B/C plans integrate into existing pages
  assert.doesNotMatch(plannerNav,/href="\.\/vsugang\.html"/,'remove old mock-registration card');
 });
 
+test('모든 텍스트 검색은 입력 즉시 갱신하며 FAQ에 실행 버튼이 없다',()=>{
+  const faq=fs.readFileSync(path.join(ROOT,'html/academic-faq.html'),'utf8');
+  const faqJs=fs.readFileSync(path.join(ROOT,'js/academic-faq.js'),'utf8');
+  const notices=fs.readFileSync(path.join(ROOT,'js/student-notices.js'),'utf8');
+  const courses=fs.readFileSync(path.join(ROOT,'js/student-catalog.js'),'utf8');
+  assert.doesNotMatch(faq,/<button[^>]*type="submit"[^>]*>검색<\/button>/);
+  assert.match(faqJs,/input\.addEventListener\('input',render\)/);
+  assert.match(faqJs,/input\.addEventListener\('search',render\)/);
+  assert.match(notices,/query\.addEventListener\('input',render\)/);
+  assert.match(courses,/query\.addEventListener\('input',render\)/);
+});
+
 test('home restores the original mock registration layout without the academic-entry promo block',()=>{
  const home=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
  assert.match(home,/<nav class="hanmo-topbar"/);

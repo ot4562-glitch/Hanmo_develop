@@ -1,7 +1,7 @@
 name: Feature browser QA (#113-#116)
 on:
   push:
-    branches: [main]
+    branches: [main, 'work/fit-academic-views-live-search-20261122']
   pull_request:
     branches: [main]
     paths:

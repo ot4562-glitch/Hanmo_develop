@@ -112,10 +112,11 @@ test('BASIC 정원 마감 ON에서 임의의 한 register를 제거하고 합성
   await expect(page).toHaveURL(/\/html\/selectZone\.html$/);
   await page.locator('button.search').click();
   await expect(page.locator('.table')).toBeVisible();
-  await expect(page.locator('.course-capacity-label')).toHaveCount(1);
-  await expect(page.locator('#subject2 .course-capacity-label')).toBeVisible();
+  const closedCell=page.locator('#subject2 td').nth(1);
+  await expect(closedCell).toBeEmpty();
+  await expect(closedCell).toHaveAttribute('aria-label','가상 정원 마감');
   await expect(page.locator('#subject1 button.register')).toBeVisible();
-  await expect(page.locator('.course-capacity-hint')).toBeVisible();
+  await expect(page.locator('.course-capacity-hint,.course-capacity-label')).toHaveCount(0);
   await expect(page.locator('button.register')).toHaveCount(2);
   await page.locator('input[name="course-mode"][value="MAJOR"]').check();
   await expect(page.locator('.table')).toBeHidden();
@@ -159,6 +160,40 @@ test('내정보로 졸업 준비를 구성하고 학점 및 여름 계절학기 
 
 });
 
+test('졸업 준비·학사 달력·FAQ가 표준 데스크톱 모니터에 스크롤 없이 보인다',async({page})=>{
+  mkdirSync('e2e-artifacts',{recursive:true});
+  for(const viewport of [{width:1280,height:720},{width:1440,height:900}]){
+    await page.setViewportSize(viewport);
+    for(const slug of ['academic-progress','academic-calendar','academic-faq']){
+      await page.goto('/html/'+slug+'.html');
+      if(slug==='academic-progress'){
+        await expect(page.locator('.degree-credit-results')).toBeVisible();
+        await expect(page.getByRole('link',{name:'학교 공식 안내'})).toHaveCount(0);
+        await page.locator('#degree-earned-general').fill('28');
+        await page.locator('#degree-target-general').fill('34');
+        await page.locator('#degree-earned-total').fill('80');
+        await page.locator('#degree-target-total').fill('134');
+      }else if(slug==='academic-calendar'){
+        await expect(page.locator('#calendar-view [role="table"]')).toBeVisible();
+      }else{
+        await expect(page.locator('#faq-topic-list .hanmo-item')).toHaveCount(4);
+        await expect(page.locator('#faq-search-form button')).toHaveCount(0);
+      }
+      const bounds=await page.evaluate(()=>{
+        const html=document.documentElement;
+        const main=document.getElementById('main');
+        return {height:window.innerHeight,scrollHeight:html.scrollHeight,
+          width:window.innerWidth,scrollWidth:html.scrollWidth,
+          bottom:main?.getBoundingClientRect().bottom??0};
+      });
+      expect(bounds.scrollHeight,'전체 높이 '+slug+' '+viewport.height).toBeLessThanOrEqual(bounds.height+1);
+      expect(bounds.scrollWidth,'전체 너비 '+slug+' '+viewport.width).toBeLessThanOrEqual(bounds.width+1);
+      expect(bounds.bottom,'본문 끝 '+slug+' '+viewport.height).toBeLessThanOrEqual(bounds.height+1);
+      await page.screenshot({path:'e2e-artifacts/fit-'+slug+'-'+viewport.height+'.png',fullPage:false});
+    }
+  }
+});
+
 test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색이 안전하게 작동한다',async({page})=>{
   await page.goto('/index.html');
   await page.locator('.hanmo-tools summary').click();
@@ -183,8 +218,13 @@ test('학사 달력·FAQ·공식 상담 메뉴와 자료 미연결 강의 검색
   await page.screenshot({path:'e2e-artifacts/academic-calendar-month.png',fullPage:false});
   await page.goto('/html/academic-faq.html');
   await page.locator('#faq-search-query').fill('계절학기');
-  await page.locator('#faq-search-form button[type="submit"]').click();
+  await expect(page.locator('#faq-search-form button[type="submit"]')).toHaveCount(0);
+  await expect(page.locator('#faq-topic-list .hanmo-item')).toHaveCount(1);
   await expect(page.locator('#faq-topic-list')).toContainText('계절학기');
+  await page.locator('#faq-search-query').fill('없는 질문 123');
+  await expect(page.locator('#faq-topic-list')).toContainText('결과 없음');
+  await page.locator('#faq-search-query').clear();
+  await expect(page.locator('#faq-topic-list .hanmo-item')).toHaveCount(4);
   await page.goto('/html/academic-support.html');
   await page.locator('#support-campus').selectOption('GLOBAL');
   await page.locator('#support-topic').selectOption('SEASONAL');

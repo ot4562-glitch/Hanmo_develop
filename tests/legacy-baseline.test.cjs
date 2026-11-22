@@ -205,6 +205,7 @@ test('원본 모의신청 선택 UI에는 네 라디오와 각 Search 전 조건
     assert.match(html,new RegExp('data-course-filter="'+filter+'" hidden'));
   assert.match(html,/course-general-warning/);
   assert.match(html,/course-search-prompt/);
+  assert.doesNotMatch(html,/course-capacity-hint|course-capacity-label/);
   assert.match(html,/\*\*\*Select\*\*\*/);
   assert.doesNotMatch(html,/---Select---|----- \[Search\]/);
 });
