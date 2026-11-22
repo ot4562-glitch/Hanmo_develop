@@ -260,6 +260,7 @@ CREATE FUNCTION hanmo_private.guard_snapshot_source_links()
 RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog AS $
 DECLARE
   v_snapshot_id text;
+  v_review_state text;
 BEGIN
   PERFORM pg_catalog.pg_advisory_xact_lock(24031101);
   IF TG_OP = 'DELETE' THEN
@@ -270,10 +271,10 @@ BEGIN
   IF TG_OP = 'UPDATE' AND NEW.snapshot_id IS DISTINCT FROM OLD.snapshot_id THEN
     RAISE EXCEPTION 'Source links cannot be moved between snapshots';
   END IF;
-  IF NOT EXISTS (
-    SELECT 1 FROM hanmo_private.data_snapshots
-    WHERE snapshot_id = v_snapshot_id AND review_state = 'DRAFT'
-  ) OR EXISTS (
+  -- 부모 스냅샷을 잠가 DRAFT→READY 변경과 출처 연결 변경을 직렬화합니다.
+  SELECT review_state INTO v_review_state
+    FROM hanmo_private.data_snapshots WHERE snapshot_id = v_snapshot_id FOR UPDATE;
+  IF v_review_state IS DISTINCT FROM 'DRAFT' OR EXISTS (
     SELECT 1 FROM public.hanmo_public_snapshots WHERE snapshot_id = v_snapshot_id
   ) THEN
     RAISE EXCEPTION 'Source links are immutable after review or publication';
