@@ -39,6 +39,45 @@ WITH checks AS (
     NOT has_function_privilege('authenticated', 'hanmo_private.publish_snapshot(text,text)', 'EXECUTE')
   UNION ALL SELECT 'private_publish_not_executable_by_service_role',
     NOT has_function_privilege('service_role', 'hanmo_private.publish_snapshot(text,text)', 'EXECUTE')
+  UNION ALL SELECT 'private_revoke_not_executable_by_anon',
+    NOT has_function_privilege('anon', 'hanmo_private.revoke_snapshot(text,text,text)', 'EXECUTE')
+  UNION ALL SELECT 'private_revoke_not_executable_by_authenticated',
+    NOT has_function_privilege('authenticated', 'hanmo_private.revoke_snapshot(text,text,text)', 'EXECUTE')
+  UNION ALL SELECT 'private_revoke_not_executable_by_service_role',
+    NOT has_function_privilege('service_role', 'hanmo_private.revoke_snapshot(text,text,text)', 'EXECUTE')
+  UNION ALL SELECT 'anon_denied_all_private_functions',
+    NOT EXISTS (
+      SELECT 1 FROM pg_catalog.pg_proc p
+        JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'hanmo_private'
+        AND has_function_privilege('anon', p.oid, 'EXECUTE')
+    )
+  UNION ALL SELECT 'authenticated_denied_all_private_functions',
+    NOT EXISTS (
+      SELECT 1 FROM pg_catalog.pg_proc p
+        JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'hanmo_private'
+        AND has_function_privilege('authenticated', p.oid, 'EXECUTE')
+    )
+  UNION ALL SELECT 'service_role_denied_all_private_functions',
+    NOT EXISTS (
+      SELECT 1 FROM pg_catalog.pg_proc p
+        JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'hanmo_private'
+        AND has_function_privilege('service_role', p.oid, 'EXECUTE')
+    )
+  UNION ALL SELECT 'revoked_snapshot_state_guard_installed',
+    EXISTS (
+      SELECT 1 FROM pg_catalog.pg_trigger
+      WHERE tgrelid = 'hanmo_private.data_snapshots'::regclass
+        AND tgname = 'hanmo_snapshot_revocation_guard' AND NOT tgisinternal
+    )
+  UNION ALL SELECT 'reviewed_source_links_guard_installed',
+    EXISTS (
+      SELECT 1 FROM pg_catalog.pg_trigger
+      WHERE tgrelid = 'hanmo_private.snapshot_sources'::regclass
+        AND tgname = 'hanmo_snapshot_sources_guard' AND NOT tgisinternal
+    )
 )
 SELECT name, CASE WHEN passed THEN 'PASS' ELSE 'FAIL' END AS status
 FROM checks ORDER BY name;
