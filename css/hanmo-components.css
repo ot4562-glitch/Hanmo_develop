@@ -19,6 +19,8 @@
   padding:7px 8px;border-radius:7px;font-size:13px;white-space:nowrap}
 .hanmo-topbar nav a[aria-current="page"],.hanmo-topbar .hanmo-nav-inline a[aria-current="page"],
 .hanmo-topbar nav a:hover,.hanmo-topbar .hanmo-nav-inline a:hover{background:#17384d;color:var(--hm-gold)!important}
+.hanmo-policy-note{max-width:1000px;margin:4px auto 0;padding:2px 8px;color:#e6eff6;font-size:12px;line-height:1.5;text-align:center;font-weight:500}
+body.hanmo-vsugang .hanmo-policy-note,body.hanmo-flat-legacy .hanmo-policy-note{margin:4px auto 8px}
 .hanmo-schoolmark{text-align:center;margin:12px 0 32px;color:var(--hm-white)}
 .hanmo-schoolmark h2{font-size:30px;line-height:1.35;letter-spacing:-.025em;margin:0 0 5px;font-weight:700}
 .hanmo-markline{display:flex;align-items:center;justify-content:center;gap:16px;max-width:560px;margin:auto}
@@ -211,4 +213,40 @@ body.hanmo-ui .hanmo-field :is(input, select):not(:disabled):focus-visible {
   body.hanmo-flat-legacy .container > .button::before {
     transition: none;
   }
+}
+
+
+/* 학업 도구 세 기능을 메뉴 안에 묶고 마지막 내정보만 현재 페이지에서 강조한다. */
+.hanmo-topbar .hanmo-me-link{border-bottom-color:transparent}
+.hanmo-topbar .hanmo-me-link[aria-current="page"]{border-bottom-color:#f4c76c}
+.hanmo-topbar{background:#00111b;-webkit-backdrop-filter:none;backdrop-filter:none}
+.academic-calendar-days,.academic-calendar-weekdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;padding:0;list-style:none;margin:8px 0}
+.academic-calendar-weekdays span{text-align:center;font-weight:700;color:#f4c76c}
+.academic-calendar-days li{border:1px solid #4b6676;min-height:52px;padding:8px;background:#0e2839}
+.academic-calendar-days li.empty{background:transparent;border-color:transparent}
+
+/* 1920×1080 기준에서 학업 링크를 펼쳐 한 줄로 배치하고 긴 학생 정보는 줄인다. */
+@media(min-width:1600px){
+  .hanmo-topbar{padding-inline:max(24px,calc((100% - 1640px)/2));flex-wrap:nowrap}
+  .hanmo-topbar nav,.hanmo-topbar .hanmo-nav-inline{flex:1 1 auto;flex-wrap:nowrap;gap:4px 6px}
+  .hanmo-topbar .hanmo-profile-summary{min-width:0;max-width:340px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+
+/* 학사 공지·강의 검색은 같은 제목·필터·결과 간격을 공유합니다. */
+body.hanmo-search-page .hanmo-main > .hanmo-schoolmark { margin: 12px 0 16px; }
+body.hanmo-search-page .hanmo-search-controls { margin: 0; padding: 18px 0; }
+body.hanmo-search-page .hanmo-search-controls .hanmo-search-form { margin: 0; }
+body.hanmo-search-page .hanmo-search-controls .hanmo-filter {
+  display: grid; grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 18px; align-items: end;
+}
+body.hanmo-search-page .hanmo-search-controls .hanmo-form { gap: 0; }
+body.hanmo-search-page .hanmo-search-controls .hanmo-fields {
+  grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px;
+}
+body.hanmo-search-page .hanmo-section-title { margin: 22px 0 14px; }
+body.hanmo-search-page .hanmo-search-controls .hanmo-field { min-width: 0; }
+@media (max-width: 830px) {
+  body.hanmo-search-page .hanmo-search-controls :is(.hanmo-filter,.hanmo-fields) { grid-template-columns: 1fr; }
 }

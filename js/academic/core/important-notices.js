@@ -61,7 +61,6 @@ export function importantNotices(profile,items){
     item.evidence==='SOURCE_REVIEWED'&&item.appliesTo==='YES'&&
     item.studentDeadline!==null
   ).sort((a,b)=>a.sortTimestamp-b.sortTimestamp||order(a,b,profile));
-  // 학생 화면의 고정 중요공지는 최대 두 건만 노출하고 나머지는 전체 목록에 둔다.
   const confirmed=verified.slice(0,2);
   // 독립 검토된 나머지 공지는 미검증 항목이 아니라 전체 공지 목록에 남긴다.
   const trustedIds=new Set(verified.map(item=>item.event.id));

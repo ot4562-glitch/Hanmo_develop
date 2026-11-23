@@ -1,0 +1,35 @@
+/* 월간 달력을 남은 화면 높이에 맞추되 데이터·요일 표시는 축소하지 않는다. */
+.academic-calendar-main{max-width:1130px;min-height:0;padding:34px 22px 12px}
+.academic-calendar-main .hanmo-schoolmark{margin:12px 0 32px}
+.academic-calendar-main .hanmo-schoolmark h2{font-size:30px;line-height:1.35}
+.academic-calendar-surface{border-top:1px solid #3b576c;padding-top:8px;min-width:0}
+#calendar-view{color:#f0f5f8;font-family:inherit;font-size:12px;min-width:0}
+#calendar-view>div:first-child{display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;margin-bottom:8px}
+#calendar-view [role="heading"][aria-level="2"]{font-size:21px;font-weight:750;letter-spacing:-.02em}
+#calendar-view button{font:inherit;cursor:pointer;color:#e4edf3;background:transparent;border:1px solid #57788f;
+  padding:4px 10px;border-radius:3px;min-height:30px}
+#calendar-view button:hover:not(:disabled){background:#214052;border-color:#7a9aa8}
+#calendar-view button:disabled{opacity:.4;cursor:default}
+#calendar-view button:focus-visible{outline:3px solid #f4c76c;outline-offset:2px}
+#calendar-view [role="table"]{border:1px solid #345064}
+#calendar-view [role="row"][aria-label^="주 "]{flex-basis:clamp(60px,9vh,98px)!important;min-height:60px}
+#calendar-view [role="columnheader"]{background:rgba(21,46,63,.65);color:#dbe9f0;
+  border-color:#345064;font-weight:700}
+#calendar-view [role="cell"][data-date]{border-color:#345064;background:transparent;transition:background .15s}
+#calendar-view [role="cell"][data-date]:hover{background:rgba(59,92,114,.18)}
+#calendar-view [role="cell"][data-date] [role="presentation"]{color:#e7edf3}
+#calendar-view [role="cell"][data-date] [aria-hidden="true"]{color:#e7edf3}
+#calendar-view [role="cell"][data-date][aria-current="date"]{background:rgba(242,200,108,.10)}
+#calendar-view [role="cell"][data-date][aria-current="date"] [aria-hidden="true"]{color:#f4c76c;font-weight:800}
+.academic-calendar-footer{display:flex;justify-content:space-between;gap:14px;align-items:center;
+  padding:6px 0;border-bottom:1px solid #345064;font-size:12px;color:#9fbacb}
+.academic-calendar-footer a{color:#f4d39a}
+@media(max-width:800px){
+  .academic-calendar-main{padding:20px 12px 14px}
+  #calendar-view [role="heading"][aria-level="2"]{font-size:18px}
+  #calendar-view button{padding:4px 7px;min-height:29px}
+}
+@media(max-height:680px){
+  #calendar-view [role="row"][aria-label^="주 "]{flex-basis:56px!important;min-height:56px}
+}

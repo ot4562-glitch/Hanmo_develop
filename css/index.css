@@ -75,7 +75,7 @@ main {
 
 .thisTime {
 	font-weight: bold;
-	color: #8d704f;
+	color: #ffd27a;
 }
 
 .thisTime::before {

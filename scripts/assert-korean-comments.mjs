@@ -8,7 +8,7 @@ import {gitBlobHashes} from './git-blob-hashes.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const approved=JSON.parse(readFileSync(resolve(root,'scripts/baselines/legacy-js-comments.json'),'utf8'));
 const legacy=new Map(approved.files.map(({path,sha})=>[path,sha]));
-const ignored=new Set(['.git','node_modules','dist','.build','coverage','.cache']);
+const ignored=new Set(['.git','node_modules','dist','.build','coverage','.cache','test-results','playwright-report']);
 /** @param {string} dir @param {string} [prefix] @returns {string[]} */
 function list(dir,prefix=''){
   return readdirSync(dir,{withFileTypes:true}).flatMap(item=>{

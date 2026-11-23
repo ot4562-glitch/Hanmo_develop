@@ -7,6 +7,7 @@ on:
       - 'data/**'
       - 'scripts/**'
       - 'package.json'
+      - 'package-lock.json'
       - 'jsconfig.json'
       - 'index.html'
       - 'sitemap.xml'
@@ -46,8 +47,9 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
+          cache: npm
       - name: Install browser-only planner dependencies
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run repository checks and build the preview
         run: npm run check
       - name: Protect the original site's custom domain

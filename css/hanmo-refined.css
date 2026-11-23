@@ -1,0 +1,339 @@
+/* 이번에 검토한 화면에만 적용합니다. practice·selectZone의 공통 자산은 변경하지 않습니다. */
+body.hanmo-refined {
+  --hm-radius: 6px;
+  --hm-radius-sm: 4px;
+  --hm-line: #385367;
+  --hm-readable: #c4d3de;
+  color-scheme: dark;
+  font-family: var(--hm-font, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif);
+  user-select: text;
+}
+.hanmo-refined [hidden] { display: none !important; }
+.hanmo-refined :is(a, button, input, select, [role="button"]):focus-visible {
+  outline: 2px solid #f4c76c;
+  outline-offset: 4px;
+}
+.hanmo-refined :is(a, button) { -webkit-tap-highlight-color: transparent; }
+.hanmo-refined a { text-underline-offset: 4px; }
+.hanmo-refined .titleContainer { cursor: default; }
+.hanmo-refined .hanmo-topbar {
+  box-shadow: none;
+  padding: 10px max(24px, calc((100% - 1184px) / 2));
+}
+.hanmo-refined .hanmo-topbar :is(nav, .hanmo-nav-inline) { gap: 4px 8px; }
+.hanmo-refined .hanmo-topbar :is(nav, .hanmo-nav-inline) a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  transition: color .16s, border-color .16s;
+}
+.hanmo-refined .hanmo-topbar :is(nav, .hanmo-nav-inline) a[aria-current="page"] {
+  border-bottom-color: #f4c76c;
+  color: #f4c76c !important;
+  background: transparent;
+}
+.hanmo-refined .hanmo-topbar :is(nav, .hanmo-nav-inline) a:hover {
+  color: #f4c76c !important;
+  background: transparent;
+}
+.hanmo-refined .hanmo-topbar .hanmo-me-link:not([aria-current]) { font-weight: 600 !important; }
+.hanmo-refined .hanmo-topbar .hanmo-profile-summary { color: var(--hm-readable); }
+
+/* 대표 제목 왼쪽에 작은 도움말을 두고 마우스·키보드에 같은 안내를 제공합니다. */
+.hanmo-refined .hanmo-title-line {
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  max-width: 100%;
+}
+.hanmo-refined .hanmo-title-help { display: inline-flex; align-items: center; }
+.hanmo-refined .hanmo-title-help-button {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 21px;
+  height: 21px;
+  padding: 0;
+  border: 1px solid #85a1b5;
+  border-radius: 50%;
+  background: transparent;
+  color: #e6eef4;
+  font: 600 12px/1 var(--hm-font);
+  cursor: help;
+}
+.hanmo-refined .hanmo-title-help-tip {
+  box-sizing: border-box;
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 50%;
+  z-index: 20;
+  width: max-content;
+  max-width: min(300px, calc(100vw - 32px));
+  padding: 9px 12px;
+  border: 1px solid #638297;
+  border-radius: 4px;
+  background: #071d2b;
+  color: #f2f5f8;
+  font-size: 12px;
+  line-height: 1.6;
+  font-weight: 400;
+  text-align: left;
+  white-space: normal;
+  box-shadow: 0 5px 15px rgba(0,0,0,.24);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -4px);
+  transition: opacity .16s, transform .16s, visibility .16s;
+}
+.hanmo-refined .hanmo-title-help:is(:hover, :focus-within) .hanmo-title-help-tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+/* 긴 목록과 확대 화면은 문서 스크롤로 읽습니다. 글자를 줄여 맞추지 않습니다. */
+html:has(body.hanmo-refined:not(.hanmo-vsugang)) { height: auto; overflow: auto; }
+body.hanmo-refined:not(.hanmo-vsugang) {
+  height: auto;
+  min-height: 100dvh;
+  max-height: none;
+  overflow: visible;
+}
+body.hanmo-refined > main { user-select: text; }
+body.hanmo-ui.hanmo-refined > main.hanmo-main {
+  box-sizing: border-box;
+  flex: 1 0 auto;
+  width: min(1184px, 100%);
+  max-width: 1184px;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 28px 32px 36px;
+  overflow: visible;
+}
+body.hanmo-ui.hanmo-refined .hanmo-main > .hanmo-schoolmark {
+  margin: 12px 0 16px;
+  animation: none;
+}
+.hanmo-refined .hanmo-schoolmark h1 {
+  margin: 0 0 5px;
+  font-size: 28px;
+  line-height: 1.35;
+  letter-spacing: -.025em;
+  font-weight: 700;
+}
+body.hanmo-ui.hanmo-refined > main.hanmo-main > :is(.hanmo-search-controls, .hanmo-support-search) {
+  width: 100%;
+  max-width: none;
+  padding: 24px 0;
+  border-top: 1px solid var(--hm-line);
+}
+body.hanmo-ui.hanmo-refined > main.hanmo-main > :is(.hanmo-section-title, .hanmo-list, .hanmo-actions, #notice-status) {
+  width: 100%;
+  max-width: none;
+  padding-inline: 0;
+}
+body.hanmo-ui.hanmo-refined .hanmo-section-title { margin: 0 0 16px; }
+.hanmo-refined .hanmo-section-title:has(> p:empty) { display: none; }
+.hanmo-refined .hanmo-status { margin: 8px 0 16px; color: var(--hm-readable); }
+.hanmo-refined .hanmo-status:empty { display: none; }
+.hanmo-refined .hanmo-field { gap: 8px; font-size: 14px; font-weight: 600; }
+.hanmo-refined .hanmo-field :is(input, select) {
+  min-height: 44px;
+  border: 1px solid #638297;
+  border-radius: 4px;
+  background: #0b2232;
+  box-shadow: none;
+  font-size: 15px;
+  transition: border-color .16s;
+}
+.hanmo-refined .hanmo-field :is(input, select):disabled {
+  border-color: #385367;
+  background: #091c29;
+  color: #aabfce;
+  opacity: 1;
+  cursor: not-allowed;
+}
+.hanmo-refined .hanmo-field input::placeholder { color: #acbdca; }
+.hanmo-refined .hanmo-btn {
+  box-sizing: border-box;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-weight: 650;
+  box-shadow: none;
+  transition: background-color .16s, border-color .16s;
+}
+.hanmo-refined .hanmo-btn.secondary { background: transparent; border-color: #638297; }
+.hanmo-refined .hanmo-actions { align-items: center; gap: 10px; }
+body.hanmo-refined .hanmo-list { gap: 0; }
+body.hanmo-ui.hanmo-refined .hanmo-item { padding: 20px 0; }
+.hanmo-refined .hanmo-item h3 { margin: 0 0 6px; }
+.hanmo-refined .hanmo-item a { display: inline-flex; align-items: center; min-height: 40px; }
+.hanmo-refined .hanmo-item p { margin: 0; }
+
+/* 학업 버튼의 발광은 줄이되 모의신청 다섯 타일의 부드러운 빛은 유지합니다. */
+.hanmo-refined :is(.hanmo-btn, .button, .hanmo-nav-inline a)::before,
+body.hanmo-refined.hanmo-ui .hanmo-btn::before,
+body.hanmo-refined.hanmo-flat-legacy .container > .button::before { content: none; }
+.hanmo-refined .hm-icon {
+  display: inline-block;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  mask: var(--hm-icon) center / contain no-repeat;
+  -webkit-mask: var(--hm-icon) center / contain no-repeat;
+}
+.hanmo-refined .hm-icon-search { --hm-icon: url("../img/lucide/search.svg"); }
+.hanmo-refined .hm-icon-external { --hm-icon: url("../img/lucide/external-link.svg"); }
+.hanmo-refined .hm-icon-retry { --hm-icon: url("../img/lucide/rotate-ccw.svg"); }
+.hanmo-refined .hm-icon-next { --hm-icon: url("../img/lucide/arrow-right.svg"); }
+
+/* 문의 검색은 입력과 추천만 나란히 놓고 결과와 주의사항을 이어 읽게 합니다. */
+body.hanmo-support-page.hanmo-refined .hanmo-support-search { gap: 20px 40px; }
+body.hanmo-support-page.hanmo-refined .hanmo-support-suggestion {
+  min-height: 40px;
+  border-radius: 4px;
+  background: transparent;
+  font-weight: 500;
+}
+body.hanmo-support-page.hanmo-refined .hanmo-support-suggestion:hover { background: #102a3e; }
+body.hanmo-support-page.hanmo-refined .hanmo-support-caution { max-width: 76ch; color: var(--hm-readable); }
+body.hanmo-support-page.hanmo-refined #support-result-text { font-size: 15px; word-break: keep-all; }
+
+/* FullCalendar의 공개 역할·날짜 속성을 사용해 해시 클래스에 의존하지 않습니다. */
+.hanmo-refined .academic-calendar-surface { padding-top: 18px; }
+.hanmo-refined #calendar-view { font-size: 13px; }
+.hanmo-refined #calendar-view > div:first-child { margin-bottom: 16px; }
+.hanmo-refined #calendar-view > div:first-child > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+.hanmo-refined #calendar-view button { min-height: 40px; min-width: 40px; padding: 7px 12px; }
+.hanmo-refined #calendar-view [role="heading"][aria-level="2"] { font-size: 22px; }
+.hanmo-refined #calendar-view .hanmo-calendar-weekday { padding: 8px 10px; font-weight: 600; }
+.hanmo-refined #calendar-view .hanmo-calendar-date { padding: 8px 10px; }
+.hanmo-refined #calendar-view [role="row"][aria-label^="주 "] { flex-basis: clamp(60px, 8vh, 86px) !important; }
+.hanmo-refined #calendar-view [role="cell"][data-date] {
+  box-shadow: inset -1px -1px 0 #294457;
+}
+.hanmo-refined .academic-calendar-footer { min-height: 44px; padding: 8px 0; }
+.hanmo-refined .academic-calendar-footer a { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; }
+
+/* 홈은 정적 공지와 하나의 주 행동을 유지합니다. */
+body.hanmo-home.hanmo-refined > main {
+  display: flex;
+  justify-content: center;
+  flex: 1 0 auto;
+  height: auto;
+  padding: 40px 24px;
+  overflow: visible;
+}
+body.hanmo-home.hanmo-refined .home-fit-content {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: min(700px, 100%);
+  transform: none;
+}
+body.hanmo-home.hanmo-refined .titleContainer h1 { font-size: clamp(22px, 2.4vw, 30px); }
+body.hanmo-home.hanmo-refined .notice { height: auto; min-height: 40px; padding: 8px 0; background: transparent; }
+body.hanmo-home.hanmo-refined .notice ul { height: auto; margin: 0; padding: 0; position: static; list-style: none; }
+body.hanmo-home.hanmo-refined .notice li { margin: 0; font-size: 13px; }
+body.hanmo-home.hanmo-refined .notice a { color: #c4d3de; }
+body.hanmo-home.hanmo-refined .notice li:not([hidden]) { animation: hanmo-notice-reveal .2s ease-out both; }
+@keyframes hanmo-notice-reveal {
+  from { opacity: .3; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+body.hanmo-home.hanmo-refined .mainNotice {
+  border-block: 1px solid var(--hm-line);
+  border-radius: 0;
+  background: transparent;
+  padding: 24px 16px;
+}
+body.hanmo-home.hanmo-refined .mainNotice p { font-size: 15px; line-height: 1.75; }
+body.hanmo-home.hanmo-refined .mainNotice p:last-child { font-size: 13px; color: var(--hm-readable); }
+body.hanmo-home.hanmo-refined .mainNotice hr { margin: 12px 0; background: var(--hm-line); }
+body.hanmo-home.hanmo-refined .thisTime::before,
+body.hanmo-home.hanmo-refined .thisTime::after { content: none; }
+.hanmo-refined .button {
+  box-sizing: border-box;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font: 650 15px/1.5 var(--hm-font);
+  text-decoration: none;
+  gap: 8px;
+  box-shadow: none;
+  transition: background-color .16s;
+}
+body.hanmo-home.hanmo-refined .button { font-size: 15px; }
+body.hanmo-home.hanmo-refined .button.anotherB { background: transparent; border-color: #638297; color: #e2ebf1; }
+
+/* 모드의 위치·클릭 영역·설정 동작은 보존하고 읽기 밀도만 조정합니다. */
+body.hanmo-vsugang.hanmo-refined .grid { opacity: 1; }
+body.hanmo-vsugang.hanmo-refined .grid > :is(.setting, #incident-options) {
+  background: #06111c;
+  border: 1px solid #000912;
+}
+body.hanmo-vsugang.hanmo-refined .grid > :is(.setting, #incident-options):is(:hover, :focus-visible) {
+  background-color: #071a27;
+}
+body.hanmo-vsugang.hanmo-refined .grid > :is(div, button) { transition: background-color .78s var(--hm-glow-ease, ease-in-out); }
+body.hanmo-vsugang.hanmo-refined .grid > :is(div, button) > :is(h2, .mode-tile-title) {
+  margin: 16px 20px 8px;
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+body.hanmo-vsugang.hanmo-refined .grid :is(p, .mode-tile-description) { color: #c4d3de; font-size: 13px; }
+body.hanmo-vsugang.hanmo-refined .settingPanel { background: #061521; box-shadow: none; border-radius: 6px; }
+
+/* 소개와 결과의 폭·문장·수치가 각각의 역할에 맞게 보이도록 합니다. */
+body.hanmo-policy-legacy.hanmo-refined > main { flex: 1 0 auto; overflow: visible; padding: 32px 24px; justify-content: center; }
+body.hanmo-policy-legacy.hanmo-refined main > .f-dirt-down { width: min(1056px, 100%); max-height: none; align-items: center; }
+body.hanmo-policy-legacy.hanmo-refined .titleContainer { top: 0; }
+body.hanmo-policy-legacy.hanmo-refined .titleContainer h1 { font-size: 28px; }
+body.hanmo-policy-legacy.hanmo-refined .container { width: 100%; margin-top: 16px; }
+body.hanmo-developer.hanmo-refined .container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 24px 40px; }
+body.hanmo-developer.hanmo-refined .container > .info { width: 100%; margin: 0; padding: 16px 0; }
+body.hanmo-developer.hanmo-refined .info.blueBox + .info.blueBox { border-top: 0; }
+body.hanmo-developer.hanmo-refined .info > h2 { font-size: 20px; margin: 0; }
+body.hanmo-developer.hanmo-refined .info > hr { width: 100%; background: var(--hm-line); margin: 16px 0; }
+.hanmo-refined .developer-bio h3 { margin: 0 0 6px; font-size: 20px; }
+.hanmo-refined .developer-bio p { margin: 0; font-size: 13px; color: var(--hm-readable); }
+body.hanmo-developer.hanmo-refined .card { justify-content: flex-start; width: 100%; }
+body.hanmo-developer.hanmo-refined .hanmo-contributor-list { width: 100%; }
+body.hanmo-developer.hanmo-refined .container > .button { grid-column: 1 / -1; justify-self: center; width: 180px; margin: 0; }
+body.hanmo-policy-legacy.hanmo-refined .box { width: min(720px, 100%); border-radius: 0; background: transparent; border-top: 1px solid var(--hm-line); }
+body.hanmo-policy-legacy.hanmo-refined .box.time { height: auto; min-height: 180px; padding: 20px 0; }
+body.hanmo-policy-legacy.hanmo-refined .box p > span { font-size: 30px; font-variant-numeric: tabular-nums; }
+body.hanmo-policy-legacy.hanmo-refined .caption { color: #bdceda; font-size: 13px; }
+body.hanmo-policy-legacy.hanmo-refined .box.button { width: 220px; background: #f4c76c; border-radius: 4px; }
+body.hanmo-pc-only-layout.hanmo-refined main { word-break: keep-all; overflow-wrap: break-word; }
+@media (max-width: 960px) {
+  body.hanmo-ui.hanmo-refined > main.hanmo-main { padding-inline: 24px; }
+  .hanmo-refined .hanmo-topbar { padding-inline: 24px; }
+  .hanmo-refined .hanmo-topbar .hanmo-profile-summary { max-width: 220px; }
+}
+@media (max-width: 700px) {
+  body.hanmo-ui.hanmo-refined > main.hanmo-main { padding: 20px 16px 28px; }
+  body.hanmo-developer.hanmo-refined .container { grid-template-columns: 1fr; }
+  .hanmo-refined .hanmo-topbar .hanmo-profile-summary { max-width: 100%; }
+  .hanmo-refined #calendar-view .hanmo-calendar-date { padding: 6px; }
+  body.hanmo-home.hanmo-refined .mainNotice span { display: block; margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hanmo-refined *, .hanmo-refined *::before { animation: none !important; transition: none !important; }
+}

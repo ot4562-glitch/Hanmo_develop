@@ -1,4 +1,4 @@
-/* Self-reported profile. Only this browser's localStorage is used; no auth/network. */
+/* 학교 로그인과 연결하지 않고 본인이 입력한 프로필을 브라우저에만 저장한다. */
 (function(){
  'use strict';
  const form=document.getElementById('planner-profile');
@@ -11,6 +11,9 @@
  const message=document.getElementById('planner-message');
  const clear=document.getElementById('planner-clear');
  const key='hanmo:student-planner:profile:v1';
+ const currentYear=Number(new Intl.DateTimeFormat('en',{timeZone:'Asia/Seoul',year:'numeric'}).format(new Date()));
+ const maxCohort=currentYear+1;
+ cohort.max=String(maxCohort);
  function syncSecond(){
    const active=kind.value==='DOUBLE'||kind.value==='MINOR';
    second.disabled=!active;
@@ -35,7 +38,7 @@
        second.value=kind.value==='MINOR'
          ?typeof value.minor==='string'?value.minor.slice(0,100):''
          :typeof value.doubleMajor==='string'?value.doubleMajor.slice(0,100):'';
-       cohort.value=Number.isSafeInteger(value.cohort)&&value.cohort>=2010&&value.cohort<=2100
+       cohort.value=Number.isSafeInteger(value.cohort)&&value.cohort>=2010&&value.cohort<=maxCohort
          ?String(value.cohort):'';
        message.textContent='이 브라우저의 저장된 정보를 불러왔습니다. 학교 로그인 정보가 아닙니다.';
      }
@@ -53,7 +56,7 @@
    const year=Number(cohort.value);
    const selected=kind.value;
    const optional=selected==='NONE'?'':second.value.trim();
-   if(!majorName||!Number.isSafeInteger(year)||year<2010||year>2100||
+   if(!majorName||!Number.isSafeInteger(year)||year<2010||year>maxCohort||
      (selected!=='NONE'&&!optional)){
      message.textContent='캠퍼스·전공·학번 및 선택한 부전공/이중전공명을 확인해 주세요.';
      return;
@@ -72,7 +75,7 @@
    }catch{message.textContent='이 브라우저에 저장할 수 없습니다. 다른 메뉴는 그대로 이용할 수 있습니다.';}
  });
  clear.addEventListener('click',()=>{
-   try{localStorage.removeItem(key);}catch{/* private browsing */}
+   try{localStorage.removeItem(key);}catch{/* 브라우저 저장이 거부되더라도 화면 초기화는 유지한다. */}
    form.reset();
    second.value='';
    syncSecond();

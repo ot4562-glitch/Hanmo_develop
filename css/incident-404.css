@@ -20,3 +20,12 @@ body.hanmo-synthetic-404 .hanmo-404-area h2{
 }
 body.hanmo-synthetic-404 .hanmo-404-area p{margin:0;font-size:15px;line-height:1.6}
 body.hanmo-synthetic-404 .hanmo-404-area small{color:#656565}
+
+body.hanmo-synthetic-404 .hanmo-404-area > small {
+  color: #b91c30;
+}
+
+/* 모의 404의 번호와 모든 설명 문구를 같은 붉은색으로 강조합니다. */
+body.hanmo-synthetic-404 .hanmo-404-area :is(h2,p,small) {
+  color: #b91c30;
+}

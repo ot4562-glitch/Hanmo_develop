@@ -24,6 +24,10 @@ function element(tag='div') {
     },
     attributes:{},htmls:[],focusCount:0,
     appendChild(child){this.childNodes.push(child);return child;},
+    append(...children){this.childNodes.push(...children);},
+    replaceChildren(...children){this.childNodes=children;},
+    matches(){return false;},
+    prepend(...children){this.childNodes.unshift(...children);},
     insertAdjacentHTML(where,html){this.htmls.push({where,html});this.innerHTML+=html;},
     setAttribute(k,v){this.attributes[k]=String(v);},
     deleteRow(index){this.childNodes.splice(index,1);},
@@ -68,6 +72,12 @@ function createHarness(seed={}) {
     createTextNode:(value)=>({textContent:String(value)}),
     addEventListener(){},
   };
+  const sessionMap=new Map(seed.capacityActive?[['hanmo.syntheticCapacity.active.v1',seed.capacityActive]]:[]);
+  const sessionStorage={
+    getItem:k=>sessionMap.get(k)??null,
+    setItem:(k,v)=>{sessionMap.set(k,String(v));},
+    removeItem:k=>sessionMap.delete(k)
+  };
   const localStorage={
     getItem:k=>map.has(k)?map.get(k):null,
     setItem:(k,v)=>{map.set(k,String(v));},
@@ -75,7 +85,8 @@ function createHarness(seed={}) {
   };
   const location={href:'/',replace(v){events.navigations.push(v);}};
   const sandbox={
-    document:doc,localStorage,location,Date:Clock,
+    document:doc,localStorage,sessionStorage,location,Date:Clock,
+    Math:Object.assign(Object.create(Math),{random:()=>Number(seed.random??0)}),
     navigator:{userAgent:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/157'},
     alert:x=>events.alert.push(x),
     confirm:x=>{events.confirm.push(x);return true;},
@@ -165,6 +176,41 @@ test('SELECT starts with expected synthetic rows and global inline click handler
   assert.equal(typeof h.expr('pyoDisplay'),'function');
   assert.match(h.get('practiceMode').innerText,/BASIC/);
 });
+test('BASIC CAPACITY는 처음 클릭한 과목 대신 임의로 뽑은 딱 한 과목을 마감한다',()=>{
+  for(const [random,expected] of [[0,1],[0.45,2],[0.99,3]]){
+    const h=createHarness({practiceSetter:1,psubjectValue:3,subjectValue:2,
+      waitingValue:'no',capacityActive:'yes',random});
+    h.load('selectZone.js');
+    assert.equal(h.expr('capacityFullCourseId'),expected);
+    assert.equal(h.expr('closedCourses.size'),1);
+    assert.equal(h.expr('closedCourses.has('+expected+')'),true);
+    h.expr('registerClick('+expected+')');
+    assert.equal(h.expr('count'),0);
+    h.expr('registerClick('+(expected===1?2:1)+')');
+    assert.equal(h.expr('count'),1);
+  }
+});
+test('SELECT 및 BASIC 설정 OFF는 가상 정원 마감에서 제외한다',()=>{
+  for(const setting of [{practiceSetter:3,capacityActive:'yes'},{practiceSetter:1,capacityActive:'no'}]){
+    const h=createHarness({...setting,psubjectValue:3,subjectValue:2,waitingValue:'no',random:0.7});
+    h.load('selectZone.js');
+    assert.equal(h.expr('closedCourses.size'),0);
+    h.expr('registerClick(1)');
+    assert.equal(h.expr('count'),1);
+  }
+});
+test('원본 모의신청 선택 UI에는 네 라디오와 각 Search 전 조건이 있다',()=>{
+  const html=fs.readFileSync(path.join(ROOT,'html/selectZone.html'),'utf8');
+  for(const option of ['INTEREST','MAJOR','GENERAL','FOUNDATION'])
+    assert.match(html,new RegExp('name="course-mode" value="'+option+'"'));
+  for(const filter of ['MAJOR','GENERAL','FOUNDATION'])
+    assert.match(html,new RegExp('data-course-filter="'+filter+'" hidden'));
+  assert.match(html,/course-general-warning/);
+  assert.match(html,/course-search-prompt/);
+  assert.doesNotMatch(html,/course-capacity-hint|course-capacity-label/);
+  assert.match(html,/\*\*\*Select\*\*\*/);
+  assert.doesNotMatch(html,/---Select---|----- \[Search\]/);
+});
 test('successful registration stores one synthetic course and prevents duplicates',()=>{
   const h=createHarness({practiceSetter:1,psubjectValue:3,subjectValue:2,waitingValue:'no'});
   h.load('selectZone.js');
@@ -216,16 +262,27 @@ test('report subtracts waiting seconds from SELECT seconds',()=>{
   const h=createHarness({practiceSetter:1,psubjectValue:3,subjectValue:2,
     waitingValue:'yes',TIMEtime:'3.25',SELECTtime:'15.5',SELECTWaitTime:'2.5'});
   h.load('result.js');
-  assert.match(h.get('time').innerHTML,/13\.000/);
-  assert.match(h.get('result').innerHTML,/16\.250/);
-  assert.match(h.get('time').innerHTML,/접속 대기 시간은/);
+  assert.match(h.get('time').children[2].children[0].textContent,/13\.000/);
+  assert.match(h.get('result').children[0].children[0].textContent,/16\.250/);
+  assert.match(h.get('time').children[3].textContent,/접속 대기 시간은/);
 });
 test('TIME-only report remains TIME-only even with a stored SELECT amount',()=>{
   const h=createHarness({practiceSetter:2,psubjectValue:3,subjectValue:2,
     waitingValue:'no',TIMEtime:'8.75',SELECTtime:'7',SELECTWaitTime:'0'});
   h.load('result.js');
-  assert.match(h.get('result').innerHTML,/8\.750/);
-  assert.match(h.get('time').innerHTML,/TIME 부분/);
+  assert.match(h.get('result').children[0].children[0].textContent,/8\.750/);
+  assert.match(h.get('time').children[1].textContent,/TIME 부분/);
+});
+test('tampered practice count is never interpreted as HTML on the report page',()=>{
+  const h=createHarness({practiceSetter:1,psubjectValue:'<img src=x onerror=alert(1)>',
+    subjectValue:1,waitingValue:'no',TIMEtime:'1.25',SELECTtime:'2'});
+  h.load('result.js');
+  assert.equal(h.get('time').htmls.length,0);
+  assert.equal(h.get('result').htmls.length,0);
+  assert.equal(h.get('time').children[0].textContent.includes('<img'),false);
+  assert.match(h.get('time').children[0].textContent,/연습한 과목 수 0개/);
+  assert.equal(h.get('time').children[3].className,'caption');
+  assert.equal(h.get('time').children[2].children[0].tagName,'SPAN');
 });
 
 test('registered row keeps 13 columns and safe display text',()=>{
@@ -234,7 +291,7 @@ test('registered row keeps 13 columns and safe display text',()=>{
   h.expr('registerClick(1)');
   assert.equal(h.get('done').children[0].children.length,13);
   assert.equal(h.get('done').children[0].children[5].textContent,
-    '한국외국어대학교 모의수강신청1');
+    '모의수강신청 과목1');
 });
 test('queue cancellation keeps a simulated course available for retry',async()=>{
   const h=createHarness({practiceSetter:3,psubjectValue:2,subjectValue:2,waitingValue:'yes'});
@@ -290,7 +347,17 @@ test('hanmo system keeps PC user on practice outside restricted window',()=>{
 test('home renders semester/notice and shows PC-only message when device is unsupported',()=>{
   const h=createHarness({deviceInfo:false});
   h.load('index.js');
-  assert.match(h.get('noticeList').innerHTML,/업데이트/);
+  const list=h.get('noticeList');
+  assert.equal(list.children.length,2);
+  assert.match(list.children[0].children[0].textContent,/업데이트/);
+  assert.equal(list.children[0].hidden,false);
+  assert.equal(list.children[1].hidden,true);
+  // 정적 한 건만 남아 있던 회귀를 방지하도록 실제 순환 함수를 실행합니다.
+  assert.equal(h.events.intervals.length,1);
+  assert.equal(h.events.intervals[0].delay,5000);
+  h.events.intervals[0].fn();
+  assert.equal(list.children[0].hidden,true);
+  assert.equal(list.children[1].hidden,false);
   assert.match(h.get('title').innerText,/2026-2학기/);
   assert.equal(h.get('phoneContainer').style.display,'flex');
   assert.equal(h.get('container').style.display,'none');
@@ -309,8 +376,8 @@ test('each actual HTML page loads classic scripts in order without global collis
     // 공통 상단 메뉴와 함께 원본 공지·기기 확인·학기 표시를 유지한다.
     assert.equal(originalScripts.length,page==='index.html'?2:3,page+' original script count');
     if(page==='html/vsugang.html')assert.deepEqual(scripts.slice(3),[
-      'scenario-settings.js',
-    ],'isolated synthetic scripts must load only after original settings/gnb/hanmoSys');
+      'scenario-settings.js','capacity-settings.js',
+    ],'선택형 합성 스크립트는 기존 신청 설정 이후 순서대로 로드한다');
     const h=createHarness({deviceInfo:'true',practiceSetter:1,psubjectValue:2,
       subjectValue:2,waitingValue:'no',TIMEtime:'1',SELECTtime:'1',SELECTWaitTime:'0'});
     h.now('2026-11-19T10:11:00+09:00');

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 	<head>
   <script src="../js/pc-only.js"></script>
-		<!-- Google tag (gtag.js) -->
+		<!-- Google 분석 태그 -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y4YDVWRKL5"></script>
 		<script>
 		  window.dataLayer = window.dataLayer || [];
@@ -13,10 +13,10 @@
 		</script>
 		<title>한모 - 메뉴</title>
 		<meta charset='UTF-8'>
-		<meta name="description" content="한국외대 재학생을 위한 모의수강신청 사이트">
-		<meta name="keyword" content="한모, 한국외국어대학교 모의수강신청, HUFS, HUFS수강연습, 외대수강연습, HUFS연습, 외대연습, 수강연습, 한국외대, 한국외대 수강신청, 한국외대 수강신청 연습, 수강신청 연습, 한국외국어대학교, 외대, 외대 수강신청, 외대 수강신청 연습, 수강신청, 수강신청 모의연습, 한국외대 수강신청 모의연습, 한국외대 수강신청 연습, 외대 수강신청 모의연습, sugangpractice, vsugangpractice, 한국외국어대학교 수강신청 모의연습">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
-		<link href="../img/hanmo_color.png" rel="shortcut icon" type="image/x-icon">
+		<meta name="description" content="학교 공식 서비스가 아닌 한모 수강신청 모의연습">
+		<meta name="keyword" content="한모, HUFS, HUFS수강연습, 외대수강연습, HUFS연습, 외대연습, 수강연습, 한국외대, 한국외대 수강신청, 한국외대 수강신청 연습, 수강신청 연습, 한국외국어대학교, 외대, 외대 수강신청, 외대 수강신청 연습, 수강신청, 수강신청 모의연습, 한국외대 수강신청 모의연습, 한국외대 수강신청 연습, 외대 수강신청 모의연습, sugangpractice, vsugangpractice, 한국외국어대학교 수강신청 모의연습">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="icon" type="image/svg+xml" sizes="any" href="../img/favicon-purple.svg">
 		<link href="../css/gnb.css" rel="stylesheet" type="text/css">
 		<link href="../css/vsugang.css" rel="stylesheet" type="text/css">
 		<link href="../css/layout.css" rel="stylesheet" type="text/css">
@@ -26,8 +26,11 @@
   <link rel="stylesheet" href="../css/vsugang-fit.css">
   <script src="../js/student-profile-bar.js" defer></script>
   <script src="../js/vsugang-fit.js" defer></script>
+  <link rel="stylesheet" href="../css/hanmo-policy-footer.css">
+  <link rel="stylesheet" href="../css/hanmo-refined.css">
 </head>
-    <body class="hanmo-vsugang">
+    <body class="hanmo-vsugang hanmo-refined">
+  <a class="hanmo-skip" href="#main">본문으로 이동</a>
 		<script>
             (function(){var w=window;if(w.ChannelIO){return w.console.error("ChannelIO script included twice.");}var ch=function(){ch.c(arguments);};ch.q=[];ch.c=function(args){ch.q.push(args);};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return;}w.ChannelIOInitialized=true;var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var x=document.getElementsByTagName("script")[0];if(x.parentNode){x.parentNode.insertBefore(s,x);}}if(document.readyState==="complete"){l();}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l);}})();
         
@@ -52,49 +55,58 @@
 			</section>
 		</header>
 <nav class="hanmo-topbar" aria-label="전체 기능 바로가기">
-  <a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모 <span>HUFS 학업 도우미</span></a>
+  <a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모</a>
   <div class="hanmo-nav-inline">
     <a href="./academic-timeline.html">학사 공지</a>
-    <a href="./forecast.html">강의 전망</a>
     <a href="./catalog.html">강의 검색</a>
-    <a href="./academic-progress.html">학점 정리</a>
+    <a href="./academic-calendar.html">학사 달력</a>
+    <a href="./academic-support.html">학교 문의처</a>
     <span class="hanmo-profile-summary" data-profile-summary role="status" aria-live="polite" aria-label="브라우저에 저장한 내정보, 학교 로그인 아님">내정보 미설정</span>
     <a class="hanmo-me-link" href="./planner.html">내정보</a>
   </div>
 </nav>
-		<main>
+		<main id="main" tabindex="-1">
+    
 			<section class='settingSection'>
-				<div class='settingPanel'>
-					<ul>
-						관심강좌에 담은 과목 개수
-						<li><input class='textbox psugangVal' type='textbox'></li>
-						수강신청할 과목 개수
-						<li><input class='textbox vsugangVal' type='textbox'></li>
-						'접속 대기 시간' 활성화 여부
-						<li class='waiting-setting-groups'>
-							<fieldset class='waiting-setting-group'>
-								<legend>강의 신청에 적용할까요?</legend>
-								<label><input type='radio' name='waitingCourseYN' value='yes' checked /> 예</label>
-								<label><input type='radio' name='waitingCourseYN' value='no' /> 아니오</label>
-							</fieldset>
-							<fieldset class='waiting-setting-group'>
-								<legend>수강신청 페이지 접속 시에 적용할까요?</legend>
-								<label><input type='radio' name='waitingEntryYN' value='yes' /> 예</label>
-								<label><input type='radio' name='waitingEntryYN' value='no' checked /> 아니오</label>
-							</fieldset>
-						</li>
-					</ul>
-					<button type='button' class='settingButton' onclick='getSettingValue()'>
-						확인
-					</button>
-				</div>
-			</section>
-			<section class='f-dirt-down'>
-				<section class='titleContainer' onclick='location.href='../index.html''>
-					<h1><span class='title'></span> 한국외국어대학교 모의수강신청</h1>
+        <form class='settingPanel' onsubmit='getSettingValue(); return false;' aria-labelledby='setting-title'>
+          <h2 id='setting-title' class='settingTitle'>연습 설정</h2>
+          <p class='settingDesc'>BASIC·SELECT 모드의 과목 수와 두 대기 조건을 설정합니다.</p>
+          <label class='settingField'>
+            <span class='settingLabel'>관심강좌에 담은 과목 개수</span>
+            <input class='textbox psugangVal' type='number' min='1' max='15' step='1' inputmode='numeric' required>
+          </label>
+          <label class='settingField'>
+            <span class='settingLabel'>수강신청할 과목 개수</span>
+            <input class='textbox vsugangVal' type='number' min='1' max='15' step='1' inputmode='numeric' required>
+          </label>
+          <div class='waiting-setting-groups'>
+            <fieldset class='waiting-setting-group'>
+              <legend>강의 신청에 적용할까요?</legend>
+              <div class='segmented'>
+                <label><input type='radio' name='waitingCourseYN' value='yes' checked /><span>예</span></label>
+                <label><input type='radio' name='waitingCourseYN' value='no' /><span>아니오</span></label>
+              </div>
+            </fieldset>
+            <fieldset class='waiting-setting-group'>
+              <legend>수강신청 페이지 접속 시에 적용할까요?</legend>
+              <div class='segmented'>
+                <label><input type='radio' name='waitingEntryYN' value='yes' /><span>예</span></label>
+                <label><input type='radio' name='waitingEntryYN' value='no' checked /><span>아니오</span></label>
+              </div>
+            </fieldset>
+          </div>
+          <div class='settingActions'>
+            <button type='button' class='settingCancel' onclick='closeSettingPanel()'>닫기</button>
+            <button type='submit' class='settingButton'>확인</button>
+          </div>
+        </form>
+      </section>
+      <section class='f-dirt-down'>
+				<section class='titleContainer'>
+					<h1><span class='title'></span> 한모 · 비공식 모의수강신청</h1>
 					<div class='hanmo'>
 						<hr>
-						<span><img class='hanmo' src='../img/hanmo_white.svg'></span>
+						<span><img class='hanmo' src='../img/hanmo_white.svg' alt=''></span>
 						<hr>
 					</div>
 				</section>
@@ -105,19 +117,19 @@
 								BASIC MODE
 							</h2>
 							<p>
-								수강신청의 전 과정을 연습할 수 있어요.
+								시작부터 과목 선택까지
 							</p>
 						</div>
 						<button id="incident-options" type="button" aria-haspopup="dialog" aria-controls="scenario-settings" aria-labelledby="incident-options-title" aria-describedby="incident-options-description">
 							<span class="mode-tile-title" id="incident-options-title">돌발상황</span>
-							<span class="mode-tile-description" id="incident-options-description">BASIC MODE의 돌발 상황을 연습해요.</span>
+							<span class="mode-tile-description" id="incident-options-description">BASIC 모드의 접속 오류·정원 마감</span>
 						</button>
 						<div style='grid-area: t' onclick='goPractice(2)' onkeydown='if(event.key==="Enter"||event.key===" "){event.preventDefault();goPractice(2)}' role='button' tabindex='0' aria-label='TIME MODE · 시작 시간 연습'>
 							<h2>
 								TIME MODE
 							</h2>
 							<p>
-								수강신청 시작 시간에 맞춰 버튼을 신속하게 누를 수 있도록 연습할 수 있어요.
+								시작 시간에 맞춰 입장하기
 							</p>
 						</div>
 						<div style='grid-area: s' onclick='goPractice(3)' onkeydown='if(event.key==="Enter"||event.key===" "){event.preventDefault();goPractice(3)}' role='button' tabindex='0' aria-label='SELECT MODE · 과목 선택 연습'>
@@ -125,7 +137,7 @@
 								SELECT<br>MODE
 							</h2>
 							<p>
-								수강신청할 과목을 신속하게 담을 수 있도록 연습할 수 있어요.
+								신청할 과목 빠르게 담기
 							</p>
 						</div>
 						<div class='setting' style='grid-area: set;' onclick='openSettingPanel()' onkeydown='if(event.key === "Enter" || event.key === " "){event.preventDefault();openSettingPanel();}' role='button' tabindex='0' aria-label='모의신청 설정 열기'>
@@ -143,9 +155,19 @@
     <div class="incident-option-group">
       <fieldset class="waiting-setting-group" aria-describedby="incident-reconnect-description">
         <legend id="incident-reconnect-label">가상 404·접속 끊김</legend>
-        <label><input type="radio" name="incident-RECONNECT" value="yes" data-scenario-toggle="RECONNECT"> <span>예</span></label>
-        <label><input type="radio" name="incident-RECONNECT" value="no" data-scenario-off="RECONNECT" checked> <span>아니오</span></label>
+        <div class="segmented">
+          <label><input type="radio" name="incident-RECONNECT" value="yes" data-scenario-toggle="RECONNECT"><span>예</span></label>
+          <label><input type="radio" name="incident-RECONNECT" value="no" data-scenario-off="RECONNECT" checked><span>아니오</span></label>
+        </div>
         <small id="incident-reconnect-description">BASIC에서 수강신청 화면으로 이동할 때 1회 가상 404가 표시됩니다.</small>
+      </fieldset>
+      <fieldset class="waiting-setting-group" aria-describedby="incident-capacity-description">
+        <legend>정원 마감 · 대체 과목 찾기</legend>
+        <div class="segmented">
+          <label><input type="radio" name="incident-CAPACITY" value="yes" data-capacity-toggle><span>예</span></label>
+          <label><input type="radio" name="incident-CAPACITY" value="no" data-capacity-off checked><span>아니오</span></label>
+        </div>
+        <small id="incident-capacity-description">BASIC에서 임의의 한 과목이 정원 마감됩니다.</small>
       </fieldset>
     </div>
     <div class="incident-option-actions">
@@ -155,17 +177,13 @@
   </form>
 </dialog>
 
-			<section class='f-dirt-up'>
-				<section class='adfit'>
-					<ins class="kakao_ad_area" style="display:none;" data-ad-unit = "DAN-b3RfXepcKF3cMeyf" data-ad-width = "728" data-ad-height = "90"></ins>
-					<script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
-				</section>
-			</section>
 		</main>
 		<script src="../js/vsugang.js"></script>
 		<script src="../js/gnb.js"></script>
 		<script src='../js/hanmoSys.js'></script>
 <script src="../js/scenario-settings.js"></script>
-    </body>
+<script src="../js/capacity-settings.js"></script>
+      <footer class="hanmo-policy-footer" aria-label="비공식 서비스 안내"><p><strong>본 서비스는 한국외국어대학교의 공식 서비스가 아니며, 정확한 정보는 학교 원문을 확인하시기 바랍니다.</strong></p></footer>
+</body>
 
 </html>

@@ -16,7 +16,7 @@ import {buildAcademicLedger} from '../core/academics/ledger.js';
 export const SCENARIO_TERMS={A:2,B:3,C:4};
 export const MAX_COURSES=60;
 const CODE=/^[A-Za-z0-9_.:-]{1,128}$/;
-const TERM=/^20\d{2}-[12]$/;
+const TERM=/^20\d{2}-[12SW]$/;
 const OFFSET=/(?:Z|[+-]\d{2}:\d{2})$/;
 
 /** @param {string} value @returns {number} 검증한 조회 시각 */
@@ -32,7 +32,7 @@ function courseCode(raw) {
 }
 /** @param {unknown} raw @returns {string} 검증된 정규학기 */
 function academicTerm(raw) {
-  if(typeof raw!=='string'||!TERM.test(raw))throw new RangeError('학기는 2027-1 또는 2027-2 형식으로 입력해 주세요.');
+  if(typeof raw!=='string'||!TERM.test(raw))throw new RangeError('학기는 2027-1·2027-S(여름)·2027-2·2027-W(겨울) 형식으로 입력해 주세요.');
   return raw;
 }
 /** @param {unknown} raw @returns {number} 반 학점 단위로 표시한 값 */

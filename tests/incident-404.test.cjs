@@ -129,7 +129,7 @@ test('404는 화면 내 복구 동작 없이 왼쪽 원형 메뉴만 비활성�
   assert.match(html,/브라우저의 새로고침을 사용하세요/);
   assert.doesNotMatch(html,/뒤로가기/);
   const menu=fs.readFileSync(path.join(ROOT,'html/vsugang.html'),'utf8');
-  assert.match(menu,/id="incident-options-description">BASIC MODE의 돌발 상황을 연습해요\.<\/span>/);
+  assert.match(menu,/id="incident-options-description">BASIC 모드의 접속 오류·정원 마감<\/span>/);
   assert.doesNotMatch(menu,/BASIC MODE의 페이지 전환 404를 연습해요/);
   assert.match(html,/src="\.\.\/js\/pc-only\.js"/);
 });

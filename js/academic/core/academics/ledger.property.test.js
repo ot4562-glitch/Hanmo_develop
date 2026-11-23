@@ -471,7 +471,6 @@ function explain(want, got) {
     }
     return lines.length ? lines.join('; ') : null;
 }
-// ---------------------------------------------------------------------------------------------
 describe('buildAcademicLedger properties (#202)', () => {
     it('reports a failure with everything needed to rebuild and re-check it', () => {
         // 취득 기록이 있는 모든 사례에서 일부러 실패하도록 만든 속성으로 보고·축소 기능을 검증한다.

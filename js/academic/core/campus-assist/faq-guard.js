@@ -2,7 +2,6 @@
 /** @typedef {import('../../contracts/campus-assist/index.js').FaqCandidate} FaqCandidate */
 import {bigramCoverage,faqNumbers,normalizeFaqText} from './faq-text.js';
 
-/** 검색된 문단 한 건에서 답변 검증기가 필요로 하는 정보다. */
 /** @typedef {{citationId:string,title:string,text:string}} FaqGuardEvidence */
 /** @typedef {'DUPLICATE_CITATION'|'UNKNOWN_CITATION'|'QUOTE_TOO_SHORT'|'QUOTE_NOT_IN_SOURCE'|'NUMBER_NOT_QUOTED'|'AMOUNT_NOT_QUOTED'|'RELATIVE_DATE_NOT_IN_SOURCE'|'NEGATION_NOT_IN_SOURCE'|'NEGATION_DROPPED'|'UNSUPPORTED_CLAIM'|'ELIGIBILITY_VERDICT'|'URL_OR_CONTACT'} FaqRejectReason */
 /** 공백을 제외하고 이보다 짧은 인용은 대부분의 문단에서도 우연히 찾을 수 있다. */

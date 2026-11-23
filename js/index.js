@@ -3,35 +3,45 @@
 const $NOTICELIST=document.getElementsByClassName('noticeList')[0];
 const $GANEUNG=document.getElementsByClassName('ganeung')[0];
 const $JEHAN=document.getElementsByClassName('jehan')[0];
-const $ADFIT=document.getElementsByClassName('adfit')[0];
 const title=document.getElementsByClassName('title')[0];
 const $TITLECONTAINER=document.getElementsByClassName('titleContainer')[0];
 const $CONTAINER=document.getElementsByClassName('container')[0];
 const $PHONECONTAINER=document.getElementsByClassName('phoneContainer')[0];
 const nowTime=new Date();
 
-// 검증된 정적 공지만 사용한다. 사용자 입력 HTML을 이 영역에 직접 삽입하지 않는다.
-const noticeList=[
-  '<a href="https://everytime.kr/374012/v/415946307">한모 업데이트 내용은 여기를 눌러 확인해주세요.</a>',
-  '1년간 4만 명의 학우가 사용한 한모 (2025)',
+// 확인 가능한 한모 자체 안내만 교체하며 학교 공지를 가장하지 않습니다.
+const notices=[
+  {text:'한모 업데이트 보기',href:'https://everytime.kr/374012/v/415946307'},
+  {text:'돌발상황 연습은 BASIC에서 설정할 수 있어요.',href:'./html/vsugang.html'},
 ];
-for(let index=noticeList.length-1;index>=0;index--){
-  $NOTICELIST.insertAdjacentHTML('afterbegin','<li>'+noticeList[index]+'</li>');
+const noticeItems=notices.map(notice=>{
+  const li=document.createElement('li');
+  const link=document.createElement('a');
+  link.href=notice.href;
+  link.textContent=notice.text;
+  li.append(link);
+  return li;
+});
+$NOTICELIST.replaceChildren(...noticeItems);
+let noticeIndex=0;
+function showNotice(index){
+  noticeItems.forEach((item,offset)=>{item.hidden=offset!==index;});
 }
-
-let homeNoticeIndex=0;
-function rotateNotice(){
-  $NOTICELIST.style.bottom=homeNoticeIndex===0?'77px':'0px';
-  homeNoticeIndex=(homeNoticeIndex+1)%2;
+showNotice(noticeIndex);
+if(noticeItems.length>1){
+  setInterval(()=>{
+    // 마우스·키보드로 공지를 읽는 동안에는 자동으로 교체하지 않습니다.
+    if(document.hidden||$NOTICELIST.matches(':hover')||$NOTICELIST.matches(':focus-within'))return;
+    noticeIndex=(noticeIndex+1)%noticeItems.length;
+    showNotice(noticeIndex);
+  },5000);
 }
-setInterval(rotateNotice,5000);
 
 function check(){
   if(localStorage.getItem('deviceInfo')==='false'){
     $CONTAINER.style.display='none';
     $TITLECONTAINER.style.display='none';
     $PHONECONTAINER.style.display='flex';
-    $ADFIT.style.display='none';
   }
   // 제한 시간 안내는 유지하되 선택 화면으로 가는 버튼은 항상 표시합니다.
   // 실제 모의신청 진입 제한은 하위 연습 화면에서 유지합니다.

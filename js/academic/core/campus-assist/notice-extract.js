@@ -80,7 +80,6 @@ function clauses(seg) {
 }
 /** @param {Segment} seg @param {number} from @param {number} to @returns {SourceSpan} */
 const span = (seg, from, to) => ({ paragraphId: seg.paragraphId, start: seg.start + from, end: seg.start + to, text: seg.text.slice(from, to) });
-// ───────────── 대상 ─────────────
 const NEGATION = /제외|해당\s*(?:하지\s*않|없)|대상이?\s*아니|대상\s*아님|신청할\s*수\s*없|신청\s*불가|불가능/;
 const EXCEPTION = /(?:^|\s)단[,\s]|다만/;
 /** @type {[RegExp,StudentGroup][]} */
@@ -127,7 +126,6 @@ function targetsIn(seg) {
 }
 /** @param {TargetValue} v */
 const targetKey = (v) => JSON.stringify(v);
-// ───────────── 날짜 ─────────────
 const WD = '(?:\\s*\\(\\s*[월화수목금토일]\\s*\\))?';
 const TIME = '(?:\\s*(오전|오후)?\\s*(\\d{1,2})\\s*(?::\\s*(\\d{2})|시(?:\\s*(\\d{1,2})\\s*분)?))?';
 const FULL = `(20\\d{2})\\s*[.\\-/년]\\s*(\\d{1,2})\\s*[.\\-/월]\\s*(\\d{1,2})\\s*(?:일|\\.)?${WD}`;
@@ -241,7 +239,6 @@ function roleOf(clause, isRange, end) {
         return 'EVENT';
     return 'UNCLASSIFIED';
 }
-// ───────────── 정정·취소 ─────────────
 /** '수강신청 정정 기간' 같은 학사 용어가 아니라 공지 내용 자체를 고쳤다는 표현만 본다. */
 const CORRECTION_SIGNAL = /[[(【]\s*정정\s*[\])】]|정정\s*공지|변경\s*공지|(?:내용|일정|날짜|기간|장소)\s*(?:을|를)?\s*정정|정정(?:합니다|하오니|되었)|다음과\s*같이\s*(?:정정|변경)/;
 const CANCEL_TITLE = /[[(【]\s*(?:취소|철회)\s*[\])】]|(?:공지|행사|일정|설명회|시험|모집)\s*(?:취소|철회)\s*(?:공지|안내)?$/;

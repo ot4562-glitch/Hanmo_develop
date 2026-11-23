@@ -58,7 +58,6 @@ export const SEARCH_GATE_TARGETS = /** @type {const} */ ({
     p95LatencyMs: 300,
     safetyViolations: 0,
 });
-// ───────────── 분할 규칙 ─────────────
 /** 문서 계열 ID를 결정적으로 TUNE/HOLDOUT에 배정한다. 같은 seed·계열이면 언제나 같은 결과다. */
 /**
  * @param {string} documentFamily

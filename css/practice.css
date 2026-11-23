@@ -402,3 +402,70 @@ th {
 .unvisible{
 	display: none;
 }
+
+
+/* 라디오 선택 후 조회조건 전체를 한 덩어리로 가운데 배치한다. */
+#course-mode-nav{display:flex;justify-content:center;align-items:center;align-content:center;gap:6px 12px;
+  flex-wrap:wrap;padding:5px 10px;min-height:30px;box-sizing:border-box}
+#course-mode-nav .course-types{display:flex;justify-content:center;align-items:center;gap:10px;
+  flex:0 0 auto;padding:0;margin:0;border:0;min-inline-size:0}
+#course-mode-nav .course-types label{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;cursor:pointer}
+#course-mode-nav .course-types input{margin:0;accent-color:#188395;width:13px;height:13px}
+#course-mode-nav .menu-extra{display:flex;align-items:center;justify-content:center;gap:8px;
+  flex:0 1 auto;min-width:0}
+#course-mode-nav .menu-extra[hidden],.course-general-warning[hidden],.course-search-prompt[hidden]{display:none}
+#course-mode-nav .menu-extra label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+#course-mode-nav .menu-extra select{font:inherit;font-weight:400;min-width:82px;max-width:280px;
+  padding:1px 4px;height:24px;background:#fff;border:1px solid #8799a7}
+#course-mode-nav .menu-extra[data-course-filter="MAJOR"] select:first-child{min-width:125px}
+#course-mode-nav .search{flex:0 0 80px;margin:0}
+#course-mode-nav .course-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+#course-mode-nav[data-mode="INTEREST"] .course-types{display:contents}
+#course-mode-nav[data-mode="INTEREST"] .course-types label:nth-of-type(1){order:1}
+#course-mode-nav[data-mode="INTEREST"] .course-types label:nth-of-type(2){order:3}
+#course-mode-nav[data-mode="INTEREST"] .course-types label:nth-of-type(3){order:4}
+#course-mode-nav[data-mode="INTEREST"] .course-types label:nth-of-type(4){order:5}
+#course-mode-nav[data-mode="INTEREST"] .search{order:2}
+.course-search-prompt{text-align:center;color:#b8606d;font-size:12px;font-weight:700;margin:35px 0 0}
+.course-general-warning{margin:10px 0 0;color:#b75c68;text-align:center;font-size:12px;font-weight:700}
+#course-mode-nav :is(input,select,button):focus-visible{outline:2px solid #005e80;outline-offset:2px}
+@media(max-width:1000px){
+ #course-mode-nav{gap:6px 8px}
+ #course-mode-nav .menu-extra{flex-wrap:wrap;gap:5px}
+ #course-mode-nav .menu-extra select{max-width:190px}
+}
+
+/* 원본의 황갈색 메뉴·파란색 사용자 영역은 그대로 두고 배치 회귀만 고칩니다. */
+.course-warning-slot {
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 25px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 25px;
+}
+.course-warning-slot .course-general-warning { margin: 0; line-height: 1.45; }
+#course-mode-nav {
+  box-sizing: border-box;
+  flex: 0 0 40px;
+  height: 40px;
+  min-height: 40px;
+  flex-wrap: nowrap;
+  padding: 5px 8px;
+}
+#course-search-prompt {
+  box-sizing: border-box;
+  display: block;
+  flex: 0 0 24px;
+  height: 24px;
+  margin: 0;
+  line-height: 24px;
+}
+#course-search-prompt[hidden] {
+  display: block;
+  visibility: hidden;
+}
+@media (max-width: 1199px) {
+  #course-mode-nav { flex-basis: auto; height: auto; min-height: 40px; flex-wrap: wrap; }
+}

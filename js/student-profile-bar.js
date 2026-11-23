@@ -1,5 +1,5 @@
-/* Browser-only academic profile displayed in the right end of every non-imitation topbar.
- * These are self-declared settings, NOT actual HUFS authentication/student records.
+/* 상단 메뉴 오른쪽에 사용자가 직접 입력한 프로필을 표시한다.
+ * 학교 로그인·학적 기록이 아니라 이 브라우저에 저장된 값이다.
  */
 (function(){
   'use strict';
@@ -20,7 +20,8 @@
       parts.push((kind==='MINOR'?'부전공 ':'이중전공 ')+secondary.trim().slice(0,100));
     }
     const year=value.cohort;
-    parts.push(Number.isSafeInteger(year)&&year>=2010&&year<=2100?year+'학번':'학번 미설정');
+   const maxCohort=Number(new Intl.DateTimeFormat('en',{timeZone:'Asia/Seoul',year:'numeric'}).format(new Date()))+1;
+    parts.push(Number.isSafeInteger(year)&&year>=2010&&year<=maxCohort?year+'학번':'학번 미설정');
     return parts.join(' · ');
   }
   function update(){
@@ -28,7 +29,7 @@
     try{
       const raw=localStorage.getItem(KEY);
       if(raw&&raw.length<4096)stored=JSON.parse(raw);
-    }catch(_error){/* browser may refuse storage */}
+    }catch(_error){/* 저장이 차단된 브라우저에서는 미설정으로 표시한다. */}
     const value=summary(stored);
     for(const item of items){
       item.textContent=value;

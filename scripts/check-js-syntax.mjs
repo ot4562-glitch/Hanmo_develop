@@ -1,5 +1,4 @@
 // @ts-check
-// 학업 JavaScript 모듈의 구문을 파일을 실행하지 않고 검사한다.
 import {readFileSync,readdirSync} from 'node:fs';
 import {join} from 'node:path';
 import {parse} from 'acorn';

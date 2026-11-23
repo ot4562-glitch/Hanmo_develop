@@ -58,3 +58,53 @@ body.hanmo-ui .hanmo-card :is(h2, h3) {
     border-top-color: rgba(131, 174, 194, .32);
   }
 }
+
+/* 학사 공지·강의 검색도 문의처처럼 본문 폭을 열고 같은 최대 작업 영역을 사용합니다. */
+body.hanmo-ui.hanmo-search-page > main.hanmo-main {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+body.hanmo-ui.hanmo-search-page > main.hanmo-main > .hanmo-search-controls {
+  box-sizing: border-box;
+  width: min(1660px, 100%);
+  margin-inline: auto;
+  padding: 26px 30px;
+  border-top: 1px solid #385367;
+}
+body.hanmo-ui.hanmo-search-page > main.hanmo-main > :is(.hanmo-section-title, .hanmo-list, .hanmo-actions, #notice-status) {
+  box-sizing: border-box;
+  width: min(1660px, 100%);
+  margin-inline: auto;
+}
+@media (max-width: 830px) {
+  body.hanmo-ui.hanmo-search-page > main.hanmo-main > .hanmo-search-controls {
+    padding: 18px 14px;
+  }
+}
+@media (min-width: 1600px) and (min-height: 900px) {
+  body.hanmo-ui.hanmo-search-page > main.hanmo-main > .hanmo-search-controls {
+    padding-block: 18px;
+  }
+}
+
+/* 1980×1080에서는 문의처의 전체 폭 규칙과 동일하게 중앙 1660px 제한을 해제합니다. */
+@media (min-width: 1600px) and (min-height: 900px) {
+  body.hanmo-ui.hanmo-search-page > main.hanmo-main > :is(
+    .hanmo-search-controls, .hanmo-section-title, .hanmo-list, .hanmo-actions, #notice-status
+  ) {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* 안내 문장과 링크 버튼의 시작점을 검색 입력란의 왼쪽에 정확히 맞춥니다. */
+body.hanmo-ui.hanmo-search-page > main.hanmo-main > :is(.hanmo-section-title,.hanmo-actions,#notice-status) {
+  padding-inline:30px;
+}
+@media (max-width:830px) {
+  body.hanmo-ui.hanmo-search-page > main.hanmo-main > :is(.hanmo-section-title,.hanmo-actions,#notice-status) {
+    padding-inline:14px;
+  }
+}

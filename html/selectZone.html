@@ -14,13 +14,14 @@
         <title>한모 - 모의수강신청</title>
         <meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
-		<link href="../img/hanmo_color.png" rel="shortcut icon" type="image/x-icon">
+		<link rel="icon" type="image/svg+xml" sizes="any" href="../img/favicon-purple.svg">
 		<link href="../css/practice.css" rel="stylesheet" type="text/css">
 		<link href="../css/normalize.css" rel="stylesheet" type="text/css">
     	<link href="../css/gnb.css" rel="stylesheet" type="text/css">
 		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
-    </head>
-    <body>
+      <link rel="stylesheet" href="../css/hanmo-policy-footer.css">
+</head>
+    <body class="hanmo-practice-layout">
 		<script>
             (function(){var w=window;if(w.ChannelIO){return w.console.error("ChannelIO script included twice.");}var ch=function(){ch.c(arguments);};ch.q=[];ch.c=function(args){ch.q.push(args);};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return;}w.ChannelIOInitialized=true;var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var x=document.getElementsByTagName("script")[0];if(x.parentNode){x.parentNode.insertBefore(s,x);}}if(document.readyState==="complete"){l();}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l);}})();
         
@@ -49,6 +50,7 @@
             <nav class="navigation"> <!--화면의 왼쪽 메뉴에 해당, HUFS Blue(위)과 HUFS GOLD(아래) 나눔(display: grid)-->
                 <div class="userInfo"> <!--HUFS Blue-->
                     <h1><span class='title'></span> 모의수강신청</h1>
+                
 					<p class='practiceMode'></p>
                 </div>
                 <div class="navButton"> <!--HUFS GOLD부분-->
@@ -60,21 +62,40 @@
                     <button>강의시간표조회</button>
                 </div>
 			</nav>
-            <main class="selectZone_mainArea"> <!--화면의 오른쪽 정보 출력에 해당, 내용 가운데 배치를 위해 grid 사용-->
+            <main class="selectZone_mainArea">
+                <!--화면의 오른쪽 정보 출력에 해당, 내용 가운데 배치를 위해 grid 사용-->
                 
 				<h2>수강신청 및 수정/삭제(Course Registeration[Adding/Deleting])</h2>
 				<div class='tableZone'>
-					<nav class="menu">
-						<input type="radio" name="수강유형" checked="checked"/>관심강좌
+					<nav class="menu" id="course-mode-nav" data-mode="INTEREST" aria-label="가상 수강 과목 조회 조건">
+						<fieldset class="course-types">
+							<legend class="course-visually-hidden">수강유형</legend>
+							<label><input type="radio" name="course-mode" value="INTEREST" checked>관심강좌</label>
+							<label><input type="radio" name="course-mode" value="MAJOR">전공</label>
+							<label><input type="radio" name="course-mode" value="GENERAL">교양</label>
+							<label><input type="radio" name="course-mode" value="FOUNDATION">기초</label>
+						</fieldset>
+						<div class="menu-extra" data-course-filter="MAJOR" hidden>
+							<label>학과선택 <select aria-label="학과선택"><option value="">***Select***</option><option value="SEOUL">서울캠퍼스 가상 전공</option><option value="GLOBAL">글로벌캠퍼스 가상 전공</option></select></label>
+							<label>학년 <select aria-label="전공 학년"><option>1학년</option><option>2학년</option><option>3학년</option><option>4학년</option></select></label>
+						</div>
+						<div class="menu-extra" data-course-filter="GENERAL" hidden>
+							<label>교양과목 <select aria-label="교양과목"><option value="">***Select***</option><option value="GENERAL">교양 가상 강좌</option></select></label>
+							<label>조회구분 <select aria-label="교양 조회구분"><option value="">***Select***</option><option value="AVAILABLE">신청가능과목</option><option value="ALL">전체과목</option></select></label>
+							<label>학년 <select aria-label="교양 학년"><option>1학년</option><option>2학년</option><option>3학년</option><option>4학년</option></select></label>
+						</div>
+						<div class="menu-extra" data-course-filter="FOUNDATION" hidden>
+							<label>이수영역 <select aria-label="기초 이수영역"><option>［글로벌］(모든영역 공통)기초 인문영역</option><option>［서울］기초 교양영역</option></select></label>
+							<label>조회구분 <select aria-label="기초 조회구분"><option value="">***Select***</option><option value="AVAILABLE">신청가능과목</option><option value="ALL">전체과목</option></select></label>
+						</div>
 						<button class="search" type="button" onclick="pyoDisplay()">Search</button>
-						<input type="radio" style='margin-left: 70px;' name="수강유형"/>전공
-						<input type="radio" style='margin-left: 70px;' name="수강유형"/>교차수강
-						<input type="radio" style='margin-left: 70px;' name="수강유형"/>교양
 					</nav>
+					<div class="course-warning-slot"><p class="course-general-warning" id="course-general-warning" hidden>*** 교양교과목 수강신청 시 종합정보시스템의 '교양영역별 취득현황'을 확인 후 신청바람. ***</p></div>
+					<p class="course-search-prompt" id="course-search-prompt" role="status">***** [Search] 버튼을 눌러 개설강좌를 조회하세요! *****</p>
 					<section class='vsugangTable'>
 						<div class='waiting unvisible'>
 							<img class='waitingLogo' src='../img/hanmo_color.png'/>
-							<h3 class='waitingTitle'>한국외국어대학교 모의수강신청</h3>
+							<h3 class='waitingTitle'>한모</h3>
 							<hr class='waitingDivider' />
 							<p class='waitingLabel'>내 앞의 대기자 수</p>
 							<p class='waitingCount'>0</p>
@@ -136,6 +157,7 @@
 				</div>
             </main>
         </div>
+        <footer class="hanmo-policy-footer" aria-label="비공식 서비스 안내"><p><strong>본 서비스는 한국외국어대학교의 공식 서비스가 아니며, 정확한 정보는 학교 원문을 확인하시기 바랍니다.</strong></p></footer>
 		<script src="../js/gnb.js"></script>
         <script src="../js/selectZone.js"></script>
 		<script src='../js/hanmoSys.js'></script>

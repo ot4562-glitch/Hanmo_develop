@@ -1,4 +1,4 @@
-/* 공개 승인을 받은 학사 공지만 표시한다. */
+/* 연결 상태를 구분하고 검수된 공지 자료만 표시합니다. */
 (function(){
  'use strict';
  const list=document.getElementById('notice-list');
@@ -23,11 +23,11 @@
    return 'OTHER';
  }
  const messages={
-   LOADING:'승인된 학사공지 데이터를 확인하고 있습니다.',
-   NOT_CONNECTED:'학교에서 사용·공개가 승인된 학사공지 데이터가 아직 연결되지 않았습니다.',
-   EMPTY:'연결은 되었지만 현재 공개 가능한 승인 공지가 없습니다.',
-   OFFLINE:'자료 서버에 연결하지 못했습니다. 연결 상태를 확인하고 다시 시도해 주세요.',
-   INVALID:'공개 자료의 판본 또는 유효기간을 확인할 수 없어 표시를 중단했습니다.'
+   LOADING:'공지 자료를 확인하고 있습니다.',
+   NOT_CONNECTED:'공지 자료 연결 전입니다. 학교 원문에서 확인해 주세요.',
+   EMPTY:'현재 표시할 공지 자료가 없습니다.',
+   OFFLINE:'자료 연결에 실패했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.',
+   INVALID:'자료 검증에 실패해 표시를 중단했습니다. 학교 원문을 확인해 주세요.'
  };
  const node=(tag,message,cls)=>{
    const el=document.createElement(tag);el.textContent=message;
@@ -51,7 +51,7 @@
      const card=node('article','','hanmo-item');
      card.append(node('h3',item.title));
      card.append(node('p','게시일: '+(item.publishedDate||'원문 확인 필요')));
-     const link=node('a','학교 공식 원문 확인 →');
+     const link=node('a','원문 확인');
      link.href=item.sourceUrl;link.rel='noopener noreferrer';link.target='_blank';
      card.append(link);
      list.append(card);
@@ -62,8 +62,7 @@
    events=state==='READY'?result.notices:[];
    meta=result.meta;
    status.textContent=state==='READY'
-     ?'승인 공개판본 '+meta.snapshotId+' · 출처 검수일 '+meta.sourceCheckedAt.slice(0,10)+
-       ' · 신청 대상과 마감은 원문 확인'
+     ?'자료 확인 '+meta.sourceCheckedAt.slice(0,10)+' · 대상·마감은 원문 확인'
      :messages[state]||messages.INVALID;
    query.disabled=state!=='READY';
    type.disabled=state!=='READY';
@@ -77,8 +76,12 @@
      show(adapter&&typeof adapter.load==='function'
        ?await adapter.load():{status:'OFFLINE'});
    }catch{show({status:'OFFLINE'});}
-   finally{loading=false;retry.disabled=false;}
+   finally{
+     loading=false;retry.disabled=false;
+     retry.hidden=!['OFFLINE','INVALID'].includes(state);
+   }
  }
+ document.getElementById('notice-filter').addEventListener('submit',event=>event.preventDefault());
  query.addEventListener('input',render);
  type.addEventListener('change',render);
  retry.addEventListener('click',()=>{void refresh();});

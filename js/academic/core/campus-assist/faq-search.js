@@ -33,7 +33,6 @@ export function searchFaqParagraphs(question,items,opts={}){
   /** @type {Map<string,FaqSearchHit>} */
   const best=new Map();
   for(const words of clauses){
-    // 내용어가 없는 절은 검색하지 않는다.
     const topical=words.filter(w=>!isGenericFaqWord(w));
     if(topical.length===0)continue;
     // 각 질문 절의 IDF를 문단마다 다시 계산하지 않는다.

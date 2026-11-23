@@ -1,10 +1,9 @@
 // @ts-check
-// 저장소 전체의 TypeScript 소스 금지와 학업 JavaScript 검사 지시문을 점검한다.
 import {readFileSync,readdirSync} from 'node:fs';
 import {resolve,dirname,join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const ignored=new Set(['.git','node_modules','dist','.build','coverage','.cache']);
+const ignored=new Set(['.git','node_modules','dist','.build','coverage','.cache','test-results','playwright-report']);
 /** @param {string} dir @param {string} [prefix] @returns {string[]} 저장소 파일 목록 */
 function list(dir,prefix=''){
   return readdirSync(dir,{withFileTypes:true}).flatMap(entry=>{

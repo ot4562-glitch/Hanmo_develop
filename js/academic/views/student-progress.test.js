@@ -13,6 +13,16 @@ describe('#63 local-only student graduation/ABC scenario preview',()=>{
     expect(()=>normalizeStudentCourse({...record,slot:/** @type {never} */ ('APPROVED')})).toThrow(/취득/);
     expect(()=>normalizeStudentCourse({...record,courseId:'<script>'})).toThrow(/학수번호/);
   });
+  it('accepts summer and winter terms for earned records without treating them as regular planning semesters',()=>{
+    const summer=normalizeStudentCourse({...record,term:'2025-S'});
+    const winter=normalizeStudentCourse({...record,courseId:'ECON102',term:'2025-W'});
+    expect(summer.term).toBe('2025-S');
+    expect(winter.term).toBe('2025-W');
+    const result=compareProvisionalScenario({asOf:AS_OF,scenario:'A',
+      records:[summer,winter],plans:[]});
+    expect(result.audit.earnedCreditUnits).toBe(12);
+    expect(()=>normalizeStudentCourse({...record,term:'2025-3'})).toThrow(/학기/);
+  });
   it('uses Korea time for upcoming two to four regular semesters',()=>{
     expect(upcomingTerms(AS_OF,4)).toEqual(['2027-1','2027-2','2028-1','2028-2']);
     expect(upcomingTerms('2026-08-31T23:00:00+09:00',2)).toEqual(['2026-2','2027-1']);

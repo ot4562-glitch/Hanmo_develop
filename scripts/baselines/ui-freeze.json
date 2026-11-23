@@ -1,15 +1,19 @@
 {
   "schemaVersion": 1,
   "baselineCommit": "da30a87510f1cdac282600fa4e914da2585a6031",
-  "purpose": "Current conservative PC UI and original registration paths; changes need explicit approval and full visual/legacy QA.",
+  "purpose": "2026-11-23 후속 요청: NOTICE 순환 복구, 제목 서비스 문구, 세 화면 학교 홈페이지 링크·문의 생성 버튼 제거, 네 페이지 i 도움말, SETTING·돌발상황 동일한 빛. practice·selectZone 및 공통 의존성 보호.",
   "files": [
     {
-      "path": "css/academic-progress.css",
-      "sha": "c34999729cfecac7737fa8315de1513ae88b1479"
+      "path": "css/academic-calendar.css",
+      "sha": "e79b1e6a46d5469b108f189adbd1a6784dd78d54"
+    },
+    {
+      "path": "css/academic-support.css",
+      "sha": "dc5eb9ac04b134075f79b92918ec9ce2775365ff"
     },
     {
       "path": "css/developer.css",
-      "sha": "6b21aae0a7f268b1b23b1b75631ff97272d92d73"
+      "sha": "38f6e0340bba57ead965e52b801a769e6e846f45"
     },
     {
       "path": "css/gnb.css",
@@ -17,11 +21,23 @@
     },
     {
       "path": "css/hanmo-components.css",
-      "sha": "6f4b3cf5e27dbd7f434a35aecc0af7aeb3b4aee7"
+      "sha": "1e8fdafc310403c629eabff6af6e8b6495f75f0d"
     },
     {
       "path": "css/hanmo-flat.css",
-      "sha": "600c17d6f5a11d12731cc97aebb3575fc9dadb92"
+      "sha": "ddb890861ddeb2d9a64f6aeb4af3a73b1d6d66d3"
+    },
+    {
+      "path": "css/hanmo-policy-footer.css",
+      "sha": "4d8a6331659bfe385fcd3cf7ec49c64895eed009"
+    },
+    {
+      "path": "css/hanmo-refined.css",
+      "sha": "97a3669b2a2309bbaba1ed1ada61c32f047dfa1e"
+    },
+    {
+      "path": "css/hanmo-title-divider.css",
+      "sha": "8d685bdda0841c33e6d89d89cdc31d2cff2f272f"
     },
     {
       "path": "css/hanmo-tokens.css",
@@ -33,15 +49,15 @@
     },
     {
       "path": "css/home-fit.css",
-      "sha": "f8a48ace466de9849244b4fa0359f1f1d40666bc"
+      "sha": "55278509ba34cc5b9085eda4e299814e03942aab"
     },
     {
       "path": "css/incident-404.css",
-      "sha": "e2c0167eccaf390f6ba5277c040415c51475acd0"
+      "sha": "627f42e67124d1f1f656c876265741259a7606e1"
     },
     {
       "path": "css/index.css",
-      "sha": "392c0a09571c5bc393ac3bd15c4fe4801aa02abf"
+      "sha": "920d9b86936a3e687c57dca56de3abfd1b2e8ee4"
     },
     {
       "path": "css/layout.css",
@@ -53,7 +69,7 @@
     },
     {
       "path": "css/practice.css",
-      "sha": "46643e4603bca30e17121440081e4232d1393c52"
+      "sha": "900699df37380821064db808652ed0386398b2ef"
     },
     {
       "path": "css/result.css",
@@ -65,63 +81,67 @@
     },
     {
       "path": "css/vsugang-fit.css",
-      "sha": "6053e74db3c1d180d3b0d5b92d4a97637b4ccbf0"
+      "sha": "cc986466608283ee79e4b3daf195ff22a9d1290a"
     },
     {
       "path": "css/vsugang.css",
       "sha": "d0f4e1f009d2dee1bb43641919066c1679f7589d"
     },
     {
-      "path": "html/academic-progress.html",
-      "sha": "73cc906843b7ad8fe50e75401ff726eaf5466fc1"
+      "path": "html/academic-calendar.html",
+      "sha": "05b697268d948f67179f914291c83b1d02a6481b"
+    },
+    {
+      "path": "html/academic-support.html",
+      "sha": "8a59ca1475f09b12387ed0fdd304ab7f1df40f6b"
     },
     {
       "path": "html/academic-timeline.html",
-      "sha": "72a20cb75b93d618a91624668b3bc072daac88bf"
+      "sha": "6d97f3a61c1babd34e9f669600238fff92eecfe8"
     },
     {
       "path": "html/catalog.html",
-      "sha": "cd36d7aee9a7bec995b574725b450f795a9447f9"
+      "sha": "989ea913d7bbc175cef555c09e6085ac5fb6b5b6"
     },
     {
       "path": "html/developer.html",
-      "sha": "8dbb8a088a24844ae641076472b75015f027fce7"
+      "sha": "135bb54fdded45bc9dedc49ee263b511770f91fc"
     },
     {
       "path": "html/forecast.html",
-      "sha": "e4eaf6d57881bd25d9eb2303947f6073fd25a7cd"
+      "sha": "af0578f1a2ac7297e130f19697e4ed443f700d19"
     },
     {
       "path": "html/incident-404.html",
-      "sha": "2df8fdd41f8a98a82f731438877ebcb6b722e7d6"
+      "sha": "0d9837982d528694b2b465e543759f199a714eda"
     },
     {
       "path": "html/pc-only.html",
-      "sha": "fbc89a4c93150f80c77384d0dd676b6bde297bbd"
+      "sha": "f077fca25e5275c64720f42f6f1e1518db4c71fc"
     },
     {
       "path": "html/planner.html",
-      "sha": "27eff06d28866aeb74d5e087a06d409c2f540690"
+      "sha": "616cb64f4e51868ee587a6469b08f1d211e5decd"
     },
     {
       "path": "html/practice.html",
-      "sha": "3813ebcfa4afe4deaa4b41a94859f053bde98509"
+      "sha": "d1e5dea37b110ca7002c95629463ab577f090023"
     },
     {
       "path": "html/result.html",
-      "sha": "b0fb71046501b446d1647ee41904898cbcc57c8a"
+      "sha": "d8e4874cab63a5ac00f60dc26b1bff5be94bf1ca"
     },
     {
       "path": "html/selectZone.html",
-      "sha": "e5e5f0185615c05a3eb311c7c002c52f1c7b74f6"
+      "sha": "9c3497be93620f3fba62168d209ee3a7b3c07b60"
     },
     {
       "path": "html/vsugang.html",
-      "sha": "a13c36f1f35c5f70170f1980d7906a08cb64deca"
+      "sha": "4e91ee1dff496c862166271f95588889c42e7220"
     },
     {
       "path": "img/background.svg",
-      "sha": "1812812bc0d1ffb1604c5db7aecb5e3796ab0bca"
+      "sha": "e140b96cd30dd19cde039c60f30bc744a9b0a0d7"
     },
     {
       "path": "img/delete.png",
@@ -140,16 +160,40 @@
       "sha": "c5c65390cfe101bb8ce6fab39152800493c65838"
     },
     {
+      "path": "img/favicon-purple.svg",
+      "sha": "8b5c097a6bb8d2a76d8e1bac46d730ffd4919f7f"
+    },
+    {
       "path": "img/hanmo_color.png",
       "sha": "baeb2dba7e23393844da368d51e6deb4b791fcb7"
+    },
+    {
+      "path": "img/hanmo_purple.png",
+      "sha": "3c7c89224e277953f624750c26d4e03ec6ffd9b6"
     },
     {
       "path": "img/hanmo_white.svg",
       "sha": "8fe51bea9fe8656ba47850de5720ffc0e69ae805"
     },
     {
-      "path": "img/hufs_logo.png",
-      "sha": "16ec2e58eb49cc80fda17f91f951b68782179e45"
+      "path": "img/lucide/LICENSE",
+      "sha": "718bb3f0e44153809972abed31839375804bf652"
+    },
+    {
+      "path": "img/lucide/arrow-right.svg",
+      "sha": "7cf51782e7b069553458ef5d788057d44669628f"
+    },
+    {
+      "path": "img/lucide/external-link.svg",
+      "sha": "5ae55851edf016cc899260d8020ebd3875e50b6d"
+    },
+    {
+      "path": "img/lucide/rotate-ccw.svg",
+      "sha": "651f170ab3f0f7b5cc7d18e371e612b5fd03a58c"
+    },
+    {
+      "path": "img/lucide/search.svg",
+      "sha": "77b4f7cee1102823fd48249cc50329b7c89b40bd"
     },
     {
       "path": "img/register.png",
@@ -165,11 +209,19 @@
     },
     {
       "path": "index.html",
-      "sha": "4b155e494413a6d3eff5c2380ba1475bda302dfe"
+      "sha": "b3e2df7812c1a27216fdabf8c0207914c087c77a"
     },
     {
       "path": "js/academic-data-source.js",
       "sha": "dba1d9b3160f3b6e65fc988b6262fd374069bea1"
+    },
+    {
+      "path": "js/academic-support.js",
+      "sha": "1849467b3f2e474a75930a163ddc59eca5dcb7f2"
+    },
+    {
+      "path": "js/capacity-settings.js",
+      "sha": "cff5ea8d6d71f52082c020fee049bb9a60ad76ad"
     },
     {
       "path": "js/gnb.js",
@@ -181,7 +233,7 @@
     },
     {
       "path": "js/home-fit.js",
-      "sha": "ad8c8b40ce608798ea0ae3369822b7fbf2cd4375"
+      "sha": "4e5f2da707f8a9f45ae09ad10209be302178811f"
     },
     {
       "path": "js/incident-404.js",
@@ -189,7 +241,7 @@
     },
     {
       "path": "js/index.js",
-      "sha": "f543e39059e2e650ad5ccff39b11680f90164357"
+      "sha": "57007060f4dadbdb49a9ddfd291c5ffce1335852"
     },
     {
       "path": "js/pc-only.js",
@@ -201,7 +253,7 @@
     },
     {
       "path": "js/result.js",
-      "sha": "17b08d91bf33b769e8ff760ab07ed029171fa072"
+      "sha": "9d273f3deb5d6e693b7bd2e7d37e852a6f8db8f0"
     },
     {
       "path": "js/scenario-settings.js",
@@ -209,35 +261,32 @@
     },
     {
       "path": "js/selectZone.js",
-      "sha": "6e9be5ba62bbc900e442045595d9ce5741de2abe"
+      "sha": "7c8d4ca8c4f18f1159c19fb0d576dd3a3471c2f3"
     },
     {
       "path": "js/student-catalog.js",
-      "sha": "caab269772b788d14e495893fc8b56d8be6a4e57"
+      "sha": "30cd7fba94d9970be744a72bf4b42ae57d55e8b5"
     },
     {
       "path": "js/student-notices.js",
-      "sha": "04beef806f6e561e151357b66e38cd90308c8d7a"
+      "sha": "0dff69808885c3aa65dd7110f41c5c16d10241d0"
     },
     {
       "path": "js/student-preferences.js",
-      "sha": "7057dcbea2ec19af025c54f4bf34855783f43a24"
+      "sha": "5bd23b712dfb08d80603e9e72fa3c5e124e4a8e6"
     },
     {
       "path": "js/student-profile-bar.js",
-      "sha": "179a4a65bc68f75921b79c1b2d334584974e0892"
-    },
-    {
-      "path": "js/student-progress.js",
-      "sha": "06ed9ead7d271157a035a6f54f3a7568fadbd6e9"
+      "sha": "70ac52364d854b85422a711238f16752fc546bac"
     },
     {
       "path": "js/vsugang-fit.js",
-      "sha": "b757906ec1014393c5506185e6c46e0458a73d0a"
+      "sha": "85ab95d5d8f38f1ea2a3ad354e8dc07e2ef9ce52"
     },
     {
       "path": "js/vsugang.js",
-      "sha": "f1600cffd02276cc41d0a5c261d90fcec8088b3c"
+      "sha": "de143d3e416de633074530694f6507b9c4b8fdac"
     }
-  ]
+  ],
+  "policyRevision": "2026-11-23-hufs-written-restrictions"
 }

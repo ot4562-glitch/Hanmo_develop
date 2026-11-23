@@ -110,7 +110,6 @@ export function reviewSyntheticActivityIntake(input){
       deny('RECORD_NOT_CURRENT');continue;
     }
     // REVOKED·DELETED 최신판을 보존해 currentActivityRecords가 이전 승인판을 억제하도록 한다.
-    // 철회 이전의 기록을 되살리지 않는다.
     records.push(r);
   }
   return {records,quarantined,acceptedCount:records.length};

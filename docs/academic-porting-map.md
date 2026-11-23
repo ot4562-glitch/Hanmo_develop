@@ -1,8 +1,8 @@
 # HUFS One AI → 한모 학업 소스 이관 지도
 
-> **현재 상태: 2026-11-22 기준 소스 전환 완료 / 제품 통합 인수 미완료.** [아키텍처 §8](architecture.md#8-javascript-전용-소스--4차-최종-통합-검증) · [#101](https://github.com/ot4562-glitch/Hanmo_develop/issues/101).
+> **현재 상태: 2026-11-23 기준 JS/JSDoc 전환 완료, 운영 인수 미완료.** [아키텍처 §8](architecture.md#8-javascript-전용-소스--4차-최종-통합-검증) · [#101](https://github.com/ot4562-glitch/Hanmo_develop/issues/101).
 
-과거 TypeScript 이관 계획의 작업 단계를 **이미 완료된 전환 작업**으로 구별합니다. [PR #100](https://github.com/ot4562-glitch/Hanmo_develop/pull/100)과 [PR #102](https://github.com/ot4562-glitch/Hanmo_develop/pull/102) 병합 이후 `main`에 **TypeScript 소스/테스트 0개**, 학업 기능은 JavaScript + JSDoc으로 유지합니다. `tsconfig.json` 대신 `jsconfig.json`의 `allowJs`·`checkJs`·`noEmit`를 사용합니다. **과거 이관 전 98개 TS(그중 테스트 42개)는 역사적 인벤토리이며 현재 남은 파일이 아닙니다.**
+소스 언어 전환과 제품 통합 인수는 별도 작업입니다. [PR #100](https://github.com/ot4562-glitch/Hanmo_develop/pull/100)과 [PR #102](https://github.com/ot4562-glitch/Hanmo_develop/pull/102) 병합 이후 `main`에 **TypeScript 소스/테스트 0개**, 학업 기능은 JavaScript + JSDoc으로 유지합니다. `tsconfig.json` 대신 `jsconfig.json`의 `allowJs`·`checkJs`·`noEmit`를 사용합니다. **과거 이관 전 98개 TS(그중 테스트 42개)는 역사적 인벤토리이며 현재 남은 파일이 아닙니다.**
 
 | 과거 이식·신규 구현 계열 | 현재 JS 유지보수 경로 | 현재 판정 |
 |---|---|---|

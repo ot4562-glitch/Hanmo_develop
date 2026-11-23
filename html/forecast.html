@@ -2,25 +2,28 @@
 <html lang="ko">
 <head>
   <script src="../js/pc-only.js"></script>
+  <script>location.replace("./catalog.html");</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="강의 개설 전망 · 한모 학생용 학업 도우미">
   <title>강의 개설 전망 | 한모</title>
-  <link rel="icon" href="../img/hanmo_color.png">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="../img/favicon-purple.svg">
   <link rel="stylesheet" href="../css/student-ui.css">
   <script src="../js/academic-data-source.js" defer></script>
   <script src="../js/student-forecast.js" defer></script>
   <script src="../js/student-profile-bar.js" defer></script>
+  <link rel="stylesheet" href="../css/hanmo-policy-footer.css">
+  <link rel="stylesheet" href="../css/hanmo-title-divider.css">
 </head>
 <body class="hanmo-ui">
   <a class="hanmo-skip" href="#main">본문으로 이동</a>
   <header class="hanmo-topbar">
-  <a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모 <span>HUFS 학업 도우미</span></a>
+  <a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모</a>
   <nav aria-label="주요 서비스">
     <a href="./academic-timeline.html">학사 공지</a>
-    <a href="./forecast.html" aria-current="page">강의 전망</a>
     <a href="./catalog.html">강의 검색</a>
-    <a href="./academic-progress.html">학점 정리</a>
+    <a href="./academic-calendar.html">학사 달력</a>
+    <a href="./academic-support.html">학교 문의처</a>
     <span class="hanmo-profile-summary" data-profile-summary role="status" aria-live="polite" aria-label="브라우저에 저장한 내정보, 학교 로그인 아님">내정보 미설정</span>
     <a class="hanmo-me-link" href="./planner.html">내정보</a>
   </nav>
@@ -28,7 +31,9 @@
   <main id="main" class="hanmo-main" tabindex="-1">
   <div class="hanmo-schoolmark" aria-label="강의 개설 전망 화면">
     <h2>강의 개설 전망</h2>
-    <div class="hanmo-markline" aria-hidden="true"><span></span><img src="../img/hanmo_white.svg" alt=""><span></span></div>
+    <div class="hanmo-title-divider" aria-hidden="true"><hr><span><img src="../img/hanmo_white.svg" alt=""></span><hr></div>
+
+    
   </div>
 <div class="hanmo-card-grid two">
   <section class="hanmo-card" aria-labelledby="form-title">
@@ -50,5 +55,6 @@
   </section>
 </div>
 </main>
+  <footer class="hanmo-policy-footer" aria-label="비공식 서비스 안내"><p><strong>본 서비스는 한국외국어대학교의 공식 서비스가 아니며, 정확한 정보는 학교 원문을 확인하시기 바랍니다.</strong></p></footer>
 </body>
 </html>

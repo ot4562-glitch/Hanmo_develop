@@ -4,10 +4,11 @@ import {resolve,join} from 'node:path';
 const root=resolve(import.meta.dirname,'..');
 const dist=join(root,'dist');
 const build=join(root,'.build');
-const bundles=['student-forecast.js','student-entry.js','academic-progress.js'];
+const bundles=['student-forecast.js','student-entry.js','academic-calendar.js'];
 const exists=async p=>{try{return(await stat(p)).isFile()}catch{return false}};
 for(const bundle of bundles)
   if(!await exists(join(build,bundle)))throw Error('Missing generated academic JS bundle: '+bundle);
+if(!await exists(join(build,'academic-calendar.css')))throw Error('Missing FullCalendar CSS bundle');
 await rm(dist,{recursive:true,force:true});
 await mkdir(dist,{recursive:true});
 await copyFile(join(root,'index.html'),join(dist,'index.html'));
@@ -17,15 +18,19 @@ const academicSource=join(root,'js','academic');
 for(const directory of ['css','js','html','img'])
   await cp(join(root,directory),join(dist,directory),{recursive:true,filter:source=>source!==academicSource});
 await mkdir(join(dist,'data'),{recursive:true});
+await copyFile(join(build,'academic-calendar.css'),join(dist,'css','academic-calendar-vendor.css'));
 await copyFile(join(root,'data','academic-source-config.json'),
   join(dist,'data','academic-source-config.json'));
 for(const bundle of bundles)
   await copyFile(join(build,bundle),join(dist,'js',bundle));
 for(const name of [
  'index.html','html/planner.html','html/forecast.html','html/catalog.html',
- 'html/academic-timeline.html','html/academic-progress.html',
- 'html/vsugang.html','sitemap.xml','js/student-forecast.js','js/student-entry.js','js/academic-progress.js','data/academic-source-config.json',
+ 'html/academic-timeline.html',
+ 'html/vsugang.html','css/academic-calendar-vendor.css','js/academic-calendar.js','sitemap.xml','js/student-forecast.js','js/student-entry.js','data/academic-source-config.json',
 ])if(!await exists(join(dist,name)))throw Error('Missing public student asset '+name);
+for(const banned of ['html/academic-progress.html','html/academic-faq.html','css/academic-progress.css',
+ 'css/academic-faq.css','js/academic-faq.js','js/degree-preparation.js','img/hufs_logo.png'])
+ if(await exists(join(dist,banned)))throw Error('Disallowed web artifact: '+banned);
 if(await exists(join(dist,'CNAME')))throw Error('CNAME leaked into QA artifact');
 const rootEntries=await readdir(dist);
 if(rootEntries.includes('degree-rescue'))throw Error('Legacy academic directory leaked into Pages artifact');

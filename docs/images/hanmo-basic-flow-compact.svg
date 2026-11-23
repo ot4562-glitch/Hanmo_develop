@@ -1,13 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="294" viewBox="0 0 1280 294" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400" role="img" aria-labelledby="title desc">
 <title id="title">BASIC 모드 돌발상황 흐름도, 축약</title>
-<desc id="desc">BASIC 연습에서 돌발상황을 활성화하면 가상 404가 한 번 표시되고, 브라우저 새로고침으로 복구합니다. 페이지 접속 대기를 활성화했다면 복구 후 대기하고 기존 신청을 이어갑니다. 돌발상황은 기본 OFF입니다.</desc>
+<desc id="desc">BASIC의 독립적인 두 가지 합성 돌발상황. RECONNECT를 켜면 가상 404를 한 번 거쳐 새로고침으로 복구하며, CAPACITY를 켜면 과목 하나가 가상 정원 마감되고 합성 후보 Search를 연습합니다. 모두 기본 OFF이고 학교 실제 정원과 무관합니다.</desc>
 <defs>
  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071925"/><stop offset="1" stop-color="#103247"/></linearGradient>
  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#75A9BD"/></marker>
 </defs>
 <g font-family="Pretendard, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif">
-<rect x="0" y="0" width="1280" height="294" rx="17" fill="url(#bg)"/>
-<text x="38" y="56" fill="#F6F9FC" font-size="27" font-weight="800" >BASIC  /  선택형 돌발상황</text>
+<rect x="0" y="0" width="1280" height="400" rx="17" fill="url(#bg)"/>
+<text x="38" y="56" fill="#F6F9FC" font-size="27" font-weight="800" >BASIC  /  RECONNECT + CAPACITY</text>
 <rect x="1080" y="26" width="160" height="40" rx="20" fill="#233A3F" stroke="#627C77"/>
 <text x="1160" y="53" fill="#BFDAD8" font-size="19" font-weight="740" text-anchor="middle">기본값 OFF</text>
 <rect x="38" y="107" width="211" height="110" rx="15" fill="#0E3145" stroke="#3A718C" stroke-width="1.5"/>
@@ -31,7 +31,13 @@
 <text x="1038" y="168" fill="#F4F9FC" font-size="24" font-weight="780" >신청 계속</text>
 <text x="1038" y="195" fill="#BFD7E4" font-size="17" font-weight="510" >기존 결과 흐름</text>
 <path d="M252 162 H280" stroke="#75A9BD" stroke-width="2.5" marker-end="url(#arr)"/><path d="M490 162 H521" stroke="#75A9BD" stroke-width="2.5" marker-end="url(#arr)"/><path d="M739 162 H770" stroke="#75A9BD" stroke-width="2.5" marker-end="url(#arr)"/><path d="M984 162 H1015" stroke="#75A9BD" stroke-width="2.5" marker-end="url(#arr)"/>
-<path d="M38 249 H1240" stroke="#426477" stroke-width="1"/>
-<text x="40" y="274" fill="#C9DFE8" font-size="19" font-weight="570" >돌발상황 OFF → 정상 신청 진행</text>
-<text x="1240" y="274" fill="#E7CB8D" font-size="19" font-weight="550" text-anchor="end">ON인 경우 새로고침 복구 후 접속 대기 적용</text>
+<rect x="38" y="238" width="1202" height="98" rx="15" fill="#112C3B" stroke="#B49255" stroke-width="1.4"/>
+<rect x="55" y="254" width="199" height="29" rx="14.5" fill="#473923"/>
+<text x="154" y="274.5" font-size="15" font-weight="800" fill="#F5D794" text-anchor="middle">CAPACITY · 선택형 ON</text>
+<text x="55" y="316" fill="#F5F9FC" font-size="23" font-weight="770">한 과목 가상 정원 마감</text>
+<text x="447" y="280" fill="#D7EBF3" font-size="20" font-weight="620">신청 버튼 제거 · 전공/교양/기초 합성 후보 Search</text>
+<text x="447" y="313" fill="#BFD7E4" font-size="17" font-weight="540">RECONNECT와 독립 · 학교의 실제 정원·강좌와 무관</text>
+<path d="M38 354 H1240" stroke="#426477" stroke-width="1"/>
+<text x="40" y="381" fill="#C9DFE8" font-size="18" font-weight="570">두 옵션 모두 OFF → 기존 BASIC/TIME/SELECT 흐름 유지</text>
+<text x="1240" y="381" fill="#E7CB8D" font-size="17" font-weight="550" text-anchor="end">404 복구 후 접속 대기는 설정이 ON일 때만</text>
 </g></svg>

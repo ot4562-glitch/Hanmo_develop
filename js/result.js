@@ -5,7 +5,8 @@ const $resultBox=document.querySelector('.result');
 
 /** 저장된 시간 값을 순수하게 읽고 반올림한다. TIME 모드에는 SELECT 측정 구간이 없다. */
 function readPracticeReport(){
-  const preselected=localStorage.getItem('psubjectValue');
+  const storedCount=Number(localStorage.getItem('psubjectValue'));
+  const preselected=Number.isSafeInteger(storedCount)&&storedCount>=0&&storedCount<=15?storedCount:0;
   const mode=Number(localStorage.getItem('practiceSetter'));
   const requested=mode===2?0:Number(localStorage.getItem('subjectValue'));
   // 기존 신청 대기 키와 신규 접속 대기 키를 함께 반영합니다.
@@ -20,18 +21,33 @@ function readPracticeReport(){
   return {preselected,requested,waiting,timeSeconds,selectSeconds,totalSeconds};
 }
 
-/** 기존 HTML 호출명과 결과 문구는 하위 호환을 위해 변경하지 않는다. */
+/** @param {string} title @param {string} value @returns {HTMLParagraphElement} 외부 입력을 HTML로 해석하지 않는 결과 행 */
+function reportLine(title,value){
+  const p=document.createElement('p');
+  p.textContent=title;
+  const span=document.createElement('span');
+  span.textContent=value;
+  p.append(span);
+  return p;
+}
+
+/** 기존 HTML 호출명·표시 문구·구조를 유지하고 저장 값은 텍스트로만 추가한다. */
 function timeCheck(){
   const value=readPracticeReport();
-  $timeBox.insertAdjacentHTML('afterbegin',
-    '<p>연습한 과목 수 '+value.preselected+'개 중 '+value.requested
-    +'개 / 접속 대기 여부 '+value.waiting.toUpperCase()+'</p>'
-    +'<p>TIME 부분 소요 시간<span>'+value.timeSeconds+'초</span></p>'
-    +'<p>SELECT 부분 소요 시간<span>'
-    +(value.requested>0?value.selectSeconds:'0.000')+'초</span></p>'
-    +'<p class="caption">※ 접속 대기 시간은 소요 시간에 포함하지 않아요.</p>');
-  $resultBox.insertAdjacentHTML('afterbegin',
-    '<p>총 소요 시간<span>'
-    +(value.requested>0?value.totalSeconds:value.timeSeconds)+'초</span></p>');
+  const count=document.createElement('p');
+  count.textContent='연습한 과목 수 '+value.preselected+'개 중 '+value.requested
+    +'개 / 접속 대기 여부 '+value.waiting.toUpperCase();
+  const caption=document.createElement('p');
+  caption.className='caption';
+  caption.textContent='※ 접속 대기 시간은 소요 시간에 포함하지 않아요.';
+  $timeBox.prepend(
+    count,
+    reportLine('TIME 부분 소요 시간',value.timeSeconds+'초'),
+    reportLine('SELECT 부분 소요 시간',(value.requested>0?value.selectSeconds:'0.000')+'초'),
+    caption
+  );
+  $resultBox.prepend(
+    reportLine('총 소요 시간',(value.requested>0?value.totalSeconds:value.timeSeconds)+'초')
+  );
 }
 timeCheck();
