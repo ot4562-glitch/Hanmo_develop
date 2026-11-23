@@ -3,7 +3,7 @@
  * #52 반복 학사행사 계열 연결과 예상 구간 백테스트(순수 코어). 학생 화면에는 아직 연결하지 않는다.
  *
  * 1) 공지 연결: #46 공지 추출 결과를 activities.js가 쓰는 행사 기록(ActivityRecord)으로 바꾼다.
- *    행사 계열(졸업시험·이중전공 신청 등)과 캠퍼스는 제목·대상 근거로 정하고, 정정·취소는 판본 연결로 유지한다.
+ *    행사 계열(이중전공 신청 등, 졸업·학칙 관련은 제외)과 캠퍼스는 제목·대상 근거로 정하고, 정정·취소는 판본 연결로 유지한다.
  *    행사일은 추출된 행사일이 하나뿐이고 연도를 추정하지 않았으며 검수자가 확인한 경우에만 넣는다.
  *    게시일을 행사일로 쓰지 않는다.
  * 2) 백테스트: 연도별 기준 시점에 그때까지 공개·검수된 기록만으로 예상 구간을 만들고,
@@ -14,8 +14,8 @@
 /** @typedef {import("./notice-extract.js").NoticeExtraction} NoticeExtraction */
 /** @typedef {import("../../contracts/campus-assist/index.js").ActivityRecord} ActivityRecord */
 /** @typedef {import("../../contracts/campus-assist/index.js").ActivityForecast} ActivityForecast */
-/** @typedef {'GRADUATION_EXAM'|'DOUBLE_MAJOR_APPLICATION'|'MINOR_APPLICATION'|'COURSE_REGISTRATION'|'GRADUATION_THESIS'|'EXCHANGE_APPLICATION'} SeriesType */
-/** @typedef {'NOT_A_KNOWN_SERIES'|'CAMPUS_UNSTATED'|'EXCLUDED'|'EVENT_DATE_NOT_CONFIRMED'|'MULTIPLE_EVENT_DATES'|'EVENT_YEAR_INFERRED'|'NO_EVENT_DATE'} LinkIssue */
+/** @typedef {'DOUBLE_MAJOR_APPLICATION'|'MINOR_APPLICATION'|'COURSE_REGISTRATION'|'EXCHANGE_APPLICATION'} SeriesType */
+/** @typedef {'EXCLUDED_TOPIC'|'NOT_A_KNOWN_SERIES'|'CAMPUS_UNSTATED'|'EXCLUDED'|'EVENT_DATE_NOT_CONFIRMED'|'MULTIPLE_EVENT_DATES'|'EVENT_YEAR_INFERRED'|'NO_EVENT_DATE'} LinkIssue */
 /** @typedef {{extraction:NoticeExtraction,title:string,sourceUrl:string,publishedAt:string,organizationId:string,verifiedAt:string,eventDateConfirmed:boolean}} NoticeLinkInput */
 /** @typedef {{records:readonly ActivityRecord[],organizationId:string,seriesId:string,years:readonly number[],asOfMonthDay?:string}} BacktestInput */
 /** @typedef {{record:ActivityRecord|null,seriesType:SeriesType|null,issues:LinkIssue[]}} NoticeLinkResult */
@@ -24,11 +24,14 @@
 import {ActivityRecordSchema} from '../../contracts/campus-assist/index.js';
 import {currentActivityRecords,forecastActivity} from './activities.js';
 
+/**
+ * 졸업·학칙 관련 공지는 정보처 서면 회신(2026-11-23)에 따라 행사 계열·예상 구간에 쓰지 않는다.
+ * 계열 규칙보다 먼저 검사해, 제목에 다른 계열 단어가 함께 있어도 연결하지 않는다.
+ */
+const EXCLUDED_TOPIC=/졸\s*업|졸시|학\s*위\s*수\s*여|학\s*칙/;
 /** 제목 규칙으로 계열을 정한다. 띄어쓰기를 허용하고, 어느 규칙에도 안 맞으면 연결하지 않는다. */
 /** @type {[SeriesType,RegExp][]} */
 const SERIES_RULES=[
-  ['GRADUATION_EXAM',/졸\s*업\s*시\s*험|졸시/],
-  ['GRADUATION_THESIS',/졸\s*업\s*논\s*문/],
   ['DOUBLE_MAJOR_APPLICATION',/이\s*중\s*전\s*공|복전/],
   ['MINOR_APPLICATION',/부\s*전\s*공/],
   ['EXCHANGE_APPLICATION',/교\s*환\s*학\s*생/],
@@ -47,6 +50,7 @@ export function activityRecordFromNotice(input){
   /** @type {LinkIssue[]} */
   const issues=[];
   if(x.status==='EXCLUDED')return {record:null,seriesType:null,issues:['EXCLUDED']};
+  if(EXCLUDED_TOPIC.test(input.title))return {record:null,seriesType:null,issues:['EXCLUDED_TOPIC']};
   const seriesType=SERIES_RULES.find(([,re])=>re.test(input.title))?.[0]??null;
   if(!seriesType)return {record:null,seriesType:null,issues:['NOT_A_KNOWN_SERIES']};
   const campuses=new Set(x.targets.included.flatMap(t=>t.value.kind==='CAMPUS'?[t.value.campus]:[]));
@@ -79,6 +83,18 @@ export function activityRecordFromNotice(input){
 }
 
 const DAY=86400000;
+/**
+ * 연도와 'MM-DD'가 실제 달력 날짜인지 확인한다.
+ * @param {number} year 대상 연도
+ * @param {string} md 'MM-DD'
+ * @returns {boolean}
+ */
+export function isCalendarDay(year,md){
+  if(!Number.isInteger(year))return false;
+  const m=Number(md.slice(0,2)),d=Number(md.slice(3,5));
+  const t=new Date(Date.UTC(year,m-1,d));
+  return t.getUTCFullYear()===year&&t.getUTCMonth()===m-1&&t.getUTCDate()===d;
+}
 /** @param {string} a @param {string} b @returns {number} 두 날짜 사이 일수(양 끝 포함) */
 const spanDays=(a,b)=>Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/DAY)+1;
 const round=(/** @type {number} */x)=>Math.round(x*1e4)/1e4;
@@ -93,6 +109,9 @@ const round=(/** @type {number} */x)=>Math.round(x*1e4)/1e4;
 export function backtestActivityForecast(input){
   const md=input.asOfMonthDay??'01-01';
   if(!/^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(md))throw new RangeError('asOfMonthDay must be MM-DD');
+  // 형식만 맞는 02-31·04-31을 Date가 다음 달로 넘기지 않도록 대상 연도마다 실제 달력 날짜인지 확인한다.
+  // 02-29는 윤년인 대상 연도에서만 유효하며, 평년이면 다른 날로 바꾸지 않고 거부한다.
+  for(const y of input.years)if(!isCalendarDay(y,md))throw new RangeError('asOfMonthDay '+md+' does not exist in '+y);
   const provenances=new Set(input.records.map(r=>r.provenance));
   if(provenances.size>1)throw new RangeError('Mixed synthetic and real records');
   // 실제 결과는 가장 늦은 시점의 확정 판본으로 판단한다(정정 반영). 예측 입력에는 소급하지 않는다.
