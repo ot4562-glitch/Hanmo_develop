@@ -13,7 +13,7 @@
  */
 /** @typedef {import("./academic-search.js").NormalizedQuery} NormalizedQuery */
 /** @typedef {z.infer<typeof NoticeMetaSchema>} NoticeMeta */
-/** @typedef {'SCHEMA_INVALID'|'FORBIDDEN_CONTENT'|'CONFLICTING_DUPLICATE'|'MIXED_PROVENANCE'} HoldReason */
+/** @typedef {'SCHEMA_INVALID'|'FORBIDDEN_CONTENT'|'ID_HAS_HELD_COPY'|'CONFLICTING_DUPLICATE'|'MIXED_PROVENANCE'} HoldReason */
 /** @typedef {{noticeId:string|null,reason:HoldReason,detail:string}} HeldNotice */
 /** @typedef {{accepted:NoticeMeta[],held:HeldNotice[],withdrawn:string[]}} ScreenResult */
 /** @typedef {'SEOUL'|'GLOBAL'} CampusFilter */
@@ -67,30 +67,43 @@ export function screenNoticeMeta(raw){
   if(!Array.isArray(raw)||raw.length>5000)throw new RangeError('notices must be an array of at most 5000');
   /** @type {HeldNotice[]} */
   const held=[];
-  /** @type {Map<string,NoticeMeta[]>} */
+  // 먼저 입력 전체를 ID별로 모은 뒤 판단한다. 한 행씩 바로 통과시키면 같은 ID의 문제 행이 정상 행을 가리지 못한다.
+  /** @type {Map<string,{rows:NoticeMeta[],held:HeldNotice[]}>} */
   const byId=new Map();
   for(const item of raw){
     const parsed=NoticeMetaSchema.safeParse(item);
-    const id=typeof item==='object'&&item&&'noticeId' in item&&typeof item.noticeId==='string'?item.noticeId:null;
-    if(!parsed.success){
-      held.push({noticeId:id,reason:'SCHEMA_INVALID',detail:parsed.error.issues.map(i=>i.path.join('.')||i.code).join(',')});
-      continue;
+    const rawId=typeof item==='object'&&item&&'noticeId' in item&&typeof item.noticeId==='string'?item.noticeId.trim():'';
+    const id=rawId||null;
+    /** @type {HeldNotice|null} */
+    let problem=null;
+    if(!parsed.success)problem={noticeId:id,reason:'SCHEMA_INVALID',detail:parsed.error.issues.map(i=>i.path.join('.')||i.code).join(',')};
+    else{
+      const rule=FORBIDDEN.find(([,re])=>re.test(parsed.data.title));
+      if(rule)problem={noticeId:id,reason:'FORBIDDEN_CONTENT',detail:rule[0]};
     }
-    const rule=FORBIDDEN.find(([,re])=>re.test(parsed.data.title));
-    if(rule){held.push({noticeId:id,reason:'FORBIDDEN_CONTENT',detail:rule[0]});continue;}
-    const rows=byId.get(parsed.data.noticeId)??[];
-    rows.push(parsed.data);byId.set(parsed.data.noticeId,rows);
+    // ID를 알 수 없는 행은 다른 행과 묶을 수 없으므로 그 행만 보류한다.
+    if(!id){if(problem)held.push(problem);continue;}
+    const group=byId.get(id)??{rows:[],held:[]};
+    if(problem)group.held.push(problem);
+    else if(parsed.success)group.rows.push(parsed.data);
+    byId.set(id,group);
   }
   /** @type {NoticeMeta[]} */
   const accepted=[];
   /** @type {string[]} */
   const withdrawn=[];
-  for(const [noticeId,rows] of byId){
-    // 같은 ID의 복사본은 내용이 완전히 같을 때만 하나로 합친다. 다르면 어느 쪽도 고르지 않는다.
-    if(new Set(rows.map(r=>JSON.stringify(Object.entries(r).sort()))).size>1){
-      held.push({noticeId,reason:'CONFLICTING_DUPLICATE',detail:String(rows.length)});continue;
+  for(const [noticeId,group] of byId){
+    // 같은 ID에 보류된 행이 하나라도 있으면 정상으로 보이는 다른 복사본도 공개하지 않는다(fail-closed).
+    if(group.held.length){
+      held.push(...group.held);
+      if(group.rows.length)held.push({noticeId,reason:'ID_HAS_HELD_COPY',detail:String(group.rows.length)});
+      continue;
     }
-    const row=/** @type {NoticeMeta} */(rows[0]);
+    // 같은 ID의 복사본은 내용이 완전히 같을 때만 하나로 합친다. ACTIVE와 WITHDRAWN이 섞인 경우도 여기서 보류된다.
+    if(new Set(group.rows.map(r=>JSON.stringify(Object.entries(r).sort()))).size>1){
+      held.push({noticeId,reason:'CONFLICTING_DUPLICATE',detail:String(group.rows.length)});continue;
+    }
+    const row=/** @type {NoticeMeta} */(group.rows[0]);
     if(row.state==='WITHDRAWN')withdrawn.push(noticeId);
     else accepted.push(row);
   }

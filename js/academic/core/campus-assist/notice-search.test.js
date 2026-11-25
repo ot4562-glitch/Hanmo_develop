@@ -58,6 +58,42 @@ describe('#53 metadata screening: forbidden fields and content never reach resul
     expect(r.accepted.map(x=>x.noticeId)).toEqual(['S']);
     expect(r.held).toEqual([{noticeId:'C',reason:'CONFLICTING_DUPLICATE',detail:'2'}]);
   });
+  // PR #130 리뷰(2026-11-23): 같은 ID의 문제 행이 정상 행을 통과시키면 안 된다.
+  it('a valid row is held when another copy with the same ID has a forbidden title (fail-closed)',()=>{
+    const r=screenNoticeMeta([n('A','가상 수강신청 안내','2026-11-01'),n('A','가상 홍길동 교수 특강','2026-11-01')]);
+    expect(r.accepted).toEqual([]);
+    expect(r.held.map(h=>[h.noticeId,h.reason])).toEqual([['A','FORBIDDEN_CONTENT'],['A','ID_HAS_HELD_COPY']]);
+  });
+  it('a valid row is held when another copy with the same ID has a disallowed field, in either order',()=>{
+    for(const rows of [[n('A','가상 안내','2026-11-01'),{...n('A','가상 안내','2026-11-01'),body:'본문'}],
+      [{...n('A','가상 안내','2026-11-01'),instructor:'가상'},n('A','가상 안내','2026-11-01')]]){
+      const r=screenNoticeMeta(rows);
+      expect(r.accepted).toEqual([]);
+      expect(r.held.map(h=>h.reason).sort()).toEqual(['ID_HAS_HELD_COPY','SCHEMA_INVALID']);
+    }
+  });
+  it('an ACTIVE copy contaminated by a WITHDRAWN copy of the same ID is neither published nor listed as withdrawn',()=>{
+    const r=screenNoticeMeta([n('A','가상 안내','2026-11-01'),n('A','가상 안내','2026-11-01',{state:'WITHDRAWN'})]);
+    expect(r).toMatchObject({accepted:[],withdrawn:[],held:[{noticeId:'A',reason:'CONFLICTING_DUPLICATE',detail:'2'}]});
+  });
+  it('a malformed withdrawn copy also blocks the valid copy',()=>{
+    const r=screenNoticeMeta([n('A','가상 안내','2026-11-01'),{...n('A','가상 안내','2026-11-01',{state:'WITHDRAWN'}),postedOn:'bad'}]);
+    expect(r.accepted).toEqual([]);
+    expect(r.withdrawn).toEqual([]);
+  });
+  it('IDs are compared after trimming, so whitespace cannot split a notice into two',()=>{
+    const r=screenNoticeMeta([n('A','가상 안내','2026-11-01'),{...n('A','가상 홍길동 교수 특강','2026-11-01'),noticeId:' A '}]);
+    expect(r.accepted).toEqual([]);
+  });
+  it('a problem row for one ID does not affect a different ID',()=>{
+    const r=screenNoticeMeta([n('A','가상 안내','2026-11-01'),n('B','가상 홍길동 교수 특강','2026-11-01')]);
+    expect(r.accepted.map(x=>x.noticeId)).toEqual(['A']);
+    expect(r.held.map(h=>h.noticeId)).toEqual(['B']);
+  });
+  it('a search never returns a notice whose ID has a held copy',()=>{
+    const r=searchNoticeMeta({query:'수강신청',notices:[...SET,n('N1','가상 2027학년도 1학기 수강신청 일정 안내','2026-11-10',{sourceUrl:'http://example.org/x'})]});
+    expect(r.hits.map(h=>h.noticeId)).not.toContain('N1');
+  });
   it('mixed synthetic and reviewed metadata is not used at all',()=>{
     const r=screenNoticeMeta([n('A','가상 안내','2026-11-01'),n('B','가상 안내 둘','2026-11-01',{provenance:'REVIEWED'})]);
     expect(r.accepted).toEqual([]);
