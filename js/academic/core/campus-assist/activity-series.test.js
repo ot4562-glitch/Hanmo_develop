@@ -29,8 +29,9 @@ describe('#52 linking notices to an event series',()=>{
   });
   it('an unconfirmed, year-inferred or multiple event date is not used as the event date',()=>{
     expect(link('가상 이중전공 설명회 안내',EXAM,{},false)).toMatchObject({issues:['EVENT_DATE_NOT_CONFIRMED'],record:{status:'ANNOUNCED'}});
-    expect(link('가상 이중전공 설명회 안내',['가상 대상: 서울캠퍼스 재학생','가상 이중전공 설명회 일시: 5월 9일(토) 10:00']).issues)
-      .toEqual(['EVENT_YEAR_INFERRED']);
+    // 연도 추정은 추출 단계의 NEEDS_REVIEW로 먼저 막힌다.
+    expect(link('가상 이중전공 설명회 안내',['가상 대상: 서울캠퍼스 재학생','가상 이중전공 설명회 일시: 5월 9일(토) 10:00']))
+      .toMatchObject({record:null,issues:['EXTRACTION_NEEDS_REVIEW']});
     expect(link('가상 이중전공 설명회 안내',['가상 대상: 서울캠퍼스 재학생','가상 1차 설명회 일시: 2026. 5. 9.(토) 10:00',
       '가상 2차 설명회 일시: 2026. 5. 16.(토) 10:00']).issues).toEqual(['MULTIPLE_EVENT_DATES']);
   });
@@ -56,6 +57,25 @@ describe('#52 linking notices to an event series',()=>{
   it('graduation or school-rule notices are never linked to a series (written reply 2026-11-23)',()=>{
     for(const title of ['가상 졸업시험 시행 안내','가상 졸업 논문 제출 안내','가상 학칙 개정 및 이중전공 안내'])
       expect(link(title,EXAM)).toMatchObject({record:null,seriesType:null,issues:['EXCLUDED_TOPIC']});
+  });
+  // PR #120 리뷰(2026-11-23): 검수가 필요한 추출 결과는 행사일이 유효해도 승인 기록이 되면 안 된다.
+  it('an extraction that needs review is never linked, even with a valid confirmed event date',()=>{
+    const cases=[
+      // 부정·예외 문장
+      ['가상 이중전공 설명회 안내',['가상 대상: 서울캠퍼스 재학생이며, 휴학생은 제외합니다.','가상 이중전공 설명회 일시: 2026. 5. 9.(토) 10:00'],{}],
+      // 같은 대상의 포함·제외 충돌
+      ['가상 이중전공 설명회 안내',['가상 서울캠퍼스 학생 대상','가상 서울캠퍼스 학생은 제외','가상 이중전공 설명회 일시: 2026. 5. 9.(토) 10:00'],{}],
+      // 정정 판본인데 정정 대상 판본 불명
+      ['[정정] 가상 이중전공 설명회 안내',EXAM,{revisionId:'r2',state:'CORRECTED'}],
+    ];
+    for(const [title,texts,patch] of /** @type {[string,string[],Partial<NoticeExtractInput>][]} */(cases)){
+      expect(link(title,texts,patch,true)).toEqual({record:null,seriesType:null,issues:['EXTRACTION_NEEDS_REVIEW']});
+    }
+  });
+  it('a needs-review notice cannot reach the forecast through the series',()=>{
+    const needsReview=link('가상 이중전공 설명회 안내',['가상 대상: 서울캠퍼스 재학생이며, 휴학생은 제외합니다.',
+      '가상 이중전공 설명회 일시: 2026. 5. 9.(토) 10:00'],{},true);
+    expect(needsReview.record).toBeNull();
   });
   it('a notice without reuse rights is not linked',()=>{
     expect(link('가상 이중전공 설명회 안내',EXAM,{rights:'REVOKED'})).toMatchObject({record:null,issues:['EXCLUDED']});

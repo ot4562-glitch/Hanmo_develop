@@ -15,7 +15,7 @@
 /** @typedef {import("../../contracts/campus-assist/index.js").ActivityRecord} ActivityRecord */
 /** @typedef {import("../../contracts/campus-assist/index.js").ActivityForecast} ActivityForecast */
 /** @typedef {'DOUBLE_MAJOR_APPLICATION'|'MINOR_APPLICATION'|'COURSE_REGISTRATION'|'EXCHANGE_APPLICATION'} SeriesType */
-/** @typedef {'EXCLUDED_TOPIC'|'NOT_A_KNOWN_SERIES'|'CAMPUS_UNSTATED'|'EXCLUDED'|'EVENT_DATE_NOT_CONFIRMED'|'MULTIPLE_EVENT_DATES'|'EVENT_YEAR_INFERRED'|'NO_EVENT_DATE'} LinkIssue */
+/** @typedef {'EXTRACTION_NEEDS_REVIEW'|'EXCLUDED_TOPIC'|'NOT_A_KNOWN_SERIES'|'CAMPUS_UNSTATED'|'EXCLUDED'|'EVENT_DATE_NOT_CONFIRMED'|'MULTIPLE_EVENT_DATES'|'EVENT_YEAR_INFERRED'|'NO_EVENT_DATE'} LinkIssue */
 /** @typedef {{extraction:NoticeExtraction,title:string,sourceUrl:string,publishedAt:string,organizationId:string,verifiedAt:string,eventDateConfirmed:boolean}} NoticeLinkInput */
 /** @typedef {{records:readonly ActivityRecord[],organizationId:string,seriesId:string,years:readonly number[],asOfMonthDay?:string}} BacktestInput */
 /** @typedef {{record:ActivityRecord|null,seriesType:SeriesType|null,issues:LinkIssue[]}} NoticeLinkResult */
@@ -50,6 +50,10 @@ export function activityRecordFromNotice(input){
   /** @type {LinkIssue[]} */
   const issues=[];
   if(x.status==='EXCLUDED')return {record:null,seriesType:null,issues:['EXCLUDED']};
+  // 추출기가 독립 검수를 요구한 결과(대상 충돌·부정/예외·정정 대상 불명·연도 추정 등)는 행사 기록을 만들지 않는다.
+  // eventDateConfirmed는 행사일 하나만 확인한 것이라 다른 검수 사유를 대신 승인하지 못한다.
+  // 기록은 rights:'APPROVED'로 만들어지므로, 여기서 막지 않으면 미검수 값이 예상 구간 계산에 들어간다.
+  if(x.status!=='CANDIDATE')return {record:null,seriesType:null,issues:['EXTRACTION_NEEDS_REVIEW']};
   if(EXCLUDED_TOPIC.test(input.title))return {record:null,seriesType:null,issues:['EXCLUDED_TOPIC']};
   const seriesType=SERIES_RULES.find(([,re])=>re.test(input.title))?.[0]??null;
   if(!seriesType)return {record:null,seriesType:null,issues:['NOT_A_KNOWN_SERIES']};
@@ -65,6 +69,7 @@ export function activityRecordFromNotice(input){
     const dates=[...new Set(x.events.map(e=>e.date))];
     if(!dates.length)issues.push('NO_EVENT_DATE');
     else if(dates.length>1)issues.push('MULTIPLE_EVENT_DATES');
+    // 연도 추정은 추출 단계에서 NEEDS_REVIEW가 되어 위에서 이미 막히지만, 추출기 규칙이 바뀌어도 새지 않게 다시 검사한다.
     else if(x.events.some(e=>e.yearInferred))issues.push('EVENT_YEAR_INFERRED');
     else if(!input.eventDateConfirmed)issues.push('EVENT_DATE_NOT_CONFIRMED');
     else eventDate=dates[0];
