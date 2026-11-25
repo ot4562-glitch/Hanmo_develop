@@ -247,15 +247,10 @@ body.hanmo-home.hanmo-refined .home-fit-content {
   transform: none;
 }
 body.hanmo-home.hanmo-refined .titleContainer h1 { font-size: clamp(22px, 2.4vw, 30px); }
-body.hanmo-home.hanmo-refined .notice { height: auto; min-height: 40px; padding: 8px 0; background: transparent; }
-body.hanmo-home.hanmo-refined .notice ul { height: auto; margin: 0; padding: 0; position: static; list-style: none; }
-body.hanmo-home.hanmo-refined .notice li { margin: 0; font-size: 13px; }
+/* 원본 NOTICE의 상대 배치·77px 세로 전환은 index.css를 따릅니다. */
+body.hanmo-home.hanmo-refined .notice { background: transparent; }
+body.hanmo-home.hanmo-refined .notice ul { padding: 0; list-style: none; }
 body.hanmo-home.hanmo-refined .notice a { color: #c4d3de; }
-body.hanmo-home.hanmo-refined .notice li:not([hidden]) { animation: hanmo-notice-reveal .2s ease-out both; }
-@keyframes hanmo-notice-reveal {
-  from { opacity: .3; transform: translateY(3px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 body.hanmo-home.hanmo-refined .mainNotice {
   border-block: 1px solid var(--hm-line);
   border-radius: 0;
@@ -336,4 +331,56 @@ body.hanmo-pc-only-layout.hanmo-refined main { word-break: keep-all; overflow-wr
 }
 @media (prefers-reduced-motion: reduce) {
   .hanmo-refined *, .hanmo-refined *::before { animation: none !important; transition: none !important; }
+}
+
+
+/* 2026-11-23 공통 상단 바 단일 설계: 모든 비모방 화면에 동일한 링크·높이를 적용합니다. */
+body.hanmo-refined .hanmo-topbar{
+  box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:nowrap;min-height:56px;padding:5px clamp(18px,3vw,46px);
+}
+body.hanmo-refined .hanmo-topbar :is(nav,.hanmo-nav-inline){
+  display:flex;align-items:center;justify-content:flex-end;gap:3px;
+  flex:1 1 auto;min-width:0;flex-wrap:nowrap;
+}
+body.hanmo-refined .hanmo-topbar :is(nav,.hanmo-nav-inline) a{
+  flex:0 0 auto;white-space:nowrap;padding:7px 8px;min-height:36px;font-size:13px;
+}
+body.hanmo-refined .hanmo-topbar .hanmo-brand{flex:0 0 auto;}
+body.hanmo-refined .hanmo-topbar .hanmo-profile-summary{
+  /* 입력한 입학년도·전공을 자르지 않고 상단 메뉴의 남은 공간에서 모두 표시합니다. */
+  box-sizing:border-box;flex:0 1 auto;max-width:none;min-width:0;
+  white-space:normal;overflow-wrap:anywhere;word-break:normal;
+  overflow:visible;text-overflow:clip;font-size:11px;line-height:1.4;padding-block:3px;
+}
+@media(max-width:1180px){
+ body.hanmo-refined .hanmo-topbar{gap:6px;padding-inline:14px;}
+ body.hanmo-refined .hanmo-topbar :is(nav,.hanmo-nav-inline) a{font-size:12px;padding-inline:5px;}
+}
+/* 작은 PC 창에서는 링크와 프로필이 겹치지 않도록 메뉴 줄바꿈을 허용합니다. */
+@media(max-width:760px){
+ body.hanmo-refined .hanmo-topbar :is(nav,.hanmo-nav-inline){flex-wrap:wrap;}
+}
+/* 일반 PC에서는 문서가 아니라 화면 내부에서 상태를 바꿉니다. 고배율·작은 창은 접근성을 위해 예외입니다. */
+@media(min-width:1100px) and (min-height:680px){
+ html:has(body.hanmo-refined){height:100%;overflow:hidden}
+ body.hanmo-refined:not(.hanmo-practice-layout){
+   box-sizing:border-box;display:flex;flex-direction:column;
+   height:100dvh;min-height:0;max-height:100dvh;overflow:hidden;
+ }
+ body.hanmo-refined>.hanmo-topbar{flex:0 0 auto;}
+ body.hanmo-refined>.hanmo-policy-footer{flex:0 0 auto;min-height:40px;padding-block:5px;}
+ body.hanmo-refined>main{box-sizing:border-box;flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;}
+ body.hanmo-ui.hanmo-refined>main.hanmo-main{padding-top:12px;padding-bottom:8px;}
+ body.hanmo-home.hanmo-refined>main{padding-top:10px;padding-bottom:10px;}
+ body.hanmo-policy-legacy.hanmo-refined>main{padding-top:8px;padding-bottom:8px;}
+}
+
+/* 배너가 있는 홈은 남은 화면의 중앙이 아니라 배너 아래부터 본문을 배치합니다. */
+body.hanmo-home.hanmo-refined > .home-banners:not([hidden]) + main {
+  justify-content: flex-start;
+  padding-top: 36px;
+}
+@media (max-height: 650px) {
+  body.hanmo-home.hanmo-refined > .home-banners:not([hidden]) + main { padding-top: 28px; }
 }

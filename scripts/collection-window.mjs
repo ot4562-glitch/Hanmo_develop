@@ -18,7 +18,7 @@ function utcCalendarDay(input){
   return time;
 }
 
-/** @param {string} input YYYY-MM-DD로 되돌리는 UTC 기준 날짜 */
+/** @param {number} input YYYY-MM-DD로 되돌리는 UTC 기준 날짜 */
 function dateFromDay(input){
   return new Date(input).toISOString().slice(0,10);
 }
@@ -30,6 +30,7 @@ function parseInstant(instant){
     throw new Error('--at에는 시간대가 포함된 ISO 8601 시각이 필요합니다.');
   if(!(instant instanceof Date)&&typeof instant!=='string')
     throw new Error('시각은 Date 또는 시간대가 포함된 ISO 문자열이어야 합니다.');
+  if(typeof instant==='string')utcCalendarDay(instant.slice(0,10));
   const date=new Date(instant);
   if(!Number.isFinite(date.getTime()))throw new Error('잘못된 시각입니다.');
   return date;
@@ -105,10 +106,13 @@ export function loadAcademicSourceConfig(){
  * @returns {object|null} 일치하지 않음은 다른 미확인 기간에 대한 수집 허가가 아닙니다.
  */
 export function findRegistrationBlackout(instant,calendar=loadCollectionCalendar()){
-  const at=parseInstant(instant);
-  const day=seoulCalendarDay(at);
-  const validated=validateCollectionCalendar(calendar);
-  const match=validated.intervals.find(item=>
+  const day=seoulCalendarDay(parseInstant(instant));
+  return findBlackoutOnDay(day,validateCollectionCalendar(calendar).intervals);
+}
+
+/** @param {number} day @param {ReturnType<typeof validateCollectionCalendar>['intervals']} intervals */
+function findBlackoutOnDay(day,intervals){
+  const match=intervals.find(item=>
     item.denyStartDay<=day&&day<item.denyEndDayExclusive);
   if(!match)return null;
   const {denyStartDay,denyEndDayExclusive,...result}=match;
@@ -128,8 +132,9 @@ export function collectionGateStatus(instant=new Date(),options={}){
   const cal=options.calendar??loadCollectionCalendar();
   const config=options.sourceConfig??loadAcademicSourceConfig();
   const validated=validateCollectionCalendar(cal);
-  const koreanDate=dateFromDay(seoulCalendarDay(at));
-  const match=findRegistrationBlackout(at,cal);
+  const day=seoulCalendarDay(at);
+  const koreanDate=dateFromDay(day);
+  const match=findBlackoutOnDay(day,validated.intervals);
   const base={checkedAt:at.toISOString(),timeZone:'Asia/Seoul',koreanDate,
     canCollect:false};
   if(match)return {...base,code:'REGISTRATION_BLACKOUT',

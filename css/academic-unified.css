@@ -1,0 +1,33 @@
+/* 한 화면에서 공지/달력 탭을 교체하고 문서 자체에 스크롤을 만들지 않습니다. */
+.hanmo-academic-unified .academic-tabs{display:flex;gap:14px;border-bottom:1px solid #38566a;margin:8px 0 14px;}
+.hanmo-academic-unified .academic-tabs button{
+  appearance:none;background:transparent;color:#d3e2eb;border:0;border-bottom:3px solid transparent;
+  padding:11px 24px;cursor:pointer;font:650 16px/1.4 "Noto Sans KR",system-ui;
+}
+.hanmo-academic-unified .academic-tabs button[aria-selected="true"]{color:#f4c76c;border-bottom-color:#f4c76c;}
+.hanmo-academic-unified .academic-tabs button:focus-visible{outline:3px solid #f4c76c;outline-offset:3px;}
+.hanmo-academic-unified [role="tabpanel"][hidden]{display:none!important;}
+.hanmo-academic-unified #academic-calendar-panel{min-height:0;}
+.hanmo-academic-unified .academic-calendar-surface{padding-top:4px;border:0;}
+.hanmo-academic-unified #calendar-view [role="row"][aria-label^="주 "]{flex-basis:clamp(40px,6.7vh,68px)!important;min-height:40px!important;}
+.hanmo-academic-unified #calendar-view [role="heading"][aria-level="2"]{font-size:18px;}
+.hanmo-academic-unified #calendar-view button{min-height:30px;padding:3px 8px;}
+.hanmo-academic-unified #calendar-view .hanmo-calendar-date{padding:3px 7px;}
+.hanmo-academic-unified #calendar-view .hanmo-calendar-weekday{padding:5px 7px;}
+.hanmo-academic-unified #calendar-view>div:first-child{margin-bottom:8px;}
+.hanmo-academic-unified .academic-calendar-footer{min-height:30px;padding:5px 0;}
+.hanmo-academic-unified .hanmo-main>.hanmo-search-controls,.hanmo-academic-unified .hanmo-main>section .hanmo-search-controls{
+  padding:9px 0!important;
+}
+.hanmo-academic-unified .hanmo-form .hanmo-fields{gap:10px 18px;}
+.hanmo-academic-unified .hanmo-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.hanmo-academic-unified .hanmo-item{padding:10px!important;border:1px solid #38566a;}
+.hanmo-academic-unified .hanmo-item h3{font-size:14px;margin:0 0 8px;}
+.hanmo-academic-unified .hanmo-item p{font-size:12px;}
+.hanmo-academic-unified .academic-pagination{display:flex;gap:14px;align-items:center;margin:12px 0 4px;color:#c3d2df;font-size:13px;}
+.hanmo-academic-unified .academic-pagination button{min-height:34px;padding:5px 12px;}
+.hanmo-academic-unified .hanmo-status{margin:5px 0;}
+@media(max-width:1000px){
+ .hanmo-academic-unified .hanmo-list{grid-template-columns:1fr;}
+ .hanmo-academic-unified .hanmo-item{padding:4px!important;}
+}

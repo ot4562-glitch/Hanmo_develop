@@ -69,7 +69,8 @@ hr {
   border-bottom: 1px solid rgba(193, 213, 226, .24);
 }
 .hanmo-contributor-list li:last-child { border-bottom: 0; }
-.hanmo-contributor-list strong { font-size: 16px; font-weight: 700; color: #f5f7fa; }
+.hanmo-contributor-list strong { font-size: 16px; font-weight: 700; color: #f5f7fa; word-break: keep-all; overflow-wrap: anywhere; }
+.hanmo-contributor-list .hanmo-contributor-role { font-size: 12px; font-weight: 400; color: #c0d4e0; }
 .hanmo-contributor-list span { font-size: 13px; color: #c0d4e0; }
 @media(max-width:700px) {
   body.hanmo-flat-legacy .info { max-width: calc(100vw - 32px); width: 100%; }

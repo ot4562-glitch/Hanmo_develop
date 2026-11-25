@@ -133,3 +133,18 @@ test('BASIC은 돌발상황 버튼과 겹치지 않는 역 ㄱ자 시각·클릭
  assert.match(css,/\.basic-mode-tile:focus-visible/);
 });
 
+
+
+test('SETTING과 BASIC 돌발상황 창은 동일한 패널 크기·제목·선택·버튼 스타일을 사용한다',()=>{
+ const html=fs.readFileSync(path.join(__dirname,'../html/vsugang.html'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../css/vsugang-fit.css'),'utf8');
+ assert.match(html,/<h2 id="scenario-settings-title" class="settingTitle">/);
+ assert.match(html,/class="waiting-setting-groups incident-option-group"/);
+ assert.match(html,/class="incident-option-actions settingActions"/);
+ assert.match(html,/class="settingCancel" type="submit" value="cancel"/);
+ assert.match(css,/body\.hanmo-vsugang \.settingPanel\{[\s\S]*?width:min\(480px,100%\)/);
+ assert.match(css,/body\.hanmo-vsugang \.settingPanel \.settingTitle/);
+ assert.match(css,/body\.hanmo-vsugang \.settingPanel \.settingActions button/);
+ assert.doesNotMatch(css,/#scenario-settings h2\{/);
+ assert.doesNotMatch(css,/\.settingSection \.settingPanel \{/);
+});

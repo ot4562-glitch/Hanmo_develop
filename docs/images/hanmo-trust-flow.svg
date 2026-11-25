@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="710" viewBox="0 0 1440 710" role="img" aria-labelledby="title desc">
-<title id="title">한모 데이터 신뢰 경계와 연결 조건</title>
-<desc id="desc">현재 내정보와 졸업 준비의 직접 입력 학점은 브라우저에 저장합니다. 학교 자료는 권리 확인, 서로 다른 사람의 검수·승인, 판본·해시·철회 확인을 거쳐야 공지·검색/전망·달력·FAQ로 연결할 수 있습니다. 현재 Supabase 실서비스와 공식 학사자료는 미연결입니다.</desc>
+<title id="title">한모 데이터와 측정값의 신뢰 경계</title>
+<desc id="desc">내정보의 학생 직접 입력과 반응속도 테스트 프로필은 브라우저에만 저장합니다. 학교 공개자료는 권리 확인, 독립 검수·승인, 출처·판본·철회 확인을 거쳐야 학사정보·강의검색에 연결할 수 있습니다. Supabase와 학사자료는 미연결입니다.</desc>
 <defs>
  <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#071724"/><stop offset=".63" stop-color="#0A2D3E"/><stop offset="1" stop-color="#092130"/></linearGradient>
  <pattern id="g" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#A0D0DF" stroke-opacity=".05"/></pattern>
@@ -13,18 +13,18 @@
 <path d="M66 59v33" stroke="#F4C977" stroke-width="5"/>
 <text x="88" y="83" font-size="20" fill="#B5D4E0" font-weight="710" letter-spacing="2.3">HANMO   /   DATA INTEGRITY</text>
 <text x="66" y="158" font-size="49" fill="#F6FAFD" font-weight="800" >정보가 없다면, 없다고 말합니다.</text>
-<text x="68" y="203" font-size="25" fill="#BBD9E6" font-weight="540" >학생 정보는 브라우저에. 학교 정보는 검증을 거친 뒤에.</text>
+<text x="68" y="203" font-size="25" fill="#BBD9E6" font-weight="540" >반응속도는 브라우저에. 학교 자료는 검수 이후에.</text>
 <rect x="65" y="229" width="197" height="38" rx="19" fill="#1B4F5A" stroke="#5B93A0" stroke-width="1.5"/>
 <text x="164" y="255" font-size="20" fill="#C8EBF3" font-weight="700" text-anchor="middle">NOW · 현재 동작</text>
 <rect x="66" y="269" width="385" height="105" rx="16" fill="#11374B" stroke="#59869A" stroke-width="1.5"/>
 <text x="93" y="315" font-size="30" fill="#FFFFFF" font-weight="770" >학생 직접 입력</text>
-<text x="93" y="348" font-size="20" fill="#B8D5E5" font-weight="540" >캠퍼스 · 전공 · 입학년도 · 학점</text>
+<text x="93" y="348" font-size="20" fill="#B8D5E5" font-weight="540" >캠퍼스 · 전공 · 입학년도</text>
 <rect x="528" y="269" width="385" height="105" rx="16" fill="#11374B" stroke="#59869A" stroke-width="1.5"/>
 <text x="555" y="315" font-size="30" fill="#FFFFFF" font-weight="770" >브라우저 로컬 저장</text>
 <text x="555" y="348" font-size="20" fill="#B8D5E5" font-weight="540" >학교 계정·성적 정보 전송 없음</text>
 <rect x="990" y="269" width="385" height="105" rx="16" fill="#11374B" stroke="#59869A" stroke-width="1.5"/>
 <text x="1017" y="315" font-size="30" fill="#FFFFFF" font-weight="770" >학생 화면</text>
-<text x="1017" y="348" font-size="20" fill="#B8D5E5" font-weight="540" >내정보 · 졸업 준비</text>
+<text x="1017" y="348" font-size="20" fill="#B8D5E5" font-weight="540" >내정보 · 반응속도 테스트</text>
 <path d="M460 321H517" stroke="#70BAC7" stroke-width="3.5" marker-end="url(#arrA)"/>
 <path d="M922 321H979" stroke="#70BAC7" stroke-width="3.5" marker-end="url(#arrA)"/>
 <path d="M65 416H1375" stroke="#3D6579"/>
@@ -42,7 +42,7 @@
 <text x="762" y="564" font-size="18" fill="#E1D4B7" font-weight="500" >출처·해시·유효기간 기록</text>
 <rect x="1083" y="490" width="293" height="105" rx="16" fill="#2A3030" stroke="#A18C5D" stroke-width="1.5"/>
 <text x="1101" y="534" font-size="26" fill="#FFE1A0" font-weight="740" >학생용 자료 표시</text>
-<text x="1101" y="564" font-size="17" fill="#E1D4B7" font-weight="500" >공지 · 검색/전망 · 달력/FAQ</text>
+<text x="1101" y="564" font-size="17" fill="#E1D4B7" font-weight="500" >학사 정보 · 강의 검색</text>
 <path d="M361 544H394" stroke="#D3A965" stroke-width="3" stroke-dasharray="8 8" marker-end="url(#arrB)"/>
 <path d="M700 544H733" stroke="#D3A965" stroke-width="3" stroke-dasharray="8 8" marker-end="url(#arrB)"/>
 <path d="M1039 544H1072" stroke="#D3A965" stroke-width="3" stroke-dasharray="8 8" marker-end="url(#arrB)"/>

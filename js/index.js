@@ -9,28 +9,32 @@ const $CONTAINER=document.getElementsByClassName('container')[0];
 const $PHONECONTAINER=document.getElementsByClassName('phoneContainer')[0];
 const nowTime=new Date();
 
-// 확인 가능한 한모 자체 안내만 교체하며 학교 공지를 가장하지 않습니다.
+// 원본 Hanmo의 NOTICE 문구와 5초 간격 세로 순환을 복원합니다.
 const notices=[
-  {text:'한모 업데이트 보기',href:'https://everytime.kr/374012/v/415946307'},
-  {text:'돌발상황 연습은 BASIC에서 설정할 수 있어요.',href:'./html/vsugang.html'},
+  {text:'한모 업데이트 내용은 여기를 눌러 확인해주세요.',href:'https://everytime.kr/374012/v/415946307'},
+  {text:'1년간 4만 명의 학우가 사용한 한모 (2025)'}
 ];
 const noticeItems=notices.map(notice=>{
   const li=document.createElement('li');
-  const link=document.createElement('a');
-  link.href=notice.href;
-  link.textContent=notice.text;
-  li.append(link);
+  if(notice.href){
+    const link=document.createElement('a');
+    link.href=notice.href;
+    link.textContent=notice.text;
+    li.append(link);
+  }else{
+    li.textContent=notice.text;
+  }
   return li;
 });
 $NOTICELIST.replaceChildren(...noticeItems);
 let noticeIndex=0;
 function showNotice(index){
-  noticeItems.forEach((item,offset)=>{item.hidden=offset!==index;});
+  $NOTICELIST.style.bottom=index===0?'0px':'77px';
 }
 showNotice(noticeIndex);
 if(noticeItems.length>1){
   setInterval(()=>{
-    // 마우스·키보드로 공지를 읽는 동안에는 자동으로 교체하지 않습니다.
+    // 사용자가 공지에 집중하는 동안에는 문구를 교체하지 않습니다.
     if(document.hidden||$NOTICELIST.matches(':hover')||$NOTICELIST.matches(':focus-within'))return;
     noticeIndex=(noticeIndex+1)%noticeItems.length;
     showNotice(noticeIndex);
@@ -57,5 +61,20 @@ function setSemester(){
   title.innerText=nowTime.getFullYear()+'-'+(nowTime.getMonth()>=6?2:1)+'학기';
 }
 
+// 배너별 종료일은 브라우저 현지 날짜 기준으로 해당 날짜까지 포함합니다.
+function updateHomeBanners(date=nowTime){
+  const region=document.getElementsByClassName('home-banners')[0];
+  if(!region)return;
+  const today=String(date.getFullYear()).padStart(4,'0')+'-'
+    +String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
+  let visible=0;
+  for(const banner of Array.from(region.children)){
+    const end=banner.dataset?.endDate;
+    banner.hidden=Boolean(end&&today>end);
+    if(!banner.hidden)visible++;
+  }
+  region.hidden=visible===0;
+}
 setSemester();
+updateHomeBanners();
 check();
