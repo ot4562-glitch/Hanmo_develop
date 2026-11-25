@@ -10,13 +10,16 @@ function render(value,missing=false){
  const events={};const store=new Map();
  if(!missing)store.set(KEY,typeof value==='string'?value:JSON.stringify(value));
  const item={textContent:'',title:''};
+ const fields=Object.fromEntries(['cohort','campus','major','secondaryLabel','secondary'].map(key=>[key,{
+  textContent:'',getAttribute:name=>name==='data-practice-field'?key:null,
+ }]));
  const ctx={
-  document:{querySelectorAll:q=>q==='[data-profile-summary]'?[item]:[]},
+  document:{querySelectorAll:q=>q==='[data-profile-summary]'?[item]:q==='[data-practice-field]'?Object.values(fields):[]},
   localStorage:{getItem:k=>store.get(k)||null},
   window:{addEventListener:(type,fn)=>{events[type]=fn}},
  };
  vm.runInNewContext(script,ctx,{filename:'student-profile-bar.js'});
- return {item,events,store};
+ return {item,events,store,fields};
 }
 test('unset profile shows neutral setup text, not fake authentication',()=>{
  const {item}=render(null,true);
@@ -52,4 +55,33 @@ test('student-provided text is assigned as text, never interpreted as HTML',()=>
  const {item}=render({campus:'SEOUL',major:input,cohort:2023});
  assert.ok(item.textContent.includes(input));
  assert.equal(item.innerHTML,undefined);
+});
+
+test('신청 화면 내정보에는 직접 입력한 항목만 표시한다',()=>{
+ const {fields}=render({campus:'SEOUL',major:'가상전공 A',secondaryKind:'DOUBLE',
+  doubleMajor:'가상전공 B',cohort:2023});
+ assert.deepEqual(Object.fromEntries(Object.entries(fields).map(([k,v])=>[k,v.textContent])),{
+  cohort:'2023년',campus:'서울캠퍼스',major:'가상전공 A',secondaryLabel:'이중전공',secondary:'가상전공 B',
+ });
+});
+test('누락된 정보는 추정하지 않고 부전공·없음 및 삭제를 구분한다',()=>{
+ const {fields,events,store}=render({campus:'GLOBAL',secondaryKind:'MINOR',minor:'가상 부전공',cohort:9999});
+ assert.equal(fields.campus.textContent,'글로벌캠퍼스');
+ assert.equal(fields.major.textContent,'미입력');
+ assert.equal(fields.cohort.textContent,'미입력');
+ assert.equal(fields.secondaryLabel.textContent,'부전공');
+ assert.equal(fields.secondary.textContent,'가상 부전공');
+ store.set(KEY,JSON.stringify({secondaryKind:'NONE',doubleMajor:'이전 값'}));
+ events['hanmo:profile-changed']();
+ assert.equal(fields.secondary.textContent,'없음');
+ store.delete(KEY);
+ events.storage({key:KEY});
+ assert.equal(fields.secondary.textContent,'미입력');
+ assert.equal(fields.campus.textContent,'미입력');
+});
+test('신청 화면의 입력 문자열은 HTML로 해석하지 않는다',()=>{
+ const {fields}=render({major:'<img src=x onerror=alert(1)>',campus:'INVALID'});
+ assert.equal(fields.major.textContent,'<img src=x onerror=alert(1)>');
+ assert.equal(fields.major.innerHTML,undefined);
+ assert.equal(fields.campus.textContent,'미입력');
 });

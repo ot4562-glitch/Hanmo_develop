@@ -59,6 +59,7 @@ function createHarness(seed={}) {
     getHours(){return this.koreanDate().getUTCHours();}
     getMinutes(){return this.koreanDate().getUTCMinutes();}
     getMonth(){return this.koreanDate().getUTCMonth();}
+    getDate(){return this.koreanDate().getUTCDate();}
     getFullYear(){return this.koreanDate().getUTCFullYear();}
   }
   const doc={
@@ -273,6 +274,14 @@ test('TIME-only report remains TIME-only even with a stored SELECT amount',()=>{
   assert.match(h.get('result').children[0].children[0].textContent,/8\.750/);
   assert.match(h.get('time').children[1].textContent,/TIME 부분/);
 });
+test('손상된 저장 시간과 음수 대기 차감으로 잘못된 결과 시간을 표시하지 않는다',()=>{
+  const h=createHarness({practiceSetter:1,psubjectValue:3,subjectValue:2,
+    waitingValue:'yes',TIMEtime:'Infinity',SELECTtime:'2',SELECTWaitTime:'3'});
+  h.load('result.js');
+  assert.equal(h.get('time').children[1].children[0].textContent,'0.000초');
+  assert.equal(h.get('time').children[2].children[0].textContent,'0.000초');
+  assert.equal(h.get('result').children[0].children[0].textContent,'0.000초');
+});
 test('tampered practice count is never interpreted as HTML on the report page',()=>{
   const h=createHarness({practiceSetter:1,psubjectValue:'<img src=x onerror=alert(1)>',
     subjectValue:1,waitingValue:'no',TIMEtime:'1.25',SELECTtime:'2'});
@@ -350,14 +359,15 @@ test('home renders semester/notice and shows PC-only message when device is unsu
   const list=h.get('noticeList');
   assert.equal(list.children.length,2);
   assert.match(list.children[0].children[0].textContent,/업데이트/);
-  assert.equal(list.children[0].hidden,false);
-  assert.equal(list.children[1].hidden,true);
-  // 정적 한 건만 남아 있던 회귀를 방지하도록 실제 순환 함수를 실행합니다.
+  assert.match(list.children[1].textContent,/1년간 4만 명/);
+  assert.equal(list.style.bottom,'0px');
+  // 원본 NOTICE의 77px 세로 순환이 첫 화면과 다음 화면을 번갈아 보여줍니다.
   assert.equal(h.events.intervals.length,1);
   assert.equal(h.events.intervals[0].delay,5000);
   h.events.intervals[0].fn();
-  assert.equal(list.children[0].hidden,true);
-  assert.equal(list.children[1].hidden,false);
+  assert.equal(list.style.bottom,'77px');
+  h.events.intervals[0].fn();
+  assert.equal(list.style.bottom,'0px');
   assert.match(h.get('title').innerText,/2026-2학기/);
   assert.equal(h.get('phoneContainer').style.display,'flex');
   assert.equal(h.get('container').style.display,'none');
@@ -421,4 +431,33 @@ test('mode-selection page stays reachable during restricted time while practice 
   practice.location.href='/html/practice.html';
   practice.load('hanmoSys.js');
   assert.equal(practice.location.href,'/');
+});
+
+test('홈의 배너별 노출 종료일은 해당 날짜를 포함하고 나머지 배너에는 영향을 주지 않는다',()=>{
+  const h=createHarness({deviceInfo:true});
+  h.now('2026-12-31T23:59:59+09:00');
+  const region=h.get('home-banners');
+  const timed=element('a');
+  timed.dataset={endDate:'2026-12-31'};
+  const next=element('a');
+  next.dataset={endDate:'2027-01-02'};
+  const permanent=element('a');
+  permanent.dataset={};
+  region.append(timed,next,permanent);
+  h.load('index.js');
+  assert.equal(timed.hidden,false);
+  assert.equal(next.hidden,false);
+  assert.equal(permanent.hidden,false);
+  assert.equal(region.hidden,false);
+  h.now('2027-01-01T00:00:00+09:00');
+  h.expr('updateHomeBanners(new Date())');
+  assert.equal(timed.hidden,true);
+  assert.equal(next.hidden,false);
+  assert.equal(permanent.hidden,false);
+  region.replaceChildren(timed,next);
+  h.now('2027-01-03T00:00:00+09:00');
+  h.expr('updateHomeBanners(new Date())');
+  assert.equal(timed.hidden,true);
+  assert.equal(next.hidden,true);
+  assert.equal(region.hidden,true);
 });

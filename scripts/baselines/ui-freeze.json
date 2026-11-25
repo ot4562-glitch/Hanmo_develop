@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
   "baselineCommit": "da30a87510f1cdac282600fa4e914da2585a6031",
-  "purpose": "2026-11-23 후속 요청: NOTICE 순환 복구, 제목 서비스 문구, 세 화면 학교 홈페이지 링크·문의 생성 버튼 제거, 네 페이지 i 도움말, SETTING·돌발상황 동일한 빛. practice·selectZone 및 공통 의존성 보호.",
+  "purpose": "사용자 지정 5개 페이지의 제목·도움말·ㅎㅁ 구분선 위치 통일, 지정 문구 제거, 반응속도 한 줄 안내, 연습 결과 PNG 저장 제거. 기존 연습 계산 및 다른 화면 보호. PC 진단 결과에 한정한 권장 조치 표시 및 결과 영역 스크롤. 연습·신청 화면 내정보 표시 및 두 표의 테두리 없는 제한된 스크롤 규격 반영. 공통 상단 내정보 말줄임 제거 및 좁은 창 줄바꿈. 양쪽 연습 화면의 상시 경고 표지 및 홈 상단 바 아래의 원본 훕또기 배너 추가. 배너와 홈 본문의 간격 축소. 연습 좌측 내정보 행간 축소 및 내부 스크롤 제거. 전략 실험의 경쟁자 가정 문구와 신청별 대기시간 모형·결과 안내. 전략 실험 전용 1~3초 대기와 접힌 수식·가정 설명. 전략 실험 공통 선착순 대기열 및 MathML 수식 표기. 전략 실험의 회차별 경쟁자 평균 이동·개인 속도 유지·신청별 변동 및 수식 갱신.",
   "files": [
     {
       "path": "css/academic-calendar.css",
       "sha": "e79b1e6a46d5469b108f189adbd1a6784dd78d54"
     },
     {
-      "path": "css/academic-support.css",
-      "sha": "dc5eb9ac04b134075f79b92918ec9ce2775365ff"
+      "path": "css/academic-unified.css",
+      "sha": "604bbcfcd3e09f41dcaebb10de8051e7c85bf7f1"
     },
     {
       "path": "css/developer.css",
-      "sha": "38f6e0340bba57ead965e52b801a769e6e846f45"
+      "sha": "c0f768714ad843a75bf38dd46115cf02905970ea"
     },
     {
       "path": "css/gnb.css",
@@ -28,12 +28,16 @@
       "sha": "ddb890861ddeb2d9a64f6aeb4af3a73b1d6d66d3"
     },
     {
+      "path": "css/hanmo-labs.css",
+      "sha": "a12037803d844de2c78a5021a4ee9dc332af04d3"
+    },
+    {
       "path": "css/hanmo-policy-footer.css",
-      "sha": "4d8a6331659bfe385fcd3cf7ec49c64895eed009"
+      "sha": "9a7f3b31cba96a613e77a347d8fa6b83ae45f9a8"
     },
     {
       "path": "css/hanmo-refined.css",
-      "sha": "97a3669b2a2309bbaba1ed1ada61c32f047dfa1e"
+      "sha": "2786425619b4c9fdb21b68e110beeeeb7aec4a74"
     },
     {
       "path": "css/hanmo-title-divider.css",
@@ -57,7 +61,7 @@
     },
     {
       "path": "css/index.css",
-      "sha": "920d9b86936a3e687c57dca56de3abfd1b2e8ee4"
+      "sha": "7ed5876ffc229a971bf83c867ba6848a3e94ee1a"
     },
     {
       "path": "css/layout.css",
@@ -69,7 +73,7 @@
     },
     {
       "path": "css/practice.css",
-      "sha": "900699df37380821064db808652ed0386398b2ef"
+      "sha": "fe778f0dfb6cd84f01cdfb41e71bd2c4203b5113"
     },
     {
       "path": "css/result.css",
@@ -81,35 +85,27 @@
     },
     {
       "path": "css/vsugang-fit.css",
-      "sha": "cc986466608283ee79e4b3daf195ff22a9d1290a"
+      "sha": "102b0a523dd17741bba85beb562763830977c942"
     },
     {
       "path": "css/vsugang.css",
       "sha": "d0f4e1f009d2dee1bb43641919066c1679f7589d"
     },
     {
-      "path": "html/academic-calendar.html",
-      "sha": "05b697268d948f67179f914291c83b1d02a6481b"
-    },
-    {
-      "path": "html/academic-support.html",
-      "sha": "8a59ca1475f09b12387ed0fdd304ab7f1df40f6b"
-    },
-    {
       "path": "html/academic-timeline.html",
-      "sha": "6d97f3a61c1babd34e9f669600238fff92eecfe8"
+      "sha": "f5a210bc759917cfb2f361d09ece7af2a7b65031"
     },
     {
       "path": "html/catalog.html",
-      "sha": "989ea913d7bbc175cef555c09e6085ac5fb6b5b6"
+      "sha": "3d241b6ea4ec36285d9221b8f64203f824b32953"
     },
     {
       "path": "html/developer.html",
-      "sha": "135bb54fdded45bc9dedc49ee263b511770f91fc"
+      "sha": "e2b141e63b1d2befe16611c1bc57dad2b1e16bac"
     },
     {
       "path": "html/forecast.html",
-      "sha": "af0578f1a2ac7297e130f19697e4ed443f700d19"
+      "sha": "e33bcf4eacfc0e80c76522b5fd167ab821eb2793"
     },
     {
       "path": "html/incident-404.html",
@@ -121,27 +117,43 @@
     },
     {
       "path": "html/planner.html",
-      "sha": "616cb64f4e51868ee587a6469b08f1d211e5decd"
+      "sha": "6019171a88961252bc965ed5840cdd105f23edf6"
     },
     {
       "path": "html/practice.html",
-      "sha": "d1e5dea37b110ca7002c95629463ab577f090023"
+      "sha": "c93be1e1ebdf0d8ca768d525826c4108a3392cd1"
+    },
+    {
+      "path": "html/reaction-test.html",
+      "sha": "3f2d6626a139ed54a3db142f7e26c946d87af779"
+    },
+    {
+      "path": "html/readiness.html",
+      "sha": "e6abb1e92cdf20e92afee85d7c05b95f9f65401c"
     },
     {
       "path": "html/result.html",
-      "sha": "d8e4874cab63a5ac00f60dc26b1bff5be94bf1ca"
+      "sha": "8e46ee4dba9dd683f1fe68118022fb73575031ba"
     },
     {
       "path": "html/selectZone.html",
-      "sha": "9c3497be93620f3fba62168d209ee3a7b3c07b60"
+      "sha": "1288330d75b7d14cb79b5019cb066f7da0169716"
+    },
+    {
+      "path": "html/strategy-lab.html",
+      "sha": "a8aa29d6f106a46ac0e73c7ce4532dd9877b5c25"
     },
     {
       "path": "html/vsugang.html",
-      "sha": "4e91ee1dff496c862166271f95588889c42e7220"
+      "sha": "e8b98ae8653aafa7818ca01ffa0acea743ef762c"
     },
     {
       "path": "img/background.svg",
       "sha": "e140b96cd30dd19cde039c60f30bc744a9b0a0d7"
+    },
+    {
+      "path": "img/boo.png",
+      "sha": "ff19d0e255ec06da33d2e426bda4d163fc7688c6"
     },
     {
       "path": "img/delete.png",
@@ -209,15 +221,15 @@
     },
     {
       "path": "index.html",
-      "sha": "b3e2df7812c1a27216fdabf8c0207914c087c77a"
+      "sha": "51115f1ce676d272cc8d066e291f39405c26f623"
     },
     {
       "path": "js/academic-data-source.js",
       "sha": "dba1d9b3160f3b6e65fc988b6262fd374069bea1"
     },
     {
-      "path": "js/academic-support.js",
-      "sha": "1849467b3f2e474a75930a163ddc59eca5dcb7f2"
+      "path": "js/academic-unified.js",
+      "sha": "973533ccba4479331d95c307f6ce03fd1a7c24ca"
     },
     {
       "path": "js/capacity-settings.js",
@@ -241,7 +253,7 @@
     },
     {
       "path": "js/index.js",
-      "sha": "57007060f4dadbdb49a9ddfd291c5ffce1335852"
+      "sha": "d448f0bb1017185d1b41738fc9fed219a53884e4"
     },
     {
       "path": "js/pc-only.js",
@@ -253,7 +265,7 @@
     },
     {
       "path": "js/result.js",
-      "sha": "9d273f3deb5d6e693b7bd2e7d37e852a6f8db8f0"
+      "sha": "83e3ae8aefbd29090c0ea91e2ad34673e52ee011"
     },
     {
       "path": "js/scenario-settings.js",
@@ -261,7 +273,7 @@
     },
     {
       "path": "js/selectZone.js",
-      "sha": "7c8d4ca8c4f18f1159c19fb0d576dd3a3471c2f3"
+      "sha": "671b6aeb56df29e41122658305663560efc36861"
     },
     {
       "path": "js/student-catalog.js",
@@ -269,7 +281,7 @@
     },
     {
       "path": "js/student-notices.js",
-      "sha": "0dff69808885c3aa65dd7110f41c5c16d10241d0"
+      "sha": "826e8d1684e4d8ebd46f5a03d87dd8d3d1f603a1"
     },
     {
       "path": "js/student-preferences.js",
@@ -277,7 +289,7 @@
     },
     {
       "path": "js/student-profile-bar.js",
-      "sha": "70ac52364d854b85422a711238f16752fc546bac"
+      "sha": "b4d144468e8ccce729be1af5820a9259e1004895"
     },
     {
       "path": "js/vsugang-fit.js",

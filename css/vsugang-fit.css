@@ -33,14 +33,16 @@ body.hanmo-vsugang :is(.settingSection,#scenario-settings){
   height:auto;max-height:none;z-index:110;overflow-y:auto;background:rgba(0,10,18,.87);padding:20px;
 }
 body.hanmo-vsugang .settingPanel{
-  box-sizing:border-box;width:min(720px,100%);height:auto;max-height:calc(100dvh - var(--vsugang-topbar-bottom,66px) - 32px);
-  overflow-y:auto;align-items:stretch;justify-content:flex-start;padding:25px 30px;border:1px solid #567084;
+  box-sizing:border-box;width:min(480px,100%);height:auto;max-height:calc(100dvh - var(--vsugang-topbar-bottom,66px) - 32px);
+  margin:auto;overflow-y:auto;align-items:stretch;justify-content:flex-start;padding:28px;
+  gap:16px;border:1px solid #567084;
 }
 .settingPanel .textbox{height:37px;color:#f2f5f8;background:#0f2535;border:1px solid #66849c;border-radius:7px;padding:5px 10px}
 .settingPanel .settingButton{align-self:flex-end;margin-top:20px;min-height:44px;border:0;flex:none}
 
 /* 두 개의 접속 대기 옵션은 각각 독립적으로 선택할 수 있습니다. */
 .settingPanel .waiting-setting-groups{display:grid;gap:12px;list-style:none}
+.settingPanel .waiting-setting-title{color:#fff;font-weight:700}
 .settingPanel .waiting-setting-group{
   display:flex;flex-wrap:wrap;align-items:center;column-gap:20px;row-gap:9px;
   min-width:0;margin:0;padding:12px 16px;border:1px solid #57778d;
@@ -80,13 +82,12 @@ body.hanmo-vsugang .settingPanel{
 #scenario-settings[open]{display:flex;align-items:center;justify-content:center}
 #scenario-settings::backdrop{background:transparent}
 .settingPanel fieldset{min-width:0}
-#scenario-settings h2{margin:0 0 14px;font-size:20px;font-weight:700}
-.incident-option-group{margin-bottom:12px}
+.incident-option-group{margin:0}
 .incident-option-group .waiting-setting-group small{
   display:block;flex:0 0 100%;margin-top:0;
   color:#bacbd7;font-size:12px;line-height:1.65
 }
-.incident-option-actions{display:flex;justify-content:flex-end;gap:8px}
+.incident-option-actions{justify-content:stretch}
 .settingPanel :is(button,input):focus-visible{outline:3px solid #ffcf76;outline-offset:2px}
 /* 높은 확대율에서는 본문만 스크롤한다. */
 body.hanmo-vsugang.vsugang-compact-scroll>main{display:block;overflow-y:auto;overscroll-behavior:contain}
@@ -178,29 +179,23 @@ body.hanmo-vsugang #scenario-settings[open] .settingPanel {
   body.hanmo-vsugang #scenario-settings[open] .settingPanel { animation: none; }
 }
 
-/* 원본의 레이블·숫자 입력 방식을 가져오되 두 독립 대기 설정을 보존합니다. */
-body.hanmo-vsugang .settingSection .settingPanel {
-  width: min(480px, 100%);
-  margin: auto;
-  padding: 28px;
-  gap: 16px;
-}
-.settingSection .settingTitle { margin: 0; font-size: 24px; font-weight: 700; }
-.settingSection .settingDesc { margin: 0; color: #cad8e2; font-size: 13px; line-height: 1.55; }
-.settingSection .settingField { display: flex; flex-direction: column; gap: 7px; margin: 0; }
-.settingSection .settingLabel { color: #e2ecf2; font-size: 14px; font-weight: 600; }
-.settingSection .settingPanel .textbox { box-sizing: border-box; width: 100%; height: 44px; font-size: 16px; }
-.settingSection .settingActions { display: flex; gap: 10px; margin-top: 2px; }
-.settingSection .settingActions button {
+/* 두 설정창의 제목·입력·간격·버튼을 하나의 스타일로 통일합니다. */
+body.hanmo-vsugang .settingPanel .settingTitle { margin: 0; font-size: 24px; font-weight: 700; }
+body.hanmo-vsugang .settingPanel .settingDesc { margin: 0; color: #cad8e2; font-size: 13px; line-height: 1.55; }
+body.hanmo-vsugang .settingPanel .settingField { display: flex; flex-direction: column; gap: 7px; margin: 0; }
+body.hanmo-vsugang .settingPanel .settingLabel { color: #e2ecf2; font-size: 14px; font-weight: 600; }
+body.hanmo-vsugang .settingPanel .textbox { box-sizing: border-box; width: 100%; height: 44px; font-size: 16px; }
+body.hanmo-vsugang .settingPanel .settingActions { display: flex; gap: 10px; margin-top: 2px; }
+body.hanmo-vsugang .settingPanel .settingActions button {
   min-height: 44px; flex: 1; border: 0; border-radius: 9px;
   padding: 10px; font: inherit; font-weight: 700; cursor: pointer;
 }
-.settingSection .settingActions .settingCancel { background: #253b4a; color: #eef4f7; }
-body.hanmo-vsugang .settingSection .settingActions .settingButton {
+body.hanmo-vsugang .settingPanel .settingActions .settingCancel { background: #253b4a; color: #eef4f7; }
+body.hanmo-vsugang .settingPanel .settingActions .settingButton {
   margin: 0; align-self: stretch; background: #ffd27a; color: #071827;
 }
 @media (max-width: 500px) {
-  body.hanmo-vsugang .settingSection .settingPanel { padding: 18px; }
+  body.hanmo-vsugang .settingPanel { padding: 18px; }
 }
 
 /* 돌발상황은 SETTING과 정확히 같은 단위 정사각형을 사용합니다. */

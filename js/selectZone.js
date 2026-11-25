@@ -49,7 +49,8 @@ function renderPracticeCourses(){
     subjectTable.insertAdjacentHTML('beforeend',
       '<tr id="subject'+index+'">'
       +'<td>'+index+'</td>'
-      +'<td><button class="register" onClick="registerClick('+index+')" tabIndex="-1"></button></td>'
+      +'<td><button type="button" class="register" style="outline:revert;outline-offset:2px"'
+      +' onClick="registerClick('+index+')" aria-label="모의수강신청 과목'+index+' 신청"></button></td>'
       +'<td>연습</td><td>H00000000</td><td></td>'
       +'<td>모의수강신청 과목'+index+'</td>'
       +'<td>1</td><td>1</td>'
@@ -128,8 +129,9 @@ function renderCourseMode(){
         const button=document.createElement('button');
         button.className='register';
         button.type='button';
+        button.style.outline='revert';
+        button.style.outlineOffset='2px';
         button.setAttribute('onclick','registerClick('+courseId+')');
-        button.tabIndex=-1;
         button.setAttribute('aria-label','가상 '+mode.name+' 대체과목 '+i+' 신청');
         td.append(button);
       }else if(index===11){

@@ -15,6 +15,7 @@ on:
       - 'tests/browser-feature.spec.mjs'
       - 'tests/playwright-feature.config.mjs'
       - 'scripts/serve-feature-preview.mjs'
+      - 'scripts/serve-static.mjs'
       - '.github/workflows/feature-browser-qa.yml'
 permissions:
   contents: read

@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "test": "vitest run js/academic/core js/academic/views",
-    "build": "esbuild js/academic/app/student-forecast.js js/academic/app/student-entry.js js/academic/app/academic-calendar.js --bundle --platform=browser --format=iife --target=es2022 --minify --keep-names --outdir=.build && node scripts/stage-static.mjs",
-    "smoke": "node scripts/check-static-pages.mjs && node --test tests/academic-data-source.test.cjs tests/student-navigation.test.cjs tests/policy-footer.test.cjs tests/student-profile.test.cjs tests/home-fit.test.cjs tests/vsugang-fit.test.cjs && node --test tests/collection-window.test.mjs",
+    "build": "esbuild js/academic/app/student-forecast.js js/academic/app/student-entry.js js/academic/app/academic-calendar.js --bundle --platform=browser --format=iife --target=es2022 --minify --keep-names --outdir=.build --metafile=.build/bundle-meta.json && node scripts/stage-static.mjs",
+    "smoke": "node --test tests/strategy-engine.test.mjs tests/readiness-metrics.test.mjs tests/reaction-profile.test.mjs && node scripts/check-static-pages.mjs && node --test tests/academic-data-source.test.cjs tests/student-navigation.test.cjs tests/policy-footer.test.cjs tests/student-profile.test.cjs tests/home-fit.test.cjs tests/vsugang-fit.test.cjs && node --test tests/collection-window.test.mjs tests/preview-data.test.mjs tests/preview-withdrawal.test.mjs",
     "collection:status": "node scripts/check-collection-window.mjs",
     "collection:gate": "node scripts/check-collection-window.mjs --enforce",
     "check": "npm run check:boundaries && npm run check:syntax && npm run check:types && npm run test && npm run check:legacy && npm run build && npm run smoke",

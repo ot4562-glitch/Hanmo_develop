@@ -180,7 +180,7 @@ body.hanmo-pc-only-layout > main {
   body.hanmo-policy-legacy .box { margin-top: 12px; gap: 12px; }
   body.hanmo-policy-legacy .button { margin-bottom: 8px; }
   body.hanmo-vsugang > main { min-height: 0; overflow: hidden; }
-  /* 수강신청 표는 최다 15개 과목을 두 세로 영역에 모두 표시하도록 밀도를 조정합니다. */
+  /* 수강신청 표는 세로 영역을 나누고 아래의 신청 화면 전용 규격을 적용합니다. */
   body.hanmo-practice-layout > .half { min-height: 0; overflow: hidden; }
   body.hanmo-practice-layout .half > .selectZone_mainArea,
   body.hanmo-practice-layout .half > .mainArea { min-height: 0; overflow: hidden; }
@@ -234,7 +234,7 @@ body.hanmo-practice-layout .half > :is(.mainArea,.selectZone_mainArea) {
   width: auto;
   min-width: 0;
 }
-@media (min-width: 1200px) and (min-height: 750px) {
+@media (min-width: 1100px) and (min-height: 680px) {
   body.hanmo-practice-layout .selectZone_mainArea { overflow: hidden; }
   body.hanmo-practice-layout .selectZone_mainArea > h2 {
     box-sizing: border-box;
@@ -243,39 +243,46 @@ body.hanmo-practice-layout .half > :is(.mainArea,.selectZone_mainArea) {
     flex: 0 0 42px;
     margin: 0;
   }
-  body.hanmo-practice-layout .tableZone {
+  body.hanmo-practice-layout .selectZone_mainArea .tableZone {
     box-sizing: border-box;
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
-    width: calc(100% - 28px);
+    width: 95.3%;
     min-height: 0;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   body.hanmo-practice-layout .tableZone > #course-mode-nav,
   body.hanmo-practice-layout .tableZone > .course-warning-slot,
   body.hanmo-practice-layout .tableZone > #course-search-prompt {
     flex-shrink: 0;
   }
-  body.hanmo-practice-layout .vsugangTable {
+  body.hanmo-practice-layout #course-search-prompt { margin: 0; }
+  body.hanmo-practice-layout .course-warning-slot .course-general-warning { margin: 0; }
+  /* 겨울계절학기 참고 화면의 너비 95%, 상단 높이 약 46%와 두 표 사이 간격을 반영합니다.
+     가용 높이가 작은 경우 두 표를 축소하고, 넘치는 표 내용만 독립적으로 스크롤합니다. */
+  body.hanmo-practice-layout .selectZone_mainArea .vsugangTable {
     box-sizing: border-box;
-    flex: 0 0 clamp(260px, 35vh, 380px);
-    height: clamp(260px, 35vh, 380px);
-    min-height: 0;
-    margin-top: 8px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    flex: 0 1 46vh;
+    flex-basis: 46dvh;
+    height: 46vh;
+    height: 46dvh;
+    min-height: 120px;
+    margin-top: 5px;
+    overflow: auto;
     align-items: stretch;
   }
-  body.hanmo-practice-layout .vsugangedTable {
+  body.hanmo-practice-layout .selectZone_mainArea .vsugangedTable {
     box-sizing: border-box;
-    flex: 0 0 clamp(138px, 21vh, 226px);
-    height: clamp(138px, 21vh, 226px);
-    min-height: 0;
-    margin-top: 26px;
+    flex: 0 1 clamp(100px, 24vh, 260px);
+    flex-basis: clamp(100px, 24dvh, 260px);
+    height: clamp(100px, 24vh, 260px);
+    height: clamp(100px, 24dvh, 260px);
+    min-height: 90px;
+    margin-top: clamp(16px, 2.3vh, 24px);
     padding-bottom: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: auto;
   }
   body.hanmo-practice-layout .vsugangTable > table,
   body.hanmo-practice-layout .vsugangedTable > table { width: 100%; }
