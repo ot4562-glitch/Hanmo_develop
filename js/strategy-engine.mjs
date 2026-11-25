@@ -278,6 +278,22 @@ export function bestOrder(weights,probability){
   }
   return order.reverse();
 }
+/**
+ * 반복 실험에서 얻은 비율의 95% Wilson 구간입니다. 유한 반복 수로 생긴 표본 오차만 나타내며,
+ * 경쟁자 수·도착 시각 같은 합성 가정이 틀렸을 때의 오차(모형 불확실성)는 포함하지 않습니다.
+ * @param {number} successes 성공 횟수
+ * @param {number} trials 반복 수
+ * @returns {[number,number]} 하한·상한(0~1)
+ */
+export function wilsonInterval(successes,trials){
+  if(!Number.isSafeInteger(trials)||trials<1||!Number.isSafeInteger(successes)||successes<0||successes>trials)
+    throw new RangeError('성공 횟수와 반복 수를 확인하세요.');
+  const z=1.959963984540054,p=successes/trials,z2=z*z;
+  const center=(p+z2/(2*trials))/(1+z2/trials);
+  const half=z*Math.sqrt(p*(1-p)/trials+z2/(4*trials*trials))/(1+z2/trials);
+  // 성공 0회·전부 성공은 해당 끝값이 정확히 0·1이다. 부동소수점 잔차(예: 3e-18)가 표시되지 않게 고정한다.
+  return [successes===0?0:Math.max(0,center-half),successes===trials?1:Math.min(1,center+half)];
+}
 /** 같은 경쟁자가 여러 과목을 신청하는 선착순 경쟁을 회차별로 계산합니다. */
 export function simulate(raw){
   validateScenario(raw);
@@ -336,13 +352,23 @@ export function simulate(raw){
   }
   const base=evaluate(baseline);
   const allWins=overlap=>guaranteed?s.trials:evaluate(population(overlap)).wins;
+  const sensitivity={lessOverlap:allWins(OVERLAP.less),moreOverlap:allWins(OVERLAP.more),
+    synchronized:guaranteed?s.trials:evaluate(baseline,1).wins};
+  // 표시용 불확실성: 반복 실험의 표본 오차(Wilson 95%)와, 합성 가정을 바꿨을 때 전체 성공률이 움직인 범위를 분리합니다.
+  // 정원이 경쟁자보다 많은 과목만 있으면 계산상 항상 성공하므로 구간이 [1,1]입니다.
+  const assumptionWins=[base.wins,sensitivity.lessOverlap,sensitivity.moreOverlap,sensitivity.synchronized];
+  const uncertainty={
+    method:'WILSON_95_SAMPLING_ONLY',
+    allWins:guaranteed?[1,1]:wilsonInterval(base.wins,s.trials),
+    courseSuccess:base.courseSuccess.map(p=>guaranteed?[1,1]:wilsonInterval(Math.round(p*s.trials),s.trials)),
+    assumptionRange:{min:Math.min(...assumptionWins)/s.trials,max:Math.max(...assumptionWins)/s.trials},
+  };
   return {
     seed:s.seed,trials:s.trials,order:order.map(index=>s.courses[index].name),
     ranks:order.map(index=>s.courses[index].rank),
     allWins:base.wins,meanScore,
     courseSuccess:base.courseSuccess,expectedCourses:base.expectedCourses,
-    sensitivity:{lessOverlap:allWins(OVERLAP.less),moreOverlap:allWins(OVERLAP.more),
-      synchronized:guaranteed?s.trials:evaluate(baseline,1).wins},
+    sensitivity,uncertainty,
     timing:base.timing,
     serverServiceMs:SERVER_SERVICE_MS,
     guaranteed,

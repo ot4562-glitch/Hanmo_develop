@@ -290,3 +290,90 @@ test('마지막 본인 요청 이후 처리 생략은 대기열의 해당 시점
   assert.deepEqual(prefix,all.slice(0,last+1));
   assert.ok(all.length>prefix.length);
 });
+
+// #134 계산 모델 검증: 입력 경계, 결정성, DP 최적성, 포화 구간, 단조성, 불확실성 표시.
+// 모든 과목·정원·경쟁자는 가상 값이며 실제 학교 경쟁률이 아니다.
+import {wilsonInterval} from '../js/strategy-engine.mjs';
+const small=()=>({...input(),trials:100});
+test('입력 경계: 정원 1·50·51·200·300 허용, 0·301 거부 / 경쟁자 0·200 허용, -1·201 거부',()=>{
+  for(const capacity of [1,50,51,200,300])assert.doesNotThrow(()=>validateScenario({...small(),courses:small().courses.map(c=>({...c,capacity}))}));
+  for(const capacity of [0,301,1.5])assert.throws(()=>validateScenario({...small(),courses:small().courses.map(c=>({...c,capacity}))}),/정원/);
+  for(const rivals of [0,200])assert.doesNotThrow(()=>validateScenario({...small(),courses:small().courses.map(c=>({...c,rivals}))}));
+  for(const rivals of [-1,201,2.5])assert.throws(()=>validateScenario({...small(),courses:small().courses.map(c=>({...c,rivals}))}),/경쟁자/);
+});
+test('입력 경계: 과목 2~8개, 이름 1~30자, 반복 100~5000, 행동·변동·지연 시간 범위, 시드 0~2^32-1',()=>{
+  const course=i=>({id:'K'+i,name:'가상 '+i,rank:i+1,capacity:10,rivals:10});
+  for(const n of [2,8])assert.doesNotThrow(()=>validateScenario({...small(),courses:Array.from({length:n},(_,i)=>course(i))}));
+  for(const n of [1,9])assert.throws(()=>validateScenario({...small(),courses:Array.from({length:n},(_,i)=>course(i))}),/과목 수/);
+  assert.doesNotThrow(()=>validateScenario({...small(),courses:[{...course(0),name:'가'.repeat(30)},course(1)]}));
+  for(const name of ['가'.repeat(31),'   '])assert.throws(()=>validateScenario({...small(),courses:[{...course(0),name},course(1)]}),/이름/);
+  for(const [key,ok,bad] of [['trials',[100,5000],[99,5001]],['actionMs',[300,3000],[299,3001]],['jitterMs',[0,1500],[-1,1501]],
+    ['startDelayMs',[0,5000],[-1,5001]],['seed',[0,4294967295],[-1,4294967296]]]){
+    for(const v of ok)assert.doesNotThrow(()=>validateScenario({...small(),[key]:v}),key+'='+v);
+    for(const v of bad)assert.throws(()=>validateScenario({...small(),[key]:v}),RangeError,key+'='+v);
+  }
+  assert.throws(()=>validateScenario({...small(),courses:[course(0),{...course(1),id:'K0'}]}),/ID/);
+});
+test('결정성: 같은 시드는 순서·확률·불확실성까지 같고, 입력 행 순서를 바꿔도 결과가 같다',()=>{
+  const a=simulate(small()),b=simulate(small());
+  assert.deepEqual(a,b);
+  const shuffled={...small(),courses:[...small().courses].reverse()};
+  assert.deepEqual(simulate(shuffled),a);
+});
+test('DP 최적성: 무작위 확률표(2~6과목)마다 모든 순열을 완전탐색한 최댓값과 같다',()=>{
+  let x=2463534242;
+  const rand=()=>((x^=x<<13,x^=x>>>17,x^=x<<5)>>>0)/4294967296;
+  const perms=arr=>arr.length<=1?[arr]:arr.flatMap((v,i)=>perms([...arr.slice(0,i),...arr.slice(i+1)]).map(p=>[v,...p]));
+  for(let n=2;n<=6;n++){
+    for(let rep=0;rep<20;rep++){
+      const weights=Array.from({length:n},(_,i)=>n-i);
+      const probability=Array.from({length:n},()=>Array.from({length:n},rand));
+      const score=order=>order.reduce((t,j,slot)=>t+weights[j]*probability[j][slot],0);
+      const best=Math.max(...perms([...Array(n).keys()]).map(score));
+      assert.ok(Math.abs(score(bestOrder(weights,probability))-best)<1e-9,'n='+n+' rep='+rep);
+    }
+  }
+});
+test('포화 구간: 모든 과목 정원이 경쟁자보다 많으면 계산상 항상 성공, 정원=경쟁자이면 포화로 보지 않는다',()=>{
+  const sat={...small(),courses:small().courses.map(c=>({...c,capacity:51,rivals:50}))};
+  const r=simulate(sat);
+  assert.equal(r.guaranteed,true);
+  assert.equal(r.allWins,r.trials);
+  assert.deepEqual(r.uncertainty.allWins,[1,1]);
+  assert.deepEqual(r.uncertainty.assumptionRange,{min:1,max:1});
+  const edge={...small(),courses:small().courses.map(c=>({...c,capacity:50,rivals:50}))};
+  assert.equal(simulate(edge).guaranteed,false);
+});
+test('단조성: 한 과목만 경합할 때 같은 시드에서 경쟁자가 늘면 기대점수가 높아지지 않는다',()=>{
+  const s=small();
+  s.courses=s.courses.map((c,i)=>({...c,capacity:i===0?20:300,rivals:0}));
+  let previous=Infinity;
+  for(const rivals of [0,20,21,50,100,200]){
+    s.courses[0].rivals=rivals;
+    const {meanScore}=simulate(s);
+    assert.ok(meanScore<=previous+1e-10,'rivals='+rivals);
+    previous=meanScore;
+  }
+});
+test('Wilson 95% 구간: 기준값과 성질, 잘못된 입력 거부',()=>{
+  const [lo0,hi0]=wilsonInterval(0,100);
+  assert.equal(lo0,0);assert.ok(Math.abs(hi0-0.0370)<0.001);
+  const [lo1,hi1]=wilsonInterval(100,100);
+  assert.ok(Math.abs(lo1-0.9630)<0.001);assert.equal(hi1,1);
+  const [lo,hi]=wilsonInterval(50,100);
+  assert.ok(Math.abs(lo-0.4038)<0.001&&Math.abs(hi-0.5962)<0.001);
+  // 반복이 늘면 같은 비율의 구간이 좁아진다.
+  const w=([a,b])=>b-a;
+  assert.ok(w(wilsonInterval(500,1000))<w(wilsonInterval(50,100)));
+  for(const [k,n] of [[-1,10],[11,10],[1,0],[0.5,10]])assert.throws(()=>wilsonInterval(k,n),RangeError);
+});
+test('불확실성 표시는 추정값을 포함하고, 가정별 범위는 모든 민감도 결과를 포함한다',()=>{
+  const r=simulate(small());
+  const p=r.allWins/r.trials;
+  assert.equal(r.uncertainty.method,'WILSON_95_SAMPLING_ONLY');
+  assert.ok(r.uncertainty.allWins[0]<=p&&p<=r.uncertainty.allWins[1]);
+  r.courseSuccess.forEach((q,i)=>{const [a,b]=r.uncertainty.courseSuccess[i];assert.ok(a<=q+1e-12&&q<=b+1e-12);});
+  for(const wins of [r.allWins,r.sensitivity.lessOverlap,r.sensitivity.moreOverlap,r.sensitivity.synchronized]){
+    assert.ok(r.uncertainty.assumptionRange.min<=wins/r.trials&&wins/r.trials<=r.uncertainty.assumptionRange.max);
+  }
+});

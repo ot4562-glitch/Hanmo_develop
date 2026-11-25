@@ -52,3 +52,63 @@ export function automaticSeed(date=new Date()){
   for(const char of raw){seed=Math.imul(seed^char.charCodeAt(0),16777619)>>>0;}
   return {seed,label:clockLabel};
 }
+
+/**
+ * 반응속도 측정의 상태 전이를 화면과 분리한 순수 함수입니다. 화면(reaction-page.mjs)은 결과 코드에 맞춰 문구만 표시합니다.
+ * 유효 샘플은 'go' 상태에서 신호 표시 이후 80~3000ms 안에 들어온 입력뿐이며,
+ * 이른 입력·범위 밖 입력·탭 숨김·취소가 생기면 모은 샘플을 모두 버리고 처음부터 다시 측정합니다.
+ * @typedef {{phase:'idle'|'waiting'|'go'|'break',shownAt:number,samples:number[]}} ReactionState
+ * @typedef {{type:'start'}|{type:'signal',at:number}|{type:'input',timeStamp:number,hidden?:boolean,repeat?:boolean}|{type:'next'}|{type:'hide'}|{type:'cancel'}} ReactionEvent
+ * @typedef {'STARTED'|'SIGNAL'|'SAMPLE'|'WAITING'|'COMPLETE'|'EARLY'|'OUT_OF_RANGE'|'HIDDEN'|'CANCELLED'|'IGNORED'} ReactionOutcome
+ */
+/** @returns {ReactionState} 측정 전 상태 */
+export function initialReactionState(){
+  return {phase:'idle',shownAt:0,samples:[]};
+}
+/**
+ * @param {ReactionState} state 현재 상태
+ * @param {ReactionEvent} event 화면 사건
+ * @returns {{state:ReactionState,outcome:ReactionOutcome,sample?:number}}
+ */
+export function reactionStep(state,event){
+  /** @param {ReactionOutcome} outcome */
+  const reset=outcome=>({state:initialReactionState(),outcome});
+  /** @param {ReactionOutcome} outcome */
+  const same=outcome=>({state,outcome});
+  switch(event.type){
+    case 'start':
+      return state.phase==='idle'?{state:{phase:'waiting',shownAt:0,samples:[]},outcome:'STARTED'}:same('IGNORED');
+    case 'signal':
+      if(state.phase!=='waiting'||!Number.isFinite(event.at))return same('IGNORED');
+      return {state:{...state,phase:'go',shownAt:event.at},outcome:'SIGNAL'};
+    case 'input':{
+      // 숨겨진 탭의 입력과 키를 누르고 있을 때의 반복 입력은 측정에 쓰지 않는다.
+      if(event.hidden||event.repeat||state.phase==='idle'||state.phase==='break')return same('IGNORED');
+      if(state.phase==='waiting'||event.timeStamp<state.shownAt)return reset('EARLY');
+      const elapsed=event.timeStamp-state.shownAt;
+      if(!Number.isFinite(elapsed)||elapsed<80||elapsed>3000)return reset('OUT_OF_RANGE');
+      const ms=Math.round(elapsed);
+      return {state:{...state,phase:'break',samples:[...state.samples,ms]},outcome:'SAMPLE',sample:ms};
+    }
+    case 'next':
+      if(state.phase!=='break')return same('IGNORED');
+      if(state.samples.length>=REACTION_COUNT)return {state:{...initialReactionState(),samples:state.samples},outcome:'COMPLETE'};
+      return {state:{...state,phase:'waiting'},outcome:'WAITING'};
+    case 'hide':
+      return state.phase==='idle'?same('IGNORED'):reset('HIDDEN');
+    case 'cancel':
+      return state.phase==='idle'?same('IGNORED'):reset('CANCELLED');
+    default:
+      return same('IGNORED');
+  }
+}
+/**
+ * 측정 프로필을 저장합니다. 저장소를 쓸 수 없으면 예외를 밖으로 던지지 않고 false를 돌려줍니다.
+ * @param {{setItem:(key:string,value:string)=>void}|undefined|null} store 저장소(기본 localStorage)
+ * @param {ReturnType<typeof profileFromSamples>} profile 저장할 프로필
+ * @returns {boolean} 저장 성공 여부
+ */
+export function saveProfile(store,profile){
+  try{(store??globalThis.localStorage).setItem(REACTION_KEY,JSON.stringify(profile));return true;}
+  catch{return false;}
+}

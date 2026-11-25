@@ -135,9 +135,15 @@ if(form){
         if(wins===r.trials)return '실패 미관측 ('+r.trials+'/'+r.trials+'회)';
         return (100*wins/r.trials).toFixed(1)+'%';
       };
+      /** @param {number} x 0~1 비율 */
+      const pct=x=>(100*x).toFixed(1)+'%';
+      // 표본 오차 범위는 같은 가정에서 반복 수가 유한해 생기는 오차뿐입니다. 가정이 바뀔 때의 변화는 아래 가정별 범위로 따로 보여 줍니다.
+      const sampling=r.guaranteed?'':' (반복 실험 오차 95% 범위 '+pct(r.uncertainty.allWins[0])+'~'+pct(r.uncertainty.allWins[1])+')';
       recommendation.textContent='추천 신청 순서 '+r.order.join(' → ')+
-        ' · 전체 성공률 '+outcome(r.allWins);
-      setup.textContent='같은 순서에서 경쟁자가 여러 과목을 신청하는 정도가 낮을 때 '+outcome(r.sensitivity.lessOverlap)+
+        ' · 가상 전체 성공률 '+outcome(r.allWins)+sampling;
+      setup.textContent=(r.guaranteed?'':'경쟁 가정에 따라 가상 전체 성공률 '+pct(r.uncertainty.assumptionRange.min)+'~'+
+        pct(r.uncertainty.assumptionRange.max)+' · ')+
+        '같은 순서에서 경쟁자가 여러 과목을 신청하는 정도가 낮을 때 '+outcome(r.sensitivity.lessOverlap)+
         ' · 높을 때 '+outcome(r.sensitivity.moreOverlap)+
         ' · 경쟁자 전원 동시 시작 '+outcome(r.sensitivity.synchronized)+' · 실험 시드 '+r.seed;
       expectedSummary.textContent='기대 성공 과목 수 '+r.expectedCourses.toFixed(2)+' / '+r.order.length+'개 · 과목별 성공률 '+
