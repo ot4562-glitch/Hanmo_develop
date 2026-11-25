@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const ROOT=path.join(__dirname,'..');
-const student=['planner','forecast','catalog','academic-timeline','academic-calendar','academic-support'];
+const student=['planner','forecast','catalog','academic-timeline','readiness','reaction-test','strategy-lab'];
 test('삭제된 학사 FAQ·졸업 페이지와 학교 로고를 웹에 남기지 않는다',()=>{
  for(const p of ['html/academic-progress.html','html/academic-faq.html','css/academic-progress.css',
   'css/academic-faq.css','js/academic-faq.js','img/hufs_logo.png'])
@@ -22,12 +22,14 @@ test('허용된 화면에 비공식 안내를 표시하고 금지된 메뉴 경�
   assert.doesNotMatch(html,/>HUFS 학업 도우미</);
  }
 });
-test('상단 메뉴는 달력·검색형 문의처로 이동한다',()=>{
- for(const p of ['index.html',...student.map(s=>'html/'+s+'.html'),'html/vsugang.html','html/developer.html','html/result.html']){
-  const html=fs.readFileSync(path.join(ROOT,p),'utf8');
-  const prefix=p==='index.html'?'./html/':'./';
-  for(const name of ['academic-calendar','academic-support'])
-   assert.ok(html.includes('href="'+prefix+name+'.html"'),p+' '+name);
+test('상단 메뉴에는 진단·반응·전략·통합 학사 정보만 보인다',()=>{
+ const targets=['readiness','reaction-test','strategy-lab','academic-timeline','catalog','planner'];
+ for(const route of ['index.html',...student.map(x=>'html/'+x+'.html'),
+  'html/vsugang.html','html/developer.html','html/result.html']){
+   const html=fs.readFileSync(path.join(ROOT,route),'utf8');
+   const bar=html.match(/<(?:header|nav) class="hanmo-topbar"[\s\S]*?<\/(?:header|nav)>/)?.[0]??'';
+   for(const target of targets)assert.ok(bar.includes(target+'.html'),route+' '+target);
+   assert.doesNotMatch(bar,/academic-calendar\.html|academic-support\.html/);
  }
 });
 
@@ -88,7 +90,7 @@ test('new views preserve original Hanmo palette, watermark and shared layers',()
  assert.ok(views.includes('background.svg'));
  for(const name of student){
    const html=fs.readFileSync(path.join(ROOT,'html',name+'.html'),'utf8');
-   assert.match(html,/class="hanmo-schoolmark"/);
+   if(['planner','forecast','catalog','academic-timeline'].includes(name))assert.match(html,/class="hanmo-schoolmark"/);
  }
  const originalMenu=fs.readFileSync(path.join(ROOT,'html/vsugang.html'),'utf8');
  assert.match(originalMenu,/class='titleContainer'/);
@@ -140,9 +142,9 @@ test('home restores the original mock registration layout without the academic-e
  const bar=home.match(/<nav class="hanmo-topbar"[\s\S]*?<\/nav>/)?.[0];
  assert.ok(bar);
  assert.doesNotMatch(bar,/<a[^>]*href=['"]\.\/html\/vsugang\.html['"][^>]*>/,'상단 바에 연습 진입을 중복하지 않습니다.');
- const allowed=['./index.html','./html/academic-timeline.html',
-   './html/catalog.html','./html/academic-calendar.html',
-   './html/academic-support.html','./html/planner.html'];
+ const allowed=['./index.html','./html/readiness.html','./html/reaction-test.html',
+    './html/strategy-lab.html','./html/academic-timeline.html','./html/catalog.html',
+    './html/planner.html'];
  assert.deepEqual([...bar.matchAll(/<a[^>]+href="([^"]+)"/g)].map(x=>x[1]),allowed);
  assert.match(home,/<a\b[^>]*class=['"]button display['"][^>]*href=['"]\.\/html\/vsugang\.html['"]/);
  const homeScript=fs.readFileSync(path.join(ROOT,'js/index.js'),'utf8');
@@ -216,7 +218,7 @@ test('academic pages have no repeated marketing introduction or rounded section 
   const html=fs.readFileSync(path.join(ROOT,'html',name+'.html'),'utf8');
   assert.doesNotMatch(html,/class="hanmo-hero"|class="hanmo-eyebrow"/,name);
   assert.doesNotMatch(html,/한모는 학생이 만든 비공식 학업 보조 서비스입니다/,name);
-  assert.ok(html.includes('class="hanmo-schoolmark"'),name);
+  if(['planner','forecast','catalog','academic-timeline'].includes(name))assert.ok(html.includes('class="hanmo-schoolmark"'),name);
  }
  const profile=fs.readFileSync(path.join(ROOT,'html/planner.html'),'utf8');
  for(const id of ['planner-profile','planner-secondary-kind','planner-cohort','planner-double'])
@@ -251,7 +253,7 @@ test('승인된 화면 정돈은 모드 타일 접근성과 제한된 시각 효
 test('검토한 화면 스타일은 비보호 페이지에만 연결한다',()=>{
  const refined=['index.html','html/vsugang.html','html/developer.html','html/result.html',
   'html/planner.html','html/catalog.html','html/academic-timeline.html',
-  'html/academic-calendar.html','html/academic-support.html','html/pc-only.html'];
+  'html/readiness.html','html/reaction-test.html','html/strategy-lab.html','html/pc-only.html'];
  for(const file of refined){
   const html=fs.readFileSync(path.join(ROOT,file),'utf8');
   assert.match(html,/<body\b[^>]*class="[^"]*\bhanmo-refined\b/,file);
@@ -264,7 +266,8 @@ test('검토한 화면 스타일은 비보호 페이지에만 연결한다',()=>
 
 test('홈과 학업 제목 장식은 유지하고 practice·selectZone에서만 제거한다',()=>{
  const pages=['index.html','html/vsugang.html','html/developer.html','html/result.html',
-  'html/academic-timeline.html','html/catalog.html','html/academic-calendar.html',
+  'html/academic-timeline.html','html/catalog.html',
+  'html/readiness.html','html/reaction-test.html','html/strategy-lab.html',
   'html/planner.html','html/forecast.html',
   'html/practice.html','html/selectZone.html','html/incident-404.html','html/pc-only.html'];
  const original=new Set(['index.html','html/vsugang.html','html/developer.html','html/result.html']);
@@ -299,7 +302,7 @@ test('홈과 학업 제목 장식은 유지하고 practice·selectZone에서만 
 
 test('모든 상단 바 브랜드 옆의 불필요한 비공식 문구를 제거한다',()=>{
  const pages=['index.html','html/vsugang.html','html/developer.html','html/result.html',
-  'html/academic-calendar.html','html/academic-timeline.html',
+  'html/readiness.html','html/reaction-test.html','html/strategy-lab.html','html/academic-timeline.html',
   'html/catalog.html','html/forecast.html','html/planner.html'];
  for(const page of pages){
   const html=fs.readFileSync(path.join(ROOT,page),'utf8');
@@ -327,13 +330,15 @@ test('강의검색과 학사공지에서 불필요한 제목만 삭제하고 검
 });
 
 
-test('학사 공지·강의 검색의 메뉴명과 최상단 표제는 완전히 일치한다',()=>{
- for(const file of ['academic-timeline','catalog','academic-support']){
+test('다섯 기능 페이지의 상단 메뉴명과 제목이 일치한다',()=>{
+ for(const file of ['readiness','reaction-test','strategy-lab','academic-timeline','catalog']){
   const html=fs.readFileSync(path.join(ROOT,'html',file+'.html'),'utf8');
   const menu=html.match(/<a href="\.\/[^"]+" aria-current="page">([^<]+)<\/a>/);
   const heading=html.match(/class="hanmo-schoolmark"[^>]*>[\s\S]*?<h1>([^<]+)<\/h1>/);
   assert.ok(menu&&heading,file);
   assert.equal(menu[1],heading[1],file);
+  assert.match(html,/class="hanmo-title-help-button"[^>]*aria-describedby="[^"]+"[^>]*>i<\/button>/,file);
+  assert.match(html,/class="hanmo-title-help-tip"[^>]*role="tooltip">[^<]+<\/span>/,file);
  }
  const catalog=fs.readFileSync(path.join(ROOT,'html/catalog.html'),'utf8');
  assert.ok(catalog.includes('과목명·학수번호'));
@@ -346,48 +351,33 @@ test('학사 페이지 제목 구분선과 첫 구성요소 사이의 여백은 
  const css=fs.readFileSync(path.join(ROOT,'css/hanmo-title-divider.css'),'utf8');
  assert.match(css,/body\.hanmo-ui \.hanmo-main > \.hanmo-schoolmark\s*\{\s*margin:\s*12px 0 16px/);
  assert.match(css,/body\.hanmo-ui \.hanmo-main > #notice-context:empty\s*\{\s*display:\s*none/);
- for(const file of ['academic-timeline','catalog','academic-support','academic-calendar','planner']){
+ for(const file of ['readiness','reaction-test','strategy-lab','academic-timeline','catalog','planner']){
   const html=fs.readFileSync(path.join(ROOT,'html',file+'.html'),'utf8');
   assert.ok(html.includes('href="../css/hanmo-title-divider.css"'),file);
   assert.ok(html.includes('class="hanmo-title-divider"'),file);
  }
 });
 
-test('학교 문의처는 검색어 추천만 제공하고 미검증 연락처 자료를 다시 추가하지 않는다',()=>{
- for(const file of ['html/academic-support.html','js/academic-support.js','css/academic-support.css']){
-  assert.equal(fs.existsSync(path.join(ROOT,file)),true,file);
+test('학사 공지·달력 통합과 문의처 페이지 삭제를 검증한다',()=>{
+ for(const file of ['html/academic-calendar.html','html/academic-support.html',
+   'js/academic-support.js','css/academic-support.css']){
+   assert.equal(fs.existsSync(path.join(ROOT,file)),false,file);
  }
- for(const removed of ['docs/academic-support-center-brief.md',
-  'docs/references/hufs-support-contacts-2026-11-23.md']){
-  assert.equal(fs.existsSync(path.join(ROOT,removed)),false,removed);
- }
- const html=fs.readFileSync(path.join(ROOT,'html/academic-support.html'),'utf8');
- const js=fs.readFileSync(path.join(ROOT,'js/academic-support.js'),'utf8');
- const site=fs.readFileSync(path.join(ROOT,'sitemap.xml'),'utf8');
- assert.match(site,/html\/academic-support\.html/);
- for(const id of ['support-query','support-suggestions','support-search-form','support-result-link']){
-  assert.ok(html.includes('id="'+id+'"'),id);
- }
- assert.doesNotMatch(html,/<select\b|(?:tel|mailto):/);
- assert.doesNotMatch(html,/문의 주제로 검색하기|확인되지 않은 연락처 대신 검색어를 추천합니다/);
- assert.match(html,/class="hanmo-card hanmo-support-search" aria-label="문의 검색과 추천 검색어"/);
- assert.doesNotMatch(js,/02-2173|031-330|@hufs\.ac\.kr/);
- // 원문·연락처 서버 호출은 여전히 금지하며 검수된 정적 추천어 파일만 읽습니다.
- assert.match(js,/fetch\('\.\.\/data\/support-topic-suggestions\.json'/);
- assert.doesNotMatch(js,/fetch\(\s*['"]https?:\/\//);
- assert.match(js,/'한국외국어대학교 '\+value/);
- for(const p of ['index.html',...student.map(name=>'html/'+name+'.html'),
-  'html/vsugang.html','html/developer.html','html/result.html']){
-  assert.match(fs.readFileSync(path.join(ROOT,p),'utf8'),/academic-support\.html/,p);
- }
+ const html=fs.readFileSync(path.join(ROOT,'html/academic-timeline.html'),'utf8');
+ for(const id of ['academic-notice-panel','academic-calendar-panel','academic-notice-tab','academic-calendar-tab','calendar-view','notice-list'])
+   assert.ok(html.includes('id="'+id+'"'),id);
+ assert.doesNotMatch(fs.readFileSync(path.join(ROOT,'sitemap.xml'),'utf8'),
+   /academic-calendar\.html|academic-support\.html/);
 });
 
 test('개발자 Contributor 네 명을 소속 정보의 임의 추측 없이 정렬한다',()=>{
  const html=fs.readFileSync(path.join(ROOT,'html/developer.html'),'utf8');
  const body=html.match(/<ul class="hanmo-contributor-list">([\s\S]*?)<\/ul>/)?.[1];
  assert.ok(body);
- const names=[...body.matchAll(/<li><strong>([^<]+)<\/strong>/g)].map(x=>x[1]);
+ const names=[...body.matchAll(/<li><strong>([^<]+)/g)].map(x=>x[1].trim());
  assert.deepEqual(names,['ZetBe','심민성','이의상','김채윤']);
+ const roles=[...body.matchAll(/<small class="hanmo-contributor-role">([^<]+)<\/small>/g)].map(x=>x[1]);
+ assert.deepEqual(roles,['· 한모(2026) 업데이트 총괄','· 한모(2026) 업데이트 nlp 담당','· 한모(2026) 업데이트 데이터 및 품질 보증 담당']);
  for(const affiliation of ['한국외국어대학교 컴퓨터전자시스템공학부',"한국외국어대학교 경제학전공 '24","한국외국어대학교 ELLT '23","한국외국어대학교 아랍어과 '23"]){
   assert.ok(body.includes(affiliation),affiliation);
  }
@@ -448,4 +438,11 @@ test('3차 김채윤 담당과 최종 원개발자 인수가 문서에서 일관
   assert.match(content,/2차|#71/,name);
  }
  assert.match(fs.readFileSync(path.join(ROOT,'README.md'),'utf8'),/<div align="center">/);
+});
+
+
+test('모의수강신청 결과의 PNG 저장 기능이 제거됐다',()=>{
+ const html=fs.readFileSync(path.join(ROOT,'html/result.html'),'utf8');
+ assert.doesNotMatch(html,/practice-report-save|practice-report-share\.mjs|연습 결과 PNG 저장/);
+ assert.equal(fs.existsSync(path.join(ROOT,'js/practice-report-share.mjs')),false);
 });

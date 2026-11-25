@@ -71,7 +71,7 @@ test('안전 여유일 누락·잘못된 시계·잘못된 일정은 실패 폐�
     {...cal,registrationPeriods:[{...cal.registrationPeriods[0],startDate:'2026-11-31'}]},
     {...cal,registrationPeriods:[{...cal.registrationPeriods[0],dailyStart:'16:00',dailyEnd:'10:00'}]}
   ])assert.throws(()=>examine('2026-11-26T10:00:00+09:00',{calendar:value}));
-  for(const instant of ['2026-11-25T10:00:00','2026-11-25','not-a-date'])
+  for(const instant of ['2026-11-25T10:00:00','2026-11-25','not-a-date','2026-11-31T10:00:00+09:00'])
     assert.throws(()=>examine(instant));
   assert.equal(examine('2026-11-29T12:00:00+09:00',{
     sourceConfig:{schemaVersion:99,mode:'enabled'}}).code,'INVALID_SOURCE_CONFIG');

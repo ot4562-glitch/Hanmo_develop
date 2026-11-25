@@ -29,4 +29,5 @@ if(root){
     titleFormat:{year:'numeric',month:'long'},
   });
   calendar.render();
+  window.addEventListener('hanmo:calendar:show',()=>calendar.render());
 }

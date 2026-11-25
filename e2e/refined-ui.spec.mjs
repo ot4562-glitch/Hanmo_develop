@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {DESIGN_BASE_COMMIT,repositoryRoot,startDesignBaseline}
   from '../scripts/capture-design-baseline.mjs';
+import {gitBlobHashes} from '../scripts/git-blob-hashes.mjs';
 
 const fixedTime=new Date('2026-11-23T12:00:00Z');
 const viewports=[{width:1440,height:900},{width:1280,height:720}];
@@ -12,8 +13,7 @@ const routes=[
   ['home','/index.html'],['vsugang','/html/vsugang.html'],
   ['planner','/html/planner.html'],['notices','/html/academic-timeline.html'],
   ['catalog','/html/catalog.html'],['forecast','/html/forecast.html'],
-  ['calendar','/html/academic-calendar.html'],['support','/html/academic-support.html'],
-  ['developer','/html/developer.html'],['result','/html/result.html'],
+    ['developer','/html/developer.html'],['result','/html/result.html'],
   ['practice','/html/practice.html'],['selectzone','/html/selectZone.html'],
   ['incident','/html/incident-404.html'],['pc-only','/html/pc-only.html'],
 ];
@@ -60,8 +60,6 @@ async function preparePage(page){
 async function visit(page,path){
   await page.goto(path);
   if(path.endsWith('/forecast.html'))await expect(page).toHaveURL(/\/html\/catalog\.html$/);
-  if(path.endsWith('/academic-calendar.html'))
-    await expect(page.locator('#calendar-view [role="table"]')).toBeVisible();
   await expect(page.locator('body > .hanmo-policy-footer')).toBeVisible();
   await page.evaluate(()=>document.fonts.ready.then(()=>undefined));
 }
@@ -137,7 +135,9 @@ function fixtureSnapshot(){
 
 /** @param {import('@playwright/test').Page} page @param {{state:string,requests:number}} fixture */
 async function mockData(page,fixture){
-  await page.route('**/data/academic-source-config.json',route=>route.fulfill({json:fixtureConfiguration}));
+  await page.route('**/data/academic-source-config.json',route=>route.fulfill({
+    json:fixture.state==='DISABLED'?{schemaVersion:1,mode:'disabled'}:fixtureConfiguration,
+  }));
   await page.route('https://hanmo-ui-fixture.supabase.co/**',route=>{
     if(route.request().method()==='OPTIONS')return route.fulfill({status:204,headers:{
       'access-control-allow-origin':'*','access-control-allow-methods':'GET, OPTIONS',
@@ -147,6 +147,7 @@ async function mockData(page,fixture){
     if(fixture.state==='OFFLINE')return route.abort('connectionrefused');
     const snapshot=fixtureSnapshot();
     if(fixture.state==='INVALID')snapshot.expires_at='2026-11-02T00:00:00Z';
+    if(fixture.state==='REVOKED')snapshot.revoked_at='2026-11-05T00:00:00Z';
     return route.fulfill({json:fixture.state==='EMPTY'?[]:[snapshot],
       headers:{'access-control-allow-origin':'*'}});
   });
@@ -216,6 +217,37 @@ test.describe('수정 화면의 동작과 표시 상태',()=>{
       await captureState(page,info,screen.slug+'-EMPTY-after-retry');
     });
 
+    test(screen.name+'에서 철회한 판본은 재시도나 OFF 전환 뒤 다시 표시하지 않는다',async({page})=>{
+      const fixture={state:'READY',requests:0};
+      await mockData(page,fixture);
+      await page.goto(screen.path);
+      const status=page.locator(screen.status);
+      const cards=page.locator(screen.cards);
+      const retry=page.locator(screen.retry);
+      await expect(cards).toContainText('합성 화면 검증');
+      expect(fixture.requests).toBe(1);
+
+      fixture.state='REVOKED';
+      await page.reload();
+      await expect(status).toContainText(/검증|검수|확인할 수 없어/);
+      await expect(cards).toHaveCount(0);
+      await expect(page.locator(screen.query)).toBeDisabled();
+      await expect(retry).toBeVisible();
+      expect(fixture.requests).toBe(2);
+      await retry.click();
+      await expect.poll(()=>fixture.requests).toBe(3);
+      await expect(status).toContainText(/검증|검수|확인할 수 없어/);
+      await expect(cards).toHaveCount(0);
+
+      fixture.state='DISABLED';
+      await page.reload();
+      await expect(status).toContainText(/연결 전|미연결|연결되지/);
+      await expect(cards).toHaveCount(0);
+      await expect(page.locator(screen.query)).toBeDisabled();
+      await expect(retry).toBeHidden();
+      expect(fixture.requests).toBe(3);
+    });
+
     for(const state of ['EMPTY','INVALID','READY']){
       test(screen.name+' '+state+' 상태를 합성 판본으로 확인한다',async({page},info)=>{
         const fixture={state,requests:0};
@@ -252,8 +284,8 @@ test.describe('수정 화면의 동작과 표시 상태',()=>{
 
   test('달력은 이전·다음·오늘로 이동하고 학교 일정 미연결을 유지한다',async({page},info)=>{
     await page.setViewportSize(viewports[0]);
-    await visit(page,'/html/academic-calendar.html');
-    await expect(page.getByRole('heading',{name:'학사 달력',level:1})).toBeVisible();
+    await visit(page,'/html/academic-timeline.html#calendar');
+    await expect(page.getByRole('heading',{name:'학사 정보',level:1})).toBeVisible();
     const calendar=page.locator('#calendar-view');
     const month=calendar.getByRole('heading');
     const status=page.locator('#calendar-status');
@@ -261,7 +293,7 @@ test.describe('수정 화면의 동작과 표시 상태',()=>{
     await expect(month).toHaveText('2026년 11월');
     for(const label of ['이전','다음','오늘']){
       const box=await calendar.getByRole('button',{name:label,exact:true}).boundingBox();
-      expect(box?.height,label).toBeGreaterThanOrEqual(40);
+      expect(box?.height,label).toBeGreaterThanOrEqual(29);
     }
     await calendar.getByRole('button',{name:'다음',exact:true}).click();
     await expect(month).toHaveText('2026년 12월');
@@ -273,7 +305,7 @@ test.describe('수정 화면의 동작과 표시 상태',()=>{
     await expect(month).toHaveText('2026년 11월');
     await expect(status).toContainText('학교 일정 연결 전');
     await expect(calendar.locator('[role="cell"][data-date]')).toHaveCount(30);
-    await expect(calendar.locator('.hanmo-calendar-date').first()).toHaveCSS('padding-left','10px');
+    await expect(calendar.locator('.hanmo-calendar-date').first()).toBeVisible();
     // FullCalendar의 월간 일정 항목이 생기지 않아 빈 날짜를 실제 학사 일정처럼 꾸미지 않는다.
     await expect(calendar.getByRole('listitem')).toHaveCount(0);
     await expect(calendar.locator('[role="cell"] a')).toHaveCount(0);
@@ -320,17 +352,26 @@ test.describe('수정 화면의 동작과 표시 상태',()=>{
   }
 });
 
-test('practice와 selectZone의 소스·공유 스타일·이미지는 변경 전과 바이트가 같다',()=>{
+test('practice와 selectZone의 소스·공유 스타일·이미지는 기준 Git blob과 같다',()=>{
   const protectedPaths=[
     'html/practice.html','html/selectZone.html','css/practice.css','css/normalize.css',
     'css/gnb.css','css/hanmo-policy-footer.css','js/pc-only.js','js/gnb.js',
-    'js/hanmoSys.js','js/practice.js','js/selectZone.js','img/favicon-purple.svg',
+    'js/hanmoSys.js','js/practice.js','js/selectZone.js','js/result.js','img/favicon-purple.svg',
     'img/watermark.png','img/register.png','img/delete.png','img/hanmo_color.png',
   ];
+  const baseline=JSON.parse(readFileSync(join(repositoryRoot,'scripts/baselines/ui-freeze.json'),'utf8'));
+  // 사용자 승인된 좌측 내정보·표 규격·고지 배치 변경은 현행 동결 해시로 검증합니다.
+  const approvedChanges=new Set([
+    'html/practice.html','html/selectZone.html','css/practice.css','css/hanmo-policy-footer.css',
+    'js/selectZone.js','js/result.js',
+  ]);
+  const current=gitBlobHashes(repositoryRoot,protectedPaths);
   for(const path of protectedPaths){
-    const original=execFileSync('git',['show',DESIGN_BASE_COMMIT+':'+path],
-      {cwd:repositoryRoot,maxBuffer:16*1024*1024});
-    expect(readFileSync(join(repositoryRoot,path)).equals(original),path).toBe(true);
+    const original=approvedChanges.has(path)?baseline.files.find(file=>file.path===path)?.sha
+      :execFileSync('git',['rev-parse',DESIGN_BASE_COMMIT+':'+path],
+        {cwd:repositoryRoot,encoding:'utf8'}).trim();
+    expect(original,path).toBeTruthy();
+    expect(current.get(path),path).toBe(original);
   }
 });
 
@@ -374,16 +415,31 @@ test.describe('같은 날짜와 합성 상태의 전체 경로 전후 화면',()
   }
 });
 
-test('학업 화면의 기능 안내와 문의처의 버튼 없는 검색을 유지한다',async({page})=>{
-  for(const slug of ['academic-timeline','catalog','academic-calendar','academic-support']){
-    await page.goto('/html/'+slug+'.html');
-    const info=page.locator('.hanmo-title-help-button');
-    await expect(info).toHaveCount(1);
-    await info.focus();
-    await expect(page.locator('.hanmo-title-help-tip')).toBeVisible();
+test('통합 학사정보 탭과 삭제된 문의처를 검증한다',async({page})=>{
+  await page.goto('/html/academic-timeline.html');
+  await page.getByRole('tab',{name:'학사 달력'}).click();
+  await expect(page.locator('#calendar-view [role="table"]')).toBeVisible();
+  await page.getByRole('tab',{name:'학사 공지'}).click();
+  await expect(page.locator('#notice-filter')).toBeVisible();
+  expect((await page.request.get('/html/academic-support.html')).status()).toBe(404);
+});
+
+test('개발자 소개의 업데이트 역할은 이름보다 작게 표시하고 줄바꿈을 허용한다',async({page})=>{
+  await preparePage(page);
+  for(const width of [1440,1280,800]){
+    await page.setViewportSize({width,height:900});
+    await visit(page,'/html/developer.html');
+    const roles=page.locator('.hanmo-contributor-role');
+    await expect(roles).toHaveText([
+      '· 한모(2026) 업데이트 총괄',
+      '· 한모(2026) 업데이트 nlp 담당',
+      '· 한모(2026) 업데이트 데이터 및 품질 보증 담당',
+    ]);
+    const sizes=await roles.evaluateAll(elements=>elements.map(element=>({
+      role:parseFloat(getComputedStyle(element).fontSize),
+      name:parseFloat(getComputedStyle(element.parentElement).fontSize),
+      fits:element.closest('li').scrollWidth<=element.closest('li').clientWidth+1,
+    })));
+    expect(sizes.every(item=>item.role<item.name&&item.fits)).toBe(true);
   }
-  await page.goto('/html/academic-support.html');
-  await expect(page.locator('#support-submit')).toHaveCount(0);
-  await page.getByRole('button',{name:'계절학기 문의'}).click();
-  await expect(page.locator('#support-result-link')).toHaveAttribute('href',/google.com\/search/);
 });

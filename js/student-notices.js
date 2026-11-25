@@ -9,6 +9,11 @@
  const status=document.getElementById('notice-status');
  const retry=document.getElementById('notice-retry');
  const adapter=window.HanmoAcademicData;
+ const prev=document.getElementById('notice-prev');
+ const next=document.getElementById('notice-next');
+ const pageLabel=document.getElementById('notice-page');
+ const PAGE_SIZE=3;
+ let pageNumber=0;
  let events=[],state='LOADING',meta=null,loading=false;
  const buckets={
    MAJOR:['DOUBLE_MAJOR_APPLICATION','DOUBLE_MAJOR_CHANGE','PRIMARY_MAJOR_DECLARATION','MAJOR_APPLICATION'],
@@ -42,12 +47,17 @@
      (!search||item.title.toLocaleLowerCase('ko').includes(search))):[];
    list.replaceChildren();
    count.textContent=available?matches.length+'개 공지':'';
+   const pageCount=Math.max(1,Math.ceil(matches.length/PAGE_SIZE));
+   pageNumber=Math.min(pageNumber,pageCount-1);
+   if(pageLabel)pageLabel.textContent=(pageNumber+1)+' / '+pageCount;
+   if(prev)prev.disabled=!available||pageNumber===0;
+   if(next)next.disabled=!available||pageNumber>=pageCount-1;
    if(!available)return;
    if(!matches.length){
      list.append(node('p','검색 결과 없음','hanmo-empty'));
      return;
    }
-   for(const item of matches){
+   for(const item of matches.slice(pageNumber*PAGE_SIZE,(pageNumber+1)*PAGE_SIZE)){
      const card=node('article','','hanmo-item');
      card.append(node('h3',item.title));
      card.append(node('p','게시일: '+(item.publishedDate||'원문 확인 필요')));
@@ -82,8 +92,10 @@
    }
  }
  document.getElementById('notice-filter').addEventListener('submit',event=>event.preventDefault());
- query.addEventListener('input',render);
- type.addEventListener('change',render);
+ query.addEventListener('input',()=>{pageNumber=0;render();});
+ type.addEventListener('change',()=>{pageNumber=0;render();});
+ prev?.addEventListener('click',()=>{pageNumber=Math.max(0,pageNumber-1);render();});
+ next?.addEventListener('click',()=>{pageNumber++;render();});
  retry.addEventListener('click',()=>{void refresh();});
  void refresh();
 })();

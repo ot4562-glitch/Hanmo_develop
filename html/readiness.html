@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <script src="../js/pc-only.js"></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="한모 비공식 PC 브라우저 준비도 · 네트워크 지연 및 다운로드 처리량 진단">
+  <title>PC 진단 | 한모</title>
+  <link rel="icon" href="../img/favicon-purple.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/student-ui.css">
+  <link rel="stylesheet" href="../css/hanmo-policy-footer.css">
+  <link rel="stylesheet" href="../css/hanmo-title-divider.css">
+  <link rel="stylesheet" href="../css/hanmo-refined.css">
+  <link rel="stylesheet" href="../css/hanmo-labs.css">
+  <script src="../js/student-profile-bar.js" defer></script>
+  <script type="module" src="../js/readiness.mjs"></script>
+</head>
+<body class="hanmo-ui hanmo-refined hanmo-lab hanmo-readiness">
+  <a class="hanmo-skip" href="#main">본문으로 이동</a>
+  <header class="hanmo-topbar">
+  <a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모</a>
+  <nav aria-label="주요 서비스">
+    <a href="./readiness.html" aria-current="page">PC 진단</a>
+    <a href="./reaction-test.html">반응속도 테스트</a>
+    <a href="./strategy-lab.html">전략 실험</a>
+    <a href="./academic-timeline.html">학사 정보</a>
+    <a href="./catalog.html">강의 검색</a>
+    <span class="hanmo-profile-summary" data-profile-summary role="status" aria-live="polite" aria-label="브라우저에 저장한 내정보, 학교 로그인 아님">내정보 미설정</span>
+    <a class="hanmo-me-link" href="./planner.html">내정보</a>
+  </nav>
+</header>
+  <main id="main" class="hanmo-main lab-layout" tabindex="-1">
+    <div class="hanmo-schoolmark" aria-label="PC 진단 화면">
+      <div class="hanmo-title-line"><span class="hanmo-title-help"><button class="hanmo-title-help-button" type="button" aria-label="PC 진단 기능 안내" aria-describedby="readiness-page-help">i</button><span class="hanmo-title-help-tip" id="readiness-page-help" role="tooltip">브라우저 화면·처리 지연과 한모 연결 상태를 측정합니다.</span></span><h1>PC 진단</h1></div>
+      <div class="hanmo-title-divider" aria-hidden="true"><hr><span><img src="../img/hanmo_white.svg" alt=""></span><hr></div>
+    </div>
+    <section class="lab-panel" id="readiness-input" aria-labelledby="readiness-heading">
+      <div class="lab-section-heading"><h2 id="readiness-heading">진단 항목</h2><span class="lab-minor">한모 정적 시험 파일 이용 · 외부 학교 서버 접근 없음</span></div>
+      <div class="lab-check-grid">
+        <p><strong>화면 안정성</strong><span>화면 갱신 간격·끊김·긴 작업</span></p>
+        <p><strong>브라우저 부하</strong><span>타이머 지연·논리 코어·메모리 대략값</span></p>
+        <p><strong>한모 연결 상태</strong><span>정적 파일 응답·지터·다운로드 처리량</span></p>
+        <p><strong>반응 정보</strong><span>별도 반응속도 테스트 연결</span></p>
+      </div>
+      <label class="lab-check" for="readiness-network"><input id="readiness-network" type="checkbox" checked>
+        <span>한모 정적 파일에 7회 요청해 응답·다운로드를 검사합니다.
+          <small>HTTP 요청 최대 7회, 각 5초 제한, 학교 도메인 요청 없음. 실제 회선 속도와 다를 수 있습니다.</small></span></label>
+      <div class="lab-actions">
+        <button type="button" class="lab-button primary" id="readiness-start">PC 진단 시작</button>
+        <button type="button" class="lab-button secondary" id="readiness-cancel" hidden>검사 취소</button>
+        <a href="./reaction-test.html" class="lab-button secondary lab-inline-link">반응속도 테스트</a>
+      </div>
+      <p class="lab-status" id="readiness-status" role="status" aria-live="polite">사용자가 시작할 때만 검사합니다. 결과와 입력 내용은 서버에 저장하지 않습니다.</p>
+    </section>
+    <section class="lab-panel lab-result-panel" id="readiness-result" aria-labelledby="readiness-result-heading" tabindex="0" hidden>
+      <div class="lab-section-heading"><h2 id="readiness-result-heading">진단 결과</h2><span class="lab-minor">현재 브라우저 관측값</span></div>
+      <p id="readiness-summary" class="lab-summary"></p>
+      <dl class="lab-stats lab-stats-grid">
+        <div><dt>화면 프레임</dt><dd id="readiness-frame-value">—</dd></div>
+        <div><dt>긴 작업</dt><dd id="readiness-task-value">—</dd></div>
+        <div><dt>타이머 지연</dt><dd id="readiness-drift-value">—</dd></div>
+        <div><dt>한모 HTTP 응답시간</dt><dd id="readiness-latency-value">—</dd></div>
+        <div><dt>연결 지터</dt><dd id="readiness-jitter-value">—</dd></div>
+        <div><dt>다운로드 처리량</dt><dd id="readiness-speed-value">—</dd></div>
+        <div><dt>요청 실패·표본 제외</dt><dd id="readiness-error-value">—</dd></div>
+        <div><dt>네트워크 유형 추정</dt><dd id="readiness-connection-value">—</dd></div>
+        <div><dt>논리 코어</dt><dd id="readiness-threads-value">—</dd></div>
+        <div><dt>기기 메모리 대략값</dt><dd id="readiness-memory-value">—</dd></div>
+        <div><dt>반응속도 테스트</dt><dd id="readiness-reaction-value">—</dd></div>
+      </dl>
+      <section id="readiness-advice" aria-labelledby="readiness-advice-heading" hidden>
+        <h3 id="readiness-advice-heading">권장 조치</h3>
+        <ul id="readiness-advice-list"></ul>
+      </section>
+      <p class="lab-footnote">다운로드 처리량은 압축을 반영한 전송 본문 크기를 요청 전체 시간으로 나눈 값입니다. 브라우저 캐시와 전송 확인이 안 된 표본은 제외합니다. 지터는 연속한 응답시간 차이의 중앙값입니다. 한모 관측값은 회선 속도나 학교 서버 성능과 다를 수 있습니다.</p>
+      <button id="readiness-back" class="lab-button secondary" type="button">다시 검사하기</button>
+    </section>
+  </main>
+  <footer class="hanmo-policy-footer" aria-label="비공식 서비스 안내"><p><strong>본 서비스는 한국외국어대학교의 공식 서비스가 아니며, 정확한 정보는 학교 원문을 확인하시기 바랍니다.</strong></p></footer>
+</body></html>

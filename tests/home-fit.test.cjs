@@ -60,3 +60,16 @@ test('narrow desktop still scales all content without advertisement',()=>{
  assert.ok(h.props['--home-fit-scale']<1);
  assert.ok(h.props['--home-fit-scale']*540<=340);
 });
+
+
+test('홈 NOTICE는 원본 두 문구와 5초 간격 상하 이동을 보존한다',()=>{
+ const js=fs.readFileSync(path.join(__dirname,'../js/index.js'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../css/index.css'),'utf8');
+ const refined=fs.readFileSync(path.join(__dirname,'../css/hanmo-refined.css'),'utf8');
+ assert.match(js,/한모 업데이트 내용은 여기를 눌러 확인해주세요\./);
+ assert.match(js,/1년간 4만 명의 학우가 사용한 한모 \(2025\)/);
+ assert.match(js,/style\.bottom=index===0\?'0px':'77px'/);
+ assert.match(js,/\},5000\)/);
+ assert.match(css,/\.notice ul \{[\s\S]*?position: relative;/);
+ assert.doesNotMatch(refined,/\.notice ul\s*\{[^}]*position:\s*static/);
+});

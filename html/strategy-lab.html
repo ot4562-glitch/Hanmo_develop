@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <script src="../js/pc-only.js"></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="반응속도 측정과 경쟁 모형을 이용한 한모 비공식 수강신청 순서 실험">
+  <title>전략 실험 | 한모</title>
+  <link rel="icon" href="../img/favicon-purple.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/student-ui.css">
+  <link rel="stylesheet" href="../css/hanmo-policy-footer.css">
+  <link rel="stylesheet" href="../css/hanmo-title-divider.css">
+  <link rel="stylesheet" href="../css/hanmo-refined.css">
+  <link rel="stylesheet" href="../css/hanmo-labs.css">
+  <script src="../js/student-profile-bar.js" defer></script>
+  <script type="module" src="../js/strategy-page.mjs"></script>
+</head>
+<body class="hanmo-ui hanmo-refined hanmo-lab hanmo-strategy">
+  <a class="hanmo-skip" href="#main">본문으로 이동</a>
+  <header class="hanmo-topbar">
+  <a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모</a>
+  <nav aria-label="주요 서비스">
+    <a href="./readiness.html">PC 진단</a>
+    <a href="./reaction-test.html">반응속도 테스트</a>
+    <a href="./strategy-lab.html" aria-current="page">전략 실험</a>
+    <a href="./academic-timeline.html">학사 정보</a>
+    <a href="./catalog.html">강의 검색</a>
+    <span class="hanmo-profile-summary" data-profile-summary role="status" aria-live="polite" aria-label="브라우저에 저장한 내정보, 학교 로그인 아님">내정보 미설정</span>
+    <a class="hanmo-me-link" href="./planner.html">내정보</a>
+  </nav>
+</header>
+  <main id="main" class="hanmo-main lab-layout" tabindex="-1">
+    <div class="hanmo-schoolmark" aria-label="전략 실험 화면">
+      <div class="hanmo-title-line"><span class="hanmo-title-help"><button class="hanmo-title-help-button" type="button" aria-label="전략 실험 기능 안내" aria-describedby="strategy-page-help">i</button><span class="hanmo-title-help-tip" id="strategy-page-help" role="tooltip">입력한 과목의 신청 순서와 실험에서 성공한 비율을 비교합니다.</span></span><h1>전략 실험</h1></div>
+      <div class="hanmo-title-divider" aria-hidden="true"><hr><span><img src="../img/hanmo_white.svg" alt=""></span><hr></div>
+    </div>
+    <section id="strategy-input" class="lab-panel" aria-labelledby="strategy-input-heading">
+      <div class="lab-section-heading"><h2 id="strategy-input-heading">과목 입력</h2><span class="lab-minor">중요 순위 1이 가장 높습니다.</span></div>
+      <form id="strategy-form">
+        <div class="lab-table-scroll">
+          <table class="lab-table lab-input-table">
+            <caption>과목 2~8개</caption>
+            <thead><tr><th>과목 이름</th><th>중요 순위</th><th>정원</th><th>경쟁자</th><th>삭제</th></tr></thead>
+            <tbody id="strategy-courses"></tbody>
+          </table>
+        </div>
+        <div class="lab-actions">
+          <button type="button" class="lab-button secondary" id="strategy-add">과목 추가</button>
+        </div>
+        <div class="lab-auto-details">
+          <p><span>실험 식별값 · 자동</span><strong id="strategy-clock">—</strong></p>
+          <p><span>신청 반응 · 자동</span><strong id="strategy-reaction">반응 측정 필요</strong></p>
+          <a href="./reaction-test.html">반응속도 테스트로 이동</a>
+        </div>
+        <div class="lab-actions">
+          <button type="submit" class="lab-button primary" id="strategy-run">1,000회 실험 시작</button>
+        </div>
+      </form>
+      <button type="button" class="lab-button secondary" id="strategy-cancel" hidden>계산 중단</button>
+      <p class="lab-status" id="strategy-status" role="status" aria-live="polite">오픈 직후부터 접수 순서대로 자리를 배정하는 모형입니다. 경쟁자의 평균 반응시간은 270ms를 중심으로 변동합니다. 기본 응답 1~3초와 공통 서버 대기열을 반영합니다.</p>
+    </section>
+    <section id="strategy-result" class="lab-panel lab-result-panel" aria-labelledby="strategy-results-heading" tabindex="0" hidden>
+      <div class="lab-section-heading"><h2 id="strategy-results-heading">전략 비교 결과</h2><span class="lab-minor">실험 결과 · 실제 예측 아님</span></div>
+      <p id="strategy-recommendation" class="lab-strategy-answer" role="status"></p>
+      <p id="strategy-expected-summary" class="lab-footnote"></p>
+      <p id="strategy-setup" class="lab-footnote"></p>
+      <section class="strategy-assumption" aria-labelledby="strategy-rival-heading">
+        <h3 id="strategy-rival-heading">경쟁자 가정</h3>
+        <p class="lab-footnote">경쟁자의 전체 신청량은 본인이 입력한 과목 수와 별도로 5~8과목에서 추출합니다. 목록 밖 과목도 같은 경쟁률 가중치 분포와 개인별 선호를 적용합니다.</p>
+        <p class="lab-footnote">매 실험 회차의 경쟁자 집단 평균 반응시간은 240~300ms 사이에서 변합니다. 개인별 고유 속도와 신청별 변동 및 드문 긴 지연을 반영합니다. 조작시간도 가상 목표 거리·폭에 따라 달라집니다. 모두 합성 모형의 가정입니다.</p>
+        <p class="lab-footnote">경쟁자 수는 해당 과목을 신청할 가상 인원 전체입니다. 75%는 개시 즉시 시작하고 나머지는 0~30초 사이에 진입하는 합성 조건을 사용하며, 전원 동시 시작 조건도 별도로 평가합니다. 같은 경쟁자가 여러 과목을 함께 신청하는 정도를 달리한 비교 결과도 각 1,000회에서 계산합니다.</p>
+      </section>
+      <section class="strategy-assumption" aria-labelledby="strategy-wait-heading">
+        <h3 id="strategy-wait-heading">대기시간 가정</h3>
+        <p id="strategy-wait-summary" class="lab-footnote"></p>
+        <p class="lab-footnote">본인과 경쟁자의 모든 신청 요청은 하나의 공통 대기열에서 선착순으로 처리됩니다. 가상 처리율은 시작 후 2초까지 초당 50건, 5초까지 80건, 이후 100건이며 혼잡이 없는 기본 응답시간은 1~3초입니다. 요청이 몰리면 대기가 추가되어 3초를 넘을 수 있으며, 응답 후 다음 과목을 신청합니다. 실제 학교 서버의 대기시간을 측정한 값은 아닙니다.</p>
+      </section>
+      <details id="strategy-formulas" class="strategy-formulas">
+        <summary>수식 보기</summary>
+        <div class="strategy-formula-body">
+          <p id="strategy-formula-values" class="lab-footnote"></p>
+          <p class="lab-footnote">N: 입력 과목 수, Cᵢ: 정원, Dᵢ: 경쟁자 수(본인 제외), rᵢ: 중요 순위, s: 개인별 신청 순번, b: 반복 실험 번호, M: 반복 수, π(s): s번째 신청 과목. 시간 단위는 ms입니다. 아래의 대기열 식에서는 회차 번호 b를 생략합니다.</p>
+          <dl class="strategy-formula-list">
+            <dt>신청 행동시간과 기본 응답시간</dt>
+            <dd>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="action-mean" aria-label="행동시간 a는 3000과 반응 중앙값 더하기 380 중 작은 값"><mrow><mi>a</mi><mo>=</mo><mrow><mi mathvariant="normal">min</mi><mrow><mo>(</mo><mn>3000</mn><mo>,</mo><mrow><msub><mi>m</mi><mi mathvariant="normal">반응</mi></msub><mo>+</mo><mn>380</mn></mrow><mo>)</mo></mrow></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="action-variation" aria-label="행동시간 변동폭 시그마"><mrow><mi>σ</mi><mo>=</mo><mrow><mi mathvariant="normal">round</mi><mrow><mo>(</mo><mrow><mi mathvariant="normal">min</mi><mrow><mo>(</mo><mn>1500</mn><mo>,</mo><mrow><mi mathvariant="normal">max</mi><mrow><mo>(</mo><mn>40</mn><mo>,</mo><mrow><msub><mi>P</mi><mn>90</mn></msub><mo>−</mo><msub><mi>m</mi><mi mathvariant="normal">반응</mi></msub></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="user-action" aria-label="내 신청 행동시간은 가상 조작시간과 측정 반응시간의 합"><mrow><msub><mi>A</mi><mrow><mi>b</mi><mo>,</mo><mn>0</mn><mo>,</mo><mi>s</mi></mrow></msub><mo>=</mo><msub><mi>J</mi><mrow><mi>b</mi><mo>,</mo><mn>0</mn><mo>,</mo><mi>s</mi></mrow></msub><mo>+</mo><mi mathvariant="normal">max</mi><mrow><mo>(</mo><mn>80</mn><mo>,</mo><mi>a</mi><mo>−</mo><mn>380</mn><mo>+</mo><mi>σ</mi><msub><mi>Z</mi><mrow><mi>b</mi><mo>,</mo><mi>s</mi></mrow></msub><mo>)</mo></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="base-delay" aria-label="기본 응답시간은 1000에서 3000까지 균등 정수 분포"><mrow><msub><mi>L</mi><mrow><mi>v</mi><mo>,</mo><mi>s</mi></mrow></msub><mo>∼</mo><mi mathvariant="normal">Unif</mi><mrow><mo>(</mo><mrow><mo>{</mo><mn>1000</mn><mo>,</mo><mo>…</mo><mo>,</mo><mn>3000</mn><mo>}</mo></mrow><mo>)</mo></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="rival-group" aria-label="회차별 집단 평균 270ms에 균등분포 변동을 더함"><mrow><msub><mi>μ</mi><mrow><mi>b</mi></mrow></msub><mo>=</mo><mn>270</mn><mo>+</mo><msub><mi>δ</mi><mrow><mi>b</mi></mrow></msub><mo>,</mo><msub><mi>δ</mi><mrow><mi>b</mi></mrow></msub><mo>∼</mo><mi mathvariant="normal">Unif</mi><mrow><mo>(</mo><mo>−</mo><mn>30</mn><mo>,</mo><mn>30</mn><mo>)</mo></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="rival-reaction" aria-label="개인별 이동 로그정규 사전분포"><mrow><msub><mi>R</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi></mrow></msub><mo>=</mo><mn>80</mn><mo>+</mo><mrow><mo>(</mo><msub><mi>μ</mi><mrow><mi>b</mi></mrow></msub><mo>−</mo><mn>115</mn><mo>)</mo></mrow><mo>·</mo><msub><mi>U</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi></mrow></msub></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="rival-lognormal" aria-label="평균 1인 로그정규 개인 차이"><mrow><msub><mi>U</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi></mrow></msub><mo>∼</mo><mi mathvariant="normal">LogNormal</mi><mrow><mo>(</mo><mo>−</mo><mn>0.06125</mn><mo>,</mo><msup><mn>0.35</mn><mn>2</mn></msup><mo>)</mo></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="rival-jitter" aria-label="매 신청마다 평균 0 표준편차 25ms의 정규 변동"><mrow><msub><mi>ε</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>s</mi></mrow></msub><mo>∼</mo><mi mathvariant="normal">N</mi><mrow><mo>(</mo><mn>0</mn><mo>,</mo><msup><mn>25</mn><mn>2</mn></msup><mo>)</mo></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="rival-tail" aria-label="신청별 지수분포 지연의 평균은 35ms"><mrow><msub><mi>Y</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>s</mi></mrow></msub><mo>∼</mo><mi mathvariant="normal">Exp</mi><mrow><mo>(</mo><mfrac><mn>1</mn><mn>35</mn></mfrac><mo>)</mo></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="rival-action" aria-label="개인별 위치와 정규 변동 및 지수 지연을 더한 조작시간"><mrow><msub><mi>A</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>s</mi></mrow></msub><mo>=</mo><msub><mi>J</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>s</mi></mrow></msub><mo>+</mo><mi mathvariant="normal">max</mi><mrow><mo>(</mo><mn>80</mn><mo>,</mo><msub><mi>R</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi></mrow></msub><mo>+</mo><msub><mi>ε</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>s</mi></mrow></msub><mo>+</mo><msub><mi>Y</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>s</mi></mrow></msub><mo>)</mo></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="fitts" aria-label="가상 목표에 대한 Fitts 선택 확인 시간"><mrow><mi>J</mi><mrow><mo>(</mo><mi>d</mi><mo>,</mo><mi>w</mi><mo>)</mo></mrow><mo>=</mo><mn>380</mn><mo>+</mo><mn>110</mn><msub><mi mathvariant="normal">log</mi><mn>2</mn></msub><mrow><mo>(</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mfrac><mi>d</mi><mi>w</mi></mfrac></mrow><mn>5</mn></mfrac><mo>)</mo></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="fitts-geometry" aria-label="이동 거리 80부터 480 픽셀, 버튼 폭 60 픽셀"><mrow><mi>d</mi><mo>∼</mo><mi mathvariant="normal">Unif</mi><mrow><mo>(</mo><mn>80</mn><mo>,</mo><mn>480</mn><mo>)</mo></mrow><mo>,</mo><mi>w</mi><mo>=</mo><mn>60</mn></mrow></math></div>
+              <p class="lab-footnote">본인은 측정 중앙값을 반영한 기준 행동시간 a와 기존 변동폭 σ를 사용합니다. Z는 표준정규 난수입니다. 경쟁자의 집단 평균 μ는 회차마다 240~300ms로 이동하며 모든 비교 조건에 공유됩니다. 개인별 반응 위치 R은 이동 로그정규분포에서 한 번 추출합니다. 신청마다 정규 변동 ε와 평균 35ms의 지수 지연 Y를 더하는 계층적 Ex-Gaussian 모형입니다. 반응시간은 80ms에서 하한 처리하므로 실제 평균은 절단 전 평균과 조금 다를 수 있습니다. 본인·경쟁자의 조작시간 J는 Fitts 법칙으로 계산합니다. 목표 거리와 폭, 기울기 110ms는 합성 화면 가정이며 실제 마우스 이동 측정값이 아닙니다. 거리 240px, 폭 60px에서 기준 조작시간은 380ms입니다. 모든 신청의 이동 거리는 과목 종류와 무관하게 순번별로 추출합니다. L은 처리시간을 포함하는 기본 응답시간이며 매 요청에 1,000~3,000ms를 균등 추출합니다.</p>
+            </dd>
+            <dt>경쟁자 구성과 과목 선택 확률</dt>
+            <dd>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="population" aria-label="최대 수요와 중복도에 따른 경쟁자 후보군"><mrow><mi>G</mi><mrow><mo>(</mo><mi>ρ</mi><mo>)</mo></mrow><mo>=</mo><mo>⌈</mo><mfrac><mrow><munder><mi mathvariant="normal">max</mi><mi>i</mi></munder><msub><mi>D</mi><mrow><mi>i</mi></mrow></msub></mrow><mi>ρ</mi></mfrac><mo>⌉</mo></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="overlap" aria-label="낮음 기본 높음 중복 조건과 다른 과목의 신청 확률"><mrow><mi>ρ</mi><mo>∈</mo><mo>{</mo><mn>0.25</mn><mo>,</mo><mn>0.5</mn><mo>,</mo><mn>0.75</mn><mo>}</mo></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="membership" aria-label="후보군에서 과목 i를 신청할 확률"><mrow><mi mathvariant="normal">P</mi><mrow><mo>(</mo><mi>i</mi><mo>)</mo></mrow><mo>=</mo><mfrac><msub><mi>D</mi><mrow><mi>i</mi></mrow></msub><mi>G</mi></mfrac></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="workload" aria-label="경쟁자의 가상 전체 신청량"><mrow><msub><mi>K</mi><mrow><mi>v</mi></mrow></msub><mo>=</mo><mi mathvariant="normal">max</mi><mrow><mo>(</mo><msub><mi>m</mi><mrow><mi>v</mi></mrow></msub><mo>,</mo><msub><mi>X</mi><mrow><mi>v</mi></mrow></msub><mo>)</mo></mrow><mo>,</mo><msub><mi>X</mi><mrow><mi>v</mi></mrow></msub><mo>∼</mo><mi mathvariant="normal">Unif</mi><mo>{</mo><mn>5</mn><mo>,</mo><mn>6</mn><mo>,</mo><mn>7</mn><mo>,</mo><mn>8</mn><mo>}</mo></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="urgency" aria-label="과목 선택 가중치"><mrow><msub><mi>u</mi><mrow><mi>i</mi></mrow></msub><mo>=</mo><msqrt><mrow><mn>1</mn><mo>+</mo><mfrac><msub><mi>D</mi><mrow><mi>i</mi></mrow></msub><msub><mi>C</mi><mrow><mi>i</mi></mrow></msub></mfrac></mrow></msqrt></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="background-urgency" aria-label="목록 밖 과목도 입력 가중치에서 복원추출"><mrow><msub><mi>u</mi><mi mathvariant="normal">기타</mi></msub><mo>∼</mo><mi mathvariant="normal">Unif</mi><mo>{</mo><msub><mi>u</mi><mrow><mn>1</mn></mrow></msub><mo>,</mo><mo>…</mo><mo>,</mo><msub><mi>u</mi><mrow><mi>N</mi></mrow></msub><mo>}</mo></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="preference" aria-label="개인별 과목 선호 로그 가중치"><mrow><msub><mi>η</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>∼</mo><mi mathvariant="normal">N</mi><mrow><mo>(</mo><mn>0</mn><mo>,</mo><msup><mn>0.7</mn><mn>2</mn></msup><mo>)</mo></mrow><mo>,</mo><msub><mi>q</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>u</mi><mrow><mi>i</mi></mrow></msub><mo>·</mo><msup><mi>e</mi><msub><mi>η</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>i</mi></mrow></msub></msup></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="choice" aria-label="남은 과목 목록에서 다음 과목의 개인별 Plackett–Luce 선택 확률"><mrow><mi mathvariant="normal">P</mi><mrow><mo>(</mo><mi>i</mi><mo>|</mo><mi>ℒ</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>b</mi><mo>)</mo></mrow><mo>=</mo><mfrac><msub><mi>q</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>i</mi></mrow></msub><mrow><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>ℒ</mi></mrow></munder><msub><mi>q</mi><mrow><mi>b</mi><mo>,</mo><mi>v</mi><mo>,</mo><mi>j</mi></mrow></msub></mrow></mfrac></mrow></math></div>
+              <p class="lab-footnote">G(ρ)명의 후보군에서 과목별 Dᵢ명을 독립적으로 중복 없이 균등 추출합니다. 경쟁자가 없는 경우 후보군은 0명입니다. ρ는 최대 경쟁 과목의 후보군 내 비율(낮음 0.25, 기본 0.5, 높음 0.75)입니다. 다른 과목을 신청하는 조건부 확률도 Dᵢ/G이므로 과목 수만 증가한다고 후보군 크기가 커지지 않습니다. mᵥ는 이미 배정된 입력 과목 수이고 전체 신청량 Kᵥ는 별도 5~8과목 균등 정수 난수와 mᵥ 중 큰 값입니다. 나머지는 목록 밖 과목으로, 입력 가중치에서 복원추출해 경쟁률을 부여합니다. ℒ은 남은 신청 목록입니다. 개인별 로그 선호 η를 반영한 Plackett–Luce 순열을 추출합니다. 실제 수강 집단·수강량·선호에 적합시킨 값은 아닙니다.</p>
+            </dd>
+            <dt>공통 서버 대기열과 다음 신청 시각</dt>
+            <dd>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="service" aria-label="시간에 따른 가상 처리율, 단위는 건 밀리초"><mrow><mi>c</mi><mrow><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mo>=</mo><mo>{</mo><mtable columnalign="left"><mtr><mtd><mrow><mn>0.05</mn><mo>,</mo><mi>t</mi><mo>&lt;</mo><mn>2000</mn></mrow></mtd></mtr><mtr><mtd><mrow><mn>0.08</mn><mo>,</mo><mn>2000</mn><mo>≤</mo><mi>t</mi><mo>&lt;</mo><mn>5000</mn></mrow></mtd></mtr><mtr><mtd><mrow><mn>0.1</mn><mo>,</mo><mi>t</mi><mo>≥</mo><mn>5000</mn></mrow></mtd></mtr></mtable></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="entry" aria-label="경쟁자 시작 지연 혼합분포"><mrow><msub><mi>t</mi><mrow><mi>v</mi></mrow></msub><mo>∼</mo><mo>{</mo><mtable columnalign="left"><mtr><mtd><mrow><mn>0</mn><mo>,</mo><mi>α</mi></mrow></mtd></mtr><mtr><mtd><mrow><mi mathvariant="normal">Unif</mi><mrow><mo>(</mo><mn>0</mn><mo>,</mo><mn>30000</mn><mo>)</mo></mrow><mo>,</mo><mn>1</mn><mo>−</mo><mi>α</mi></mrow></mtd></mtr></mtable></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="entry-share" aria-label="기준 조건 즉시 시작 비율과 동시 시작 비교 조건"><mrow><mi>α</mi><mo>=</mo><mn>0.75</mn><mo>,</mo><msub><mi>α</mi><mi mathvariant="normal">동시</mi></msub><mo>=</mo><mn>1</mn></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="arrival" aria-label="최초 요청 시각과 다음 요청 시각"><mrow><msub><mi>T</mi><mrow><mi>v</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>t</mi><mrow><mi>v</mi></mrow></msub><mo>+</mo><msub><mi>A</mi><mrow><mi>v</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>,</mo><msub><mi>T</mi><mrow><mi>v</mi><mo>,</mo><mrow><mi>s</mi><mo>+</mo><mn>1</mn></mrow></mrow></msub><mo>=</mo><msub><mi>F</mi><mrow><mi>v</mi><mo>,</mo><mi>s</mi></mrow></msub><mo>+</mo><msub><mi>A</mi><mrow><mi>v</mi><mo>,</mo><mrow><mi>s</mi><mo>+</mo><mn>1</mn></mrow></mrow></msub></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="queue-start" aria-label="서버 처리 시작 시각"><mrow><msub><mi>B</mi><mrow><mi>j</mi></mrow></msub><mo>=</mo><mrow><mi mathvariant="normal">max</mi><mrow><mo>(</mo><msub><mi>T</mi><mrow><mi>j</mi></mrow></msub><mo>,</mo><msub><mi>E</mi><mrow><mrow><mi>j</mi><mo>−</mo><mn>1</mn></mrow></mrow></msub><mo>)</mo></mrow></mrow><mo>,</mo><msub><mi>E</mi><mrow><mn>0</mn></mrow></msub><mo>=</mo><mn>0</mn></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="queue-end" aria-label="처리율 적분이 한 건에 도달하는 시각에 처리 완료"><mrow><msubsup><mo>∫</mo><msub><mi>B</mi><mrow><mi>j</mi></mrow></msub><msub><mi>E</mi><mrow><mi>j</mi></mrow></msub></msubsup><mi>c</mi><mrow><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>d</mi><mi>t</mi><mo>=</mo><mn>1</mn></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="queue-reply" aria-label="응답 완료 시각은 서버 처리 완료 이후"><mrow><msub><mi>F</mi><mrow><mi>j</mi></mrow></msub><mo>=</mo><mi mathvariant="normal">max</mi><mrow><mo>(</mo><msub><mi>E</mi><mrow><mi>j</mi></mrow></msub><mo>,</mo><msub><mi>B</mi><mrow><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>L</mi><mrow><mi>j</mi></mrow></msub><mo>)</mo></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="queue-wait" aria-label="혼잡 대기와 전체 응답 대기시간"><mrow><msub><mi>Q</mi><mrow><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>B</mi><mrow><mi>j</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>j</mi></mrow></msub><mo>,</mo><msub><mi>W</mi><mrow><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>F</mi><mrow><mi>j</mi></mrow></msub><mo>−</mo><msub><mi>T</mi><mrow><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>Q</mi><mrow><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>L</mi><mrow><mi>j</mi></mrow></msub></mrow></math></div>
+              <p class="lab-footnote">v는 참가자(0은 본인), j는 모든 참가자의 요청을 합친 선착순 처리 순번입니다. T는 요청 도착, B는 처리 시작, E는 처리 완료, F는 응답 완료 시각입니다. tᵥ는 시작 지연입니다. 경쟁자는 확률 α로 즉시 시작하고 나머지는 0~30,000ms의 균등 지연 후 시작합니다. 기준 α=0.75, 전원 동시 시작 비교는 α=1입니다. 실제 진입 분포가 아닌 합성 가정입니다. 한 번에 한 요청만 처리합니다. 처리율 c(t)의 단위는 건/ms이며 처리 도중 시간대가 바뀌면 남은 작업량에 새 처리율을 적용합니다. 응답의 남은 시간은 서버를 점유하지 않습니다. 같은 사람의 다음 요청은 F 이후에만 시작합니다. 도착 시각이 같으면 고정 참가자 ID 순(본인 마지막)으로 처리합니다. 정원 마감이나 실패한 신청도 동일하게 처리합니다.</p>
+            </dd>
+            <dt>마감 시각과 추천 신청 순서</dt>
+            <dd>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="closing" aria-label="정원 번째 경쟁자 처리 완료 시각"><mrow><msub><mi>H</mi><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mo>{</mo><mtable columnalign="left"><mtr><mtd><mrow><msub><mi>E</mi><mrow><mi>b</mi><mo>,</mo><mi>i</mi><mo>,</mo><mrow><mo>(</mo><msub><mi>C</mi><mrow><mi>i</mi></mrow></msub><mo>)</mo></mrow></mrow></msub><mo>,</mo><msub><mi>C</mi><mrow><mi>i</mi></mrow></msub><mo>≤</mo><msub><mi>D</mi><mrow><mi>i</mi></mrow></msub></mrow></mtd></mtr><mtr><mtd><mrow><mo>∞</mo><mo>,</mo><msub><mi>C</mi><mrow><mi>i</mi></mrow></msub><mo>&gt;</mo><msub><mi>D</mi><mrow><mi>i</mi></mrow></msub></mrow></mtd></mtr></mtable></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="success" aria-label="본인 처리 시각이 정원 번째 경쟁자보다 빠르면 성공"><mrow><mrow><msub><mi>I</mi><mrow><mi>b</mi></mrow></msub><mrow><mo>(</mo><mi>i</mi><mo>,</mo><mi>s</mi><mo>)</mo></mrow></mrow><mo>=</mo><mn mathvariant="bold">1</mn><mrow><mo>{</mo><msub><mi>E</mi><mrow><mi>b</mi><mo>,</mo><mn>0</mn><mo>,</mo><mi>s</mi></mrow></msub><mo>&lt;</mo><msub><mi>H</mi><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>}</mo></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="probability" aria-label="과목과 순번별 성공 확률"><mrow><msub><mover accent="true"><mi>p</mi><mo>^</mo></mover><mrow><mi>i</mi><mo>,</mo><mi>s</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mi>M</mi></mfrac><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mn>1</mn></mrow><mi>M</mi></munderover><mrow><msub><mi>I</mi><mrow><mi>b</mi></mrow></msub><mrow><mo>(</mo><mi>i</mi><mo>,</mo><mi>s</mi><mo>)</mo></mrow></mrow><mo>,</mo><msub><mi>w</mi><mrow><mi>i</mi></mrow></msub><mo>=</mo><mi>N</mi><mo>−</mo><msub><mi>r</mi><mrow><mi>i</mi></mrow></msub><mo>+</mo><mn>1</mn></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="objective" aria-label="중요 순위 가중 기대점수를 최대화하는 신청 순서"><mrow><msup><mi>π</mi><mo>*</mo></msup><mo>=</mo><munder><mi mathvariant="normal">arg max</mi><mi>π</mi></munder><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>w</mi><mrow><mrow><mi>π</mi><mrow><mo>(</mo><mi>s</mi><mo>)</mo></mrow></mrow></mrow></msub><mo>·</mo><msub><mover accent="true"><mi>p</mi><mo>^</mo></mover><mrow><mrow><mi>π</mi><mrow><mo>(</mo><mi>s</mi><mo>)</mo></mrow></mrow><mo>,</mo><mi>s</mi></mrow></msub></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="score" aria-label="정규화한 기대 가중 점수"><mrow><mi>S</mi><mo>=</mo><mn>100</mn><mo>⁢</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>w</mi><mrow><mrow><msup><mi>π</mi><mo>*</mo></msup><mrow><mo>(</mo><mi>s</mi><mo>)</mo></mrow></mrow></mrow></msub><mo>·</mo><msub><mover accent="true"><mi>p</mi><mo>^</mo></mover><mrow><mrow><msup><mi>π</mi><mo>*</mo></msup><mrow><mo>(</mo><mi>s</mi><mo>)</mo></mrow></mrow><mo>,</mo><mi>s</mi></mrow></msub></mrow><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mrow><mi>i</mi></mrow></msub></mrow></mfrac></mrow></math></div>
+              <p class="lab-footnote">Eᵦ,ᵢ,(Cᵢ)는 회차 b에서 과목 i를 신청한 경쟁자들의 처리 완료 시각 중 Cᵢ번째로 작은 값입니다. 본인의 순번별 처리 시각은 과목명과 무관하고, 경쟁자는 성공 여부와 관계없이 목록을 끝까지 시도합니다. 따라서 기준 조건(ρ=0.5, α=0.75)에서 순번별 성공률로 중요 순위 가중 기대점수를 최대화하는 순열을 구할 수 있습니다. 마지막 본인 요청 이후의 마감시각은 모든 본인 요청보다 늦으므로 계산상 ∞로 두어도 성공 판정이 같습니다. 전체 과목 동시 성공률 자체의 최대화는 아닙니다.</p>
+            </dd>
+            <dt>전체 성공률과 평균 소요시간</dt>
+            <dd>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="all-success" aria-label="별도 평가 회차에서 모든 과목 성공 비율"><mrow><msub><mover accent="true"><mi>P</mi><mo>^</mo></mover><mi mathvariant="normal">전체</mi></msub><mrow><mo>(</mo><mi>ρ</mi><mo>,</mo><mi>α</mi><mo>)</mo></mrow><mo>=</mo><mfrac><mn>100</mn><mi>M</mi></mfrac><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mrow><mi>M</mi><mo>+</mo><mn>1</mn></mrow></mrow><mrow><mn>2</mn><mo>⁢</mo><mi>M</mi></mrow></munderover><munderover><mo>∏</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><msub><mi>I</mi><mrow><mi>b</mi></mrow></msub><mrow><mo>(</mo><mrow><msup><mi>π</mi><mo>*</mo></msup><mrow><mo>(</mo><mi>s</mi><mo>)</mo></mrow></mrow><mo>,</mo><mi>s</mi><mo>)</mo></mrow></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="evaluated-course" aria-label="독립 평가 회차에서 순번별 과목 성공률"><mrow><msub><mi>p</mi><mrow><mi>s</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mi>M</mi></mfrac><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mi>M</mi><mo>+</mo><mn>1</mn></mrow><mrow><mn>2</mn><mi>M</mi></mrow></munderover><mrow><msub><mi>I</mi><mrow><mi>b</mi></mrow></msub><mrow><mo>(</mo><msup><mi>π</mi><mo>*</mo></msup><mrow><mo>(</mo><mi>s</mi><mo>)</mo></mrow><mo>,</mo><mi>s</mi><mo>)</mo></mrow></mrow></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="expected-courses" aria-label="기대 성공 과목 수"><mrow><mi>E</mi><mrow><mo>(</mo><mi>K</mi><mo>)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>p</mi><mrow><mi>s</mi></mrow></msub></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="mean-queue" aria-label="기본 경쟁 가정의 평균 누적 혼잡 대기"><mrow><mover accent="true"><mi>Q</mi><mo>¯</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>M</mi></mfrac><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mrow><mi>M</mi><mo>+</mo><mn>1</mn></mrow></mrow><mrow><mn>2</mn><mo>⁢</mo><mi>M</mi></mrow></munderover><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>Q</mi><mrow><mi>b</mi><mo>,</mo><mn>0</mn><mo>,</mo><mi>s</mi></mrow></msub></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="mean-wait" aria-label="기본 경쟁 가정의 평균 누적 응답 대기"><mrow><mover accent="true"><mi>W</mi><mo>¯</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>M</mi></mfrac><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mrow><mi>M</mi><mo>+</mo><mn>1</mn></mrow></mrow><mrow><mn>2</mn><mo>⁢</mo><mi>M</mi></mrow></munderover><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>W</mi><mrow><mi>b</mi><mo>,</mo><mn>0</mn><mo>,</mo><mi>s</mi></mrow></msub></mrow></math></div>
+              <div class="strategy-math-line"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" data-formula="mean-completion" aria-label="기본 경쟁 가정의 전체 신청 시도 평균 소요시간"><mrow><mover accent="true"><mi>F</mi><mo>¯</mo></mover><mo>=</mo><mfrac><mn>1</mn><mi>M</mi></mfrac><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mrow><mi>M</mi><mo>+</mo><mn>1</mn></mrow></mrow><mrow><mn>2</mn><mo>⁢</mo><mi>M</mi></mrow></munderover><msub><mi>F</mi><mrow><mi>b</mi><mo>,</mo><mn>0</mn><mo>,</mo><mi>N</mi></mrow></msub></mrow></math></div>
+              <p class="lab-footnote">추천 순서는 처음 M회(ρ=0.5, α=0.75)로 선택하고, 별도 M회에서 같은 순서를 ρ=0.25·0.5·0.75 및 전원 동시 시작(ρ=0.5, α=1) 조건에 평가합니다. 전체 성공률은 같은 회차에서 모든 과목이 성공한 비율이며 독립 확률의 곱이 아닙니다. 순번별 성공률과 기대 성공 과목 수는 기준 조건의 독립 평가 표본에서 계산합니다. 평균 시간은 기준 평가 회차에서 마지막 응답까지 포함합니다. 모든 정원이 경쟁자 수보다 크면 모형 내 성공률은 100%이며, 그 외 성공 또는 실패를 한 번도 관측하지 못하면 미관측 횟수를 표시합니다.</p>
+            </dd>
+          </dl>
+          <p class="lab-footnote">난수는 실험 시드로 재현됩니다. 분포·선호·목표 형상·처리율과 기본 응답시간은 합성 가정이며 관측 자료를 이용한 사후 추정은 하지 않습니다. 입력된 과목의 경쟁자 및 그들의 기타 과목 신청만 포함하며 학교 전체 접속자·학년별 우선권·실제 페이지 진입 및 검색 지연은 모델링하지 않습니다. 실제 서버를 측정하거나 접근하지 않으며 실측·검증된 실제 성공 확률이 아닙니다.</p>
+        </div>
+      </details>
+      <button class="lab-button secondary" id="strategy-back" type="button">과목 수정 후 다시 실험</button>
+    </section>
+  </main>
+  <footer class="hanmo-policy-footer" aria-label="비공식 서비스 안내"><p><strong>본 서비스는 한국외국어대학교의 공식 서비스가 아니며, 정확한 정보는 학교 원문을 확인하시기 바랍니다.</strong></p></footer>
+</body></html>

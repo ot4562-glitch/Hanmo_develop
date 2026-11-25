@@ -3,6 +3,12 @@
 const $timeBox=document.querySelector('.time');
 const $resultBox=document.querySelector('.result');
 
+/** @param {string} key 소요 시간 저장 키 */
+function readSavedSeconds(key){
+  const seconds=Number(localStorage.getItem(key));
+  return Number.isFinite(seconds)&&seconds>=0&&seconds<=Number.MAX_SAFE_INTEGER/1000?seconds:0;
+}
+
 /** 저장된 시간 값을 순수하게 읽고 반올림한다. TIME 모드에는 SELECT 측정 구간이 없다. */
 function readPracticeReport(){
   const storedCount=Number(localStorage.getItem('psubjectValue'));
@@ -13,10 +19,10 @@ function readPracticeReport(){
   const courseWaiting=localStorage.getItem('waitingValue')??'no';
   const entryWaiting=localStorage.getItem('waitingEntryValue')??'no';
   const waiting=courseWaiting==='yes'||entryWaiting==='yes'?'yes':'no';
-  const timeSeconds=Number(localStorage.getItem('TIMEtime')).toFixed(3);
-  const selected=Number(localStorage.getItem('SELECTtime'));
-  const waited=waiting==='yes'?Number(localStorage.getItem('SELECTWaitTime')):0;
-  const selectSeconds=(selected-waited).toFixed(3);
+  const timeSeconds=readSavedSeconds('TIMEtime').toFixed(3);
+  const selected=readSavedSeconds('SELECTtime');
+  const waited=waiting==='yes'?readSavedSeconds('SELECTWaitTime'):0;
+  const selectSeconds=Math.max(0,selected-waited).toFixed(3);
   const totalSeconds=(Math.round((Number(timeSeconds)+Number(selectSeconds))*1000)/1000).toFixed(3);
   return {preselected,requested,waiting,timeSeconds,selectSeconds,totalSeconds};
 }

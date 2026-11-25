@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="800" viewBox="0 0 1440 800" role="img" aria-labelledby="title desc">
 <title id="title">한모의 현재 경험: 비공식 모의수강신청과 공식 원문 링크 안내</title>
-<desc id="desc">왼쪽은 BASIC TIME SELECT 및 기본 OFF인 가상 404·정원 마감, 오른쪽은 학교 공개 공지 링크, 비식별 개설 전망, 학사 달력를 보여 줍니다. 학교 공식 자료와 Supabase는 아직 연결되지 않았습니다.</desc>
+<desc id="desc">왼쪽은 BASIC/TIME/SELECT와 기본 OFF인 합성 404·정원 마감, 오른쪽은 학사정보·강의검색과 브라우저 PC 진단·반응속도·가상 전략 실험을 보여줍니다. 학교 공식 자료와 Supabase는 미연결입니다.</desc>
 <defs>
   <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#06131E"/><stop offset=".57" stop-color="#09263A"/><stop offset="1" stop-color="#11384B"/></linearGradient>
   <linearGradient id="left" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#103A4E"/><stop offset="1" stop-color="#082332"/></linearGradient>
@@ -35,27 +35,27 @@
 <text x="111" y="592" fill="#E4F1F6" font-size="23" font-weight="580" >404 새로고침 복구 · 합성 후보 검색</text>
 <text x="92" y="663" fill="#BCD6E3" font-size="20" font-weight="510" >강의 신청 대기 기본 예 · 페이지 접속 대기 기본 아니오</text>
 <rect x="765" y="285" width="225" height="38" rx="18" fill="#123949" stroke="#41778A" stroke-width="1"/>
-<text x="878" y="311" fill="#ACDCE5" font-size="18" font-weight="730" text-anchor="middle" letter-spacing="1">PUBLIC INFO · LINKS</text>
-<text x="771" y="365" fill="#FFFFFF" font-size="32" font-weight="800" >공식 링크로 다음 학기 준비</text>
+<text x="878" y="311" fill="#ACDCE5" font-size="18" font-weight="730" text-anchor="middle" letter-spacing="1">TOOLS · PUBLIC LINKS</text>
+<text x="771" y="365" fill="#FFFFFF" font-size="32" font-weight="800" >실험과 공식 원문 확인</text>
 <rect x="776" y="389" width="565" height="70" rx="13" fill="#102D40" stroke="#315A72" stroke-width="1"/>
 <rect x="794" y="407" width="31" height="31" rx="10" fill="#163E51" stroke="#4C91A4" stroke-width="1"/>
 <path d="M803 422h13m-13 7h13" stroke="#8AD0D8" stroke-width="2" stroke-linecap="round"/>
-<text x="844" y="430" fill="#EAF6FC" font-size="26" font-weight="700" >공개 공지 링크</text>
+<text x="844" y="430" fill="#EAF6FC" font-size="26" font-weight="700" >학사 정보·달력</text>
 <rect x="1144" y="410" width="175" height="38" rx="19" fill="#2C302D" stroke="#747452" stroke-width="1"/>
 <text x="1231" y="435" fill="#F6D797" font-size="19" font-weight="650" text-anchor="middle">연결 대기</text>
 <rect x="776" y="473" width="565" height="70" rx="13" fill="#102D40" stroke="#315A72" stroke-width="1"/>
 <rect x="794" y="491" width="31" height="31" rx="10" fill="#163E51" stroke="#4C91A4" stroke-width="1"/>
 <path d="M803 506h13m-13 7h13" stroke="#8AD0D8" stroke-width="2" stroke-linecap="round"/>
-<text x="844" y="514" fill="#EAF6FC" font-size="24" font-weight="700" >개설 집계 · 전망</text>
+<text x="844" y="514" fill="#EAF6FC" font-size="24" font-weight="700" >PC 진단·반응속도</text>
 <rect x="1144" y="494" width="175" height="38" rx="19" fill="#2C302D" stroke="#747452" stroke-width="1"/>
-<text x="1231" y="519" fill="#F6D797" font-size="19" font-weight="650" text-anchor="middle">연결 대기</text>
+<text x="1231" y="519" fill="#F6D797" font-size="19" font-weight="650" text-anchor="middle">실행 가능</text>
 <rect x="776" y="557" width="565" height="70" rx="13" fill="#102D40" stroke="#315A72" stroke-width="1"/>
 <rect x="794" y="575" width="31" height="31" rx="10" fill="#163E51" stroke="#4C91A4" stroke-width="1"/>
 <path d="M803 590h13m-13 7h13" stroke="#8AD0D8" stroke-width="2" stroke-linecap="round"/>
-<text x="844" y="598" fill="#EAF6FC" font-size="24" font-weight="700" >학사 달력</text>
+<text x="844" y="598" fill="#EAF6FC" font-size="24" font-weight="700" >전략 실험</text>
 <rect x="1144" y="578" width="175" height="38" rx="19" fill="#2C302D" stroke="#747452" stroke-width="1"/>
-<text x="1231" y="603" fill="#F6D797" font-size="19" font-weight="650" text-anchor="middle">링크 안내</text>
-<text x="778" y="664" fill="#BCD6E3" font-size="18" font-weight="510" >내정보는 로컬 저장 · 학교 자료는 아직 미연결</text>
+<text x="1231" y="603" fill="#F6D797" font-size="19" font-weight="650" text-anchor="middle">가상 모델</text>
+<text x="778" y="664" fill="#BCD6E3" font-size="18" font-weight="510" >반응값은 로컬 저장 · 학교 자료 미연결</text>
 <rect x="697" y="453" width="44" height="44" rx="22" fill="#F4C979" stroke="#F6DFAC" stroke-width="1"/>
 <text x="719" y="484" fill="#172E3A" font-size="28" font-weight="800" text-anchor="middle">+</text>
 <path d="M63 737H1376" stroke="#426277"/>

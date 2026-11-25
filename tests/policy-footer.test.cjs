@@ -4,8 +4,8 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const root=path.resolve(__dirname,'..');
-const pages=['index.html','html/academic-calendar.html',
- 'html/academic-timeline.html','html/catalog.html','html/academic-support.html','html/developer.html',
+const pages=['index.html','html/readiness.html','html/reaction-test.html','html/strategy-lab.html',
+ 'html/academic-timeline.html','html/catalog.html','html/developer.html',
  'html/forecast.html','html/incident-404.html','html/pc-only.html',
  'html/planner.html','html/practice.html','html/result.html',
  'html/selectZone.html','html/vsugang.html'];

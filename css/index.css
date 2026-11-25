@@ -161,3 +161,37 @@ main {
   .academic-entry-links { grid-template-columns:1fr; }
   .phoneContainer { height:auto; padding:24px; }
 }
+
+/* 원본 훕또기 배너의 색상·그림·글자 배치를 유지하고 상단 바 아래 독립 영역에 배치합니다. */
+body.hanmo-home > .home-banners{
+  box-sizing:border-box;flex:0 0 auto;display:flex;flex-direction:column;
+  align-items:center;gap:32px;width:100%;padding:32px 16px 0;
+}
+body.hanmo-home > .home-banners[hidden],.home-banners > .subNotice[hidden]{display:none}
+.home-banners > .subNotice.blueBox{
+  display:flex;align-items:center;justify-content:flex-start;
+  box-sizing:border-box;width:min(702px,100%);height:72px;padding:0 12px 0 149px;
+  background:linear-gradient(180deg,#d4ecf5 0%,#b9ddeb 55%,#a3cfe0 100%);
+  border:1px solid #9cc7d8;border-radius:15px;
+  box-shadow:inset 0 2px 1px rgba(255,255,255,.7),inset 0 -3px 4px rgba(0,0,0,.12),
+    0 6px 12px rgba(0,0,0,.35),0 2px 3px rgba(0,0,0,.25);
+  position:relative;text-decoration:none;cursor:pointer;
+}
+.home-banners > .subNotice.blueBox:hover{opacity:.85}
+.home-banners .subNoticeName{font-size:22px;font-weight:900;color:#06111c;flex:0 0 auto}
+.home-banners .subNoticeBar{width:1px;height:16px;margin:0 16px;background:rgba(6,17,28,.35);flex:0 0 auto}
+.home-banners .subNoticeDesc{font-size:16px;font-weight:500;color:rgba(6,17,28,.7)}
+.home-banners .subNoticeImg{position:absolute;left:30px;bottom:0;height:95px;width:auto;pointer-events:none}
+.home-banners .subNoticeText{display:flex;align-items:center;min-width:0;margin:0;line-height:1}
+@media(max-width:640px){
+  .home-banners > .subNotice.blueBox{padding-left:106px}
+  .home-banners .subNoticeImg{left:12px;height:78px}
+  .home-banners .subNoticeName{font-size:18px}
+  .home-banners .subNoticeBar{margin:0 10px}
+  .home-banners .subNoticeDesc{font-size:13px;line-height:1.35}
+}
+@media(max-height:650px){
+  body.hanmo-home > .home-banners{padding-top:26px;gap:26px}
+  .home-banners > .subNotice.blueBox{height:60px}
+  .home-banners .subNoticeImg{height:80px}
+}

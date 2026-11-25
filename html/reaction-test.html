@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <script src="../js/pc-only.js"></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="한모 비공식 반응속도 테스트 · 가상 전략 실험에 사용할 브라우저 반응시간">
+  <title>반응속도 테스트 | 한모</title>
+  <link rel="icon" href="../img/favicon-purple.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/student-ui.css">
+  <link rel="stylesheet" href="../css/hanmo-policy-footer.css">
+  <link rel="stylesheet" href="../css/hanmo-title-divider.css">
+  <link rel="stylesheet" href="../css/hanmo-refined.css">
+  <link rel="stylesheet" href="../css/hanmo-labs.css">
+  <script src="../js/student-profile-bar.js" defer></script>
+  <script type="module" src="../js/reaction-page.mjs"></script>
+</head>
+<body class="hanmo-ui hanmo-refined hanmo-lab hanmo-reaction">
+  <a class="hanmo-skip" href="#main">본문으로 이동</a>
+  <header class="hanmo-topbar">
+  <a class="hanmo-brand" href="../index.html" aria-label="한모 홈으로 이동"><img src="../img/hanmo_white.svg" width="29" height="24" alt="">한모</a>
+  <nav aria-label="주요 서비스">
+    <a href="./readiness.html">PC 진단</a>
+    <a href="./reaction-test.html" aria-current="page">반응속도 테스트</a>
+    <a href="./strategy-lab.html">전략 실험</a>
+    <a href="./academic-timeline.html">학사 정보</a>
+    <a href="./catalog.html">강의 검색</a>
+    <span class="hanmo-profile-summary" data-profile-summary role="status" aria-live="polite" aria-label="브라우저에 저장한 내정보, 학교 로그인 아님">내정보 미설정</span>
+    <a class="hanmo-me-link" href="./planner.html">내정보</a>
+  </nav>
+</header>
+  <main id="main" class="hanmo-main lab-layout" tabindex="-1">
+    <div class="hanmo-schoolmark" aria-label="반응속도 테스트 화면">
+      <div class="hanmo-title-line"><span class="hanmo-title-help"><button class="hanmo-title-help-button" type="button" aria-label="반응속도 테스트 기능 안내" aria-describedby="reaction-page-help">i</button><span class="hanmo-title-help-tip" id="reaction-page-help" role="tooltip">화면 신호에 반응한 시간을 8회 측정합니다.</span></span><h1>반응속도 테스트</h1></div>
+      <div class="hanmo-title-divider" aria-hidden="true"><hr><span><img src="../img/hanmo_white.svg" alt=""></span><hr></div>
+    </div>
+    <section class="lab-panel" aria-labelledby="reaction-section">
+      <div class="lab-section-heading"><h2 id="reaction-section">시각 신호 반응 측정</h2><span class="lab-minor" id="reaction-count">0 / 8</span></div>
+      <button id="reaction-target" type="button" class="lab-reaction-target" data-phase="idle" disabled>시작을 누르세요</button>
+      <div class="lab-actions"><button class="lab-button primary" id="reaction-start">8회 테스트 시작</button><button class="lab-button secondary" id="reaction-reset" hidden>취소</button></div>
+      <p class="lab-status" id="reaction-status" role="status" aria-live="polite">너무 일찍 누르거나 탭을 전환하면 이번 측정을 처음부터 다시 시작해야 합니다.</p>
+    </section>
+    <section class="lab-panel lab-result-panel" id="reaction-result" aria-label="반응속도 측정 결과" hidden>
+      <p class="lab-summary" id="reaction-report"></p>
+      <a class="lab-button primary lab-inline-link" href="./strategy-lab.html">전략 시뮬레이션에 자동 적용</a>
+    </section>
+  </main>
+  <footer class="hanmo-policy-footer" aria-label="비공식 서비스 안내"><p><strong>본 서비스는 한국외국어대학교의 공식 서비스가 아니며, 정확한 정보는 학교 원문을 확인하시기 바랍니다.</strong></p></footer>
+</body></html>
