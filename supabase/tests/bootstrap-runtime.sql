@@ -23,6 +23,18 @@ VALUES
   ('ci-never-published',1,repeat('d',64),now(),now()+interval '1 day',
    '{"notices":[],"offerings":[],"faq":[]}'::jsonb,'DRAFT');
 
+-- 필수 배열 하나라도 없으면 JSONB CHECK가 NULL로 통과하지 않아야 합니다.
+DO $check$
+BEGIN
+  BEGIN
+    INSERT INTO hanmo_private.data_snapshots
+      (snapshot_id,schema_version,manifest_sha256,source_checked_at,valid_until,payload)
+    VALUES ('ci-invalid-payload',1,repeat('e',64),now(),now()+interval '1 day','{"notices":[],"offerings":[]}'::jsonb);
+    RAISE EXCEPTION 'TEST FAILURE: incomplete payload accepted';
+  EXCEPTION WHEN check_violation THEN NULL;
+  END;
+END $check$;
+
 -- 출처 연결은 검수 상태 READY 이전에 끝내야 합니다.
 INSERT INTO hanmo_private.snapshot_sources(snapshot_id,source_revision_id)
 VALUES ('ci-published','ci-rev-a'),('ci-never-published','ci-rev-b');
@@ -54,6 +66,26 @@ BEGIN
     IF SQLERRM NOT LIKE '%Source links are immutable%' THEN RAISE; END IF;
   END;
 END $check$;
+-- 검수가 끝난 DRAFT의 데이터와 해시/유효기간을 바꾸어 기존 승인을 재사용하지 못하게 합니다.
+DO $check$
+BEGIN
+  BEGIN
+    UPDATE hanmo_private.data_snapshots
+       SET payload='{"notices":[{"id":"synthetic-changed"}],"offerings":[],"faq":[]}'::jsonb
+     WHERE snapshot_id='ci-published';
+    RAISE EXCEPTION 'TEST FAILURE: reviewed payload changed';
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM NOT LIKE '%Snapshot contents are immutable%' THEN RAISE; END IF;
+  END;
+  BEGIN
+    UPDATE hanmo_private.data_snapshots SET manifest_sha256=repeat('f',64),valid_until=now()+interval '2 days'
+     WHERE snapshot_id='ci-published';
+    RAISE EXCEPTION 'TEST FAILURE: reviewed manifest metadata changed';
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM NOT LIKE '%Snapshot contents are immutable%' THEN RAISE; END IF;
+  END;
+END $check$;
+
 UPDATE hanmo_private.data_snapshots SET review_state='READY'
 WHERE snapshot_id IN ('ci-published','ci-never-published');
 

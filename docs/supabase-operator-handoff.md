@@ -2,7 +2,9 @@
 
 > **담당:** Supabase Free($0) 프로젝트 소유·관리 — **김채윤(`qamarrchae`) 님**. 개발팀은 설계·검증·장애 복구 공동 지원. 기존 한모 운영 도메인과 원본 모의수강신청에는 영향을 주지 않습니다.
 
-## 운영자 설치 (신규·승인된 빈 프로젝트에서만)
+> **2026-11-25 현행 정책 재확인 — Draft·운영 설치 금지.** 이 브랜치의 SQL은 구형 데이터 계약에 대한 격리 PostgreSQL 검증 패키지입니다. [현행 아키텍처](https://github.com/ot4562-glitch/Hanmo_develop/blob/main/docs/architecture.md), [수집 범위](https://github.com/ot4562-glitch/Hanmo_develop/blob/main/docs/academic-data-collection-scope.md), [공개자료 운영 방침](https://github.com/ot4562-glitch/Hanmo_develop/blob/main/docs/public-data-operating-decision.md)이 우선합니다. 기존 SQL에 교수·분반·학칙·졸업·FAQ 테이블/필드가 존재해도 사용 권한 또는 공개 계약이 아닙니다. 실제 학교 자료 입력·조회·배포, 실 Supabase 설치 및 학생 화면 연결은 금지합니다. #41·#42·#64~#67·#126의 권리/최소 필드·검수·철회·운영 검증 및 협업자 재검토를 먼저 완료해야 합니다. `mode: disabled` 유지. 아래 설치 절차는 **향후 승인된 빈 격리 프로젝트에서 합성 자료로만 검증할 절차**입니다.
+
+## 운영자 설치 (향후 신규·승인된 빈 격리 프로젝트에서만)
 
 1. 김채윤(`qamarrchae`) 님이 [Supabase Dashboard](https://supabase.com/dashboard)에서 **Free 프로젝트**를 직접 생성하고 프로젝트/조직 소유권·리전·관리자 접근을 확인합니다. **Pro 및 유료 애드온을 선택하지 않습니다.** SQL 파일로 계정, 조직, 프로젝트는 만들 수 없습니다.
 2. 새 프로젝트 **SQL Editor → New query**에서 [hanmo-setup.sql](../supabase/hanmo-setup.sql)의 **전체 내용을 붙여넣어 한 번만 실행**합니다. 이 파일은 내부 스키마와 빈 데이터 테이블, 승인/철회용 관리 함수, 익명 읽기 RLS를 단일 트랜잭션으로 만듭니다. **기존 스키마에 재실행하거나 업그레이드용으로 사용하지 않습니다.**
@@ -23,33 +25,18 @@
 
 공개 페이로드는 `schemaVersion=1`에 대응하며 내부 후보 `payload`에 `notices`, `offerings`, `faq` 배열이 있어야 합니다. 게시/개설/FAQ는 반드시 **동일 `snapshot_id`·`manifest_sha256`** 아래 배포합니다. 가상자료나 이미 #95에서 삭제한 과거 참고 공지 JSON을 별도 검수 없이 승인 자료로 승격하지 마세요.
 
-## 한모 학사자료 가공·보존 경계 (설계 확정, 자동 정리 미구현)
+## 현행 자료 가공·보존 경계 (구형 스키마의 운영 전환 보류)
 
-**현행 정책 정본:** [아키텍처 §7.1.1](https://github.com/ot4562-glitch/Hanmo_develop/blob/main/docs/architecture.md) · [운영 체크리스트](https://github.com/ot4562-glitch/Hanmo_develop/blob/main/docs/academic-data-lifecycle-operations.md). **대상은 서울·글로벌 전체 전공의 2010학년도 입학생 이후**이나, 이 범위에 속한 모든 학기·전공의 자료가 확보되었다는 뜻은 아닙니다.
+[현행 최소 데이터 계획](https://github.com/ot4562-glitch/Hanmo_develop/blob/main/docs/focused-public-data-plan.md)과 [수집 범위](https://github.com/ot4562-glitch/Hanmo_develop/blob/main/docs/academic-data-collection-scope.md)를 적용합니다. 검수된 공지 제목·게시 메타데이터·공식 원문 URL, 허용·검수된 개설 관측 및 행사 메타데이터만 별도 계약 확정 후 운영 후보가 될 수 있습니다. 학칙·졸업요건·FAQ·교수명·금지된 수강 정보 및 공지 원문/첨부의 저장·공개를 지시하지 않습니다. 기존 분반·교수·규정·FAQ 관련 테이블 및 `faq` 배열은 역사적 호환 계약일 뿐이며 실제 행 입력은 금지합니다. 이 Draft에서 새 최소 공개 계약을 확정하지 않습니다. #64·#65·#66의 검수 후 별도 설계/마이그레이션이 필요합니다.
 
-| 자료 종류 | 상세 보존 경계 | 장기 정보 |
-|---|---|---|
-| 강의 개설·분반 | 현재·예정 및 **최근 3개 학년도**의 요일/시간·강의실·담당 정보 | **권리·검수가 확인된 2010년 이후** 과목×학기×캠퍼스의 개설 여부/관측된 분반 수/완전성/출처 |
-| 일반·일회성 공지 | **현재 유효한 최신판**, 종료·정정·취소 후 **90일**의 확인용 상세 | 감사·정정/철회에 필요한 최소 ID·해시·상태·시각 (보존 근거가 있을 때) |
-| 반복 학사행사 | 공지의 장문/상세는 수명 종료 후 정리 | 연도별 검증된 개최일·**학생 마감**·정정/취소·대상 및 근거 |
-| 졸업요건·학칙 | **2010학년도 이후 입학생에게 적용 가능**한 모든 승인 판본·소급·예외 | 캠퍼스·입학년도·전공/트랙·시행기간·필수요건·동일/대체 관계 |
-| FAQ·검색 문단 | 현재 유효한 승인판 중심 | 규정 적용·중대한 정정·감사에 필요한 이전 근거만 |
-| 개인정보·원문 파일 | **DB에 업로드하지 않음** | 학생 이수·성적은 브라우저 로컬; 공식 URL·SHA-256·필수 검수 메타데이터만 허용 범위에서 |
+구형 payload는 필수 배열 존재·타입을 검사하지만 중첩 필드의 현행 금지 계약을 보장하지 않습니다. **빈 합성 배열만 사용하는 설치/권한 시험으로 제한**하며 실자료 발행을 금지합니다. 검수 이후 후보 페이로드·해시·유효기한을 수정할 수 없도록 보호를 추가했으나 실제 검수자 인증, 출처 판본 자체의 불변성/동시 검수 경합, 운영용 최소 DTO·권리/철회·보존 정책은 추가 검증 게이트입니다.
 
-**분류 우선순위:** 규정/자격 변경 → 반복 학사행사 → 일반 공지. 같은 공지가 여러 목적이라면 공지 장문은 시한에 따라 정리하더라도 **추출한 행사의 실제 일자 또는 규정의 적용판본**은 별도 관계로 유지합니다. 90일은 검증된 마지막 종료·대체·취소일 기준이며, 불확실하면 자동 정리하지 않고 검수 보류합니다. 게시일을 행사일/학생 마감일로 대체하거나 과거 미관측을 미개설로 확정하지 않습니다.
+## 격리 합성 검증에서의 후보·발행 수명주기 (실제 자료 금지)
 
-**승인된 데이터의 가공 흐름:** 사용권과 수집 범위 검사 → 원문 ID/URL/내용 해시 및 관측 시각 확보 → 과목/학기/캠퍼스·공지/개정·학생/행정 마감·행사·RulePack으로 정규화 → 수명주기 분류·중복/충돌 보류 → 독립 검수·승인 → 현재 상세 데이터와 역사 관측/규정 판본으로 분리 발행. 요일·시간·강의실은 과거 3개 학년도 밖의 조회에 사용하지 않습니다.
-
-**이 설치 SQL에서 새로 마련한 필드:** course_offerings.observed_section_count(관측된 분반 수; NULL은 미확정), notice_revisions.retention_class(기본 UNCLASSIFIED)/detail_retain_until(검수된 보존기한 후보), event_occurrences.student_deadline/administrative_deadline. **이 필드가 있다고 자동 보존 기한 계산·DELETE·분반 압축이 실행되는 것은 아닙니다.** 내용이 누락된 경우 운영자가 추측값으로 채우지 않습니다.
-
-**구현 전 병합/인수 차단점:** PR #93의 data_snapshots 및 public.hanmo_public_snapshots는 아직 **전체 JSONB payload를 판본별로 복제**합니다. 공개 RLS로 이전판이 안 보이더라도 DB 용량은 사용합니다. 현행판 외 payload의 안전한 정리, API 부분 조회/페이지네이션과 3개 학년도 이후의 상세 자료 압축은 **#64(스키마/제거 안전성), #65(읽기 API), #66(분류/정규화)**에서 구현·검수해야 합니다. 원문 권리 철회·정정·취소를 피해 구판을 재활성화하지 마세요.
-
-## 최초 승인 데이터 및 갱신 (운영 승인 후 별도 작업)
-
-- 권한 확인된 출처만 `hanmo_private.data_sources`에 등록하고 `rights_status = 'ALLOWED'` 및 확인일을 남깁니다. 학교 회신 전에는 자동 수집·실제 공지/강좌 반입을 실행하지 않습니다.
+- 격리 검증에서는 가상 출처만 `hanmo_private.data_sources`에 등록하고 가상 권리 상태와 확인일을 사용합니다. 학교 자동 수집·실제 공지/강좌 반입을 실행하지 않습니다.
 - `data_snapshots`는 **먼저 `review_state='DRAFT'`로 생성**하고, 그 상태에서만 `source_revisions`/`snapshot_sources`로 출처 판본을 연결·수정합니다. 실제 원문에서 계산한 정확한 SHA-256, `schema_version=1`, 유효기한과 검수할 정규화 페이로드를 등록합니다.
-- **출처 연결을 끝낸 다음** 독립 검수/승인 별도 기록을 `source_reviews` / `review_approvals`에 등록하고, 검수 완료 후에만 스냅샷 상태를 `READY`로 전환합니다. **검수/승인 기록이 하나라도 생성된 이후에는 DRAFT 상태여도 출처 연결 추가·수정·삭제가 거부**됩니다(READY와 공개 이후도 동일). 출처를 바꿔야 한다면 새 스냅샷 ID로 근거·해시부터 재검수합니다. 서로 다른 ID만 적는 것으로 실제 신원/권한 분리가 입증되지는 않습니다.
-- 위 조건을 충족한 경우에만 **DB 관리자 세션**에서 `SELECT hanmo_private.publish_snapshot('승인된_snapshot_id','실제_운영자_식별자');`를 실행합니다. 이미 공개된 다른 안전한 판본으로 돌아갈 때도 같은 함수로 권리/검수/철회 여부를 다시 확인합니다.
+- **출처 연결을 끝낸 다음** 독립 검수/승인 별도 기록을 `source_reviews` / `review_approvals`에 등록하고, 검수 완료 후에만 스냅샷 상태를 `READY`로 전환합니다. **검수/승인 기록이 하나라도 생성된 이후에는 DRAFT 상태여도 출처 연결 추가·수정·삭제 및 후보의 페이로드·해시·메타데이터 변경이 거부**됩니다(READY와 공개 이후도 동일). 출처를 바꿔야 한다면 새 스냅샷 ID로 근거·해시부터 재검수합니다. 서로 다른 ID만 적는 것으로 실제 신원/권한 분리가 입증되지는 않습니다.
+- 위 조건을 충족한 격리 합성 시험에서만 **테스트 DB 관리자 세션**에서 `SELECT hanmo_private.publish_snapshot('승인된_snapshot_id','실제_운영자_식별자');`를 실행합니다. 이미 공개된 다른 안전한 판본으로 돌아갈 때도 같은 함수로 권리/검수/철회 여부를 다시 확인합니다.
 - 출처 권리 철회 또는 권리 확인일이 제거(`NULL`)되면 **공개된 판본뿐 아니라 해당 출처에 연결된 미공개 후보도 `REVOKED`로 영구 철회**되며, `release_audit`에 REVOKE 이력을 기록합니다. 재허용되더라도 이전 스냅샷 ID는 `READY`로 복원·삭제 후 재사용·재발행할 수 없습니다. 새로운 스냅샷 ID로 출처·페이로드·검수·승인을 다시 준비해야 합니다. 필요시 관리자 세션에서 `SELECT hanmo_private.revoke_snapshot('snapshot_id','운영자','철회 이유');`를 실행합니다. **직접 SQL로 철회판본의 `is_active`를 다시 켜는 것도 금지**됩니다.
 
 ## Free($0) 운영·복구
@@ -98,4 +85,4 @@ node --test supabase/tests/bootstrap.test.mjs
 - [#66](https://github.com/ot4562-glitch/Hanmo_develop/issues/66): 권리 승인 후 수집·정규화·검수 연동
 - [#67](https://github.com/ot4562-glitch/Hanmo_develop/issues/67): 실환경·정정/철회·장애 복구·제품 회귀 인수
 
-**기준 문서:** [docs/architecture.md §7](../docs/architecture.md#7-3차--supabase-설계인계-및-실제-제품-연계). 1차 학업 코어와 2차 시뮬레이터의 JavaScript/JSDoc 계약을 유지하며, `html/practice.html`의 원본 흐름과 `html/selectZone.html`의 **승인된 합성 CAPACITY 수정 외 기존 신청/대기 동작**을 보호합니다.
+**기준 문서:** [docs/architecture.md §0·§8](https://github.com/ot4562-glitch/Hanmo_develop/blob/main/docs/architecture.md). 1차 학업 코어와 2차 시뮬레이터의 JavaScript/JSDoc 계약을 유지하며, `html/practice.html`의 원본 흐름과 `html/selectZone.html`의 **승인된 합성 CAPACITY 수정 외 기존 신청/대기 동작**을 보호합니다.

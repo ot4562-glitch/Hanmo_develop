@@ -132,3 +132,14 @@ test('공지 수명주기 분류와 역사적 행사 학생 마감을 구조적�
   // 보존 기한 필드가 생겼다고 실데이터를 자동 삭제하지는 않습니다.
   assert.doesNotMatch(setup, /\b(?:pg_cron|cron\.schedule)\b/);
 });
+
+
+test('필수 JSON 배열 누락과 검수 이후 페이로드·메타데이터 변경을 막는다', () => {
+  assert.match(setup, /payload \?& ARRAY\['notices','offerings','faq'\]/);
+  const guard = setup.match(/CREATE FUNCTION hanmo_private\.guard_snapshot_revocation\(\)[\s\S]*?END \$\$;/)?.[0]??'';
+  assert.match(guard, /NEW\.payload/);
+  assert.match(guard, /NEW\.manifest_sha256/);
+  assert.match(guard, /FROM hanmo_private\.source_reviews WHERE snapshot_id = OLD\.snapshot_id/);
+  assert.match(guard, /FROM hanmo_private\.review_approvals WHERE snapshot_id = OLD\.snapshot_id/);
+  assert.match(guard, /Snapshot contents are immutable after review or publication/);
+});

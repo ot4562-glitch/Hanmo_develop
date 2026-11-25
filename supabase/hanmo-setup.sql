@@ -163,6 +163,7 @@ CREATE TABLE hanmo_private.data_snapshots (
   valid_until timestamptz NOT NULL,
   payload jsonb NOT NULL
     CHECK (jsonb_typeof(payload)='object'
+      AND payload ?& ARRAY['notices','offerings','faq']
       AND jsonb_typeof(payload->'notices')='array'
       AND jsonb_typeof(payload->'offerings')='array'
       AND jsonb_typeof(payload->'faq')='array'),
@@ -247,6 +248,22 @@ BEGIN
   END IF;
   IF OLD.review_state = 'REVOKED' AND NEW.review_state <> 'REVOKED' THEN
     RAISE EXCEPTION 'Revoked snapshot cannot return to READY or DRAFT';
+  END IF;
+  -- 첫 검수 이후에는 승인 대상 페이로드와 메타데이터를 바꿀 수 없습니다.
+  -- 상태 전환·철회만 허용하며 내용 변경은 새 스냅샷 ID로 다시 검수합니다.
+  IF (NEW.snapshot_id, NEW.schema_version, NEW.manifest_sha256, NEW.faq_index_revision,
+      NEW.source_checked_at, NEW.valid_until, NEW.payload, NEW.created_at)
+     IS DISTINCT FROM
+     (OLD.snapshot_id, OLD.schema_version, OLD.manifest_sha256, OLD.faq_index_revision,
+      OLD.source_checked_at, OLD.valid_until, OLD.payload, OLD.created_at)
+     AND (OLD.review_state <> 'DRAFT' OR EXISTS (
+       SELECT 1 FROM hanmo_private.source_reviews WHERE snapshot_id = OLD.snapshot_id
+     ) OR EXISTS (
+       SELECT 1 FROM hanmo_private.review_approvals WHERE snapshot_id = OLD.snapshot_id
+     ) OR EXISTS (
+       SELECT 1 FROM public.hanmo_public_snapshots WHERE snapshot_id = OLD.snapshot_id
+     )) THEN
+    RAISE EXCEPTION 'Snapshot contents are immutable after review or publication';
   END IF;
   RETURN NEW;
 END $$;
