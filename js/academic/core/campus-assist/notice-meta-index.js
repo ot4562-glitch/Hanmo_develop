@@ -13,7 +13,7 @@
 /** @typedef {import("./notice-search.js").NoticeMeta} NoticeMeta */
 /** @typedef {import("./notice-search.js").HeldNotice} HeldNotice */
 /** @typedef {z.infer<typeof NoticeIndexManifestSchema>} NoticeIndexManifest */
-/** @typedef {'INDEXED'|'HELD'|'WITHDRAWN'|'NOT_IN_MANIFEST'|'HASH_MISMATCH'|'POLICY_MISMATCH'|'OUT_OF_SCOPE'|'OBSERVED_AFTER_AS_OF'|'MISSING_ROW'} NoticeDisposition */
+/** @typedef {'INDEXED'|'HELD'|'WITHDRAWN'|'NOT_IN_MANIFEST'|'HASH_MISMATCH'|'POLICY_MISMATCH'|'OUT_OF_SCOPE'|'OUTSIDE_OBSERVATION_WINDOW'|'OBSERVED_AFTER_AS_OF'|'MISSING_ROW'} NoticeDisposition */
 /** @typedef {{noticeId:string|null,disposition:NoticeDisposition,detail?:string}} NoticeDispositionRow */
 /** @typedef {{snapshotId:string,indexRevision:string,policyVersion:string,provenance:NoticeIndexManifest['provenance'],asOf:string,status:'READY'|'PARTIAL',notices:NoticeMeta[],dispositions:NoticeDispositionRow[],coverage:{sourceIds:string[],observedFrom:string,observedTo:string,count:number}}} NoticeMetaIndex */
 import {z} from 'zod';
@@ -74,6 +74,9 @@ export function buildNoticeMetaIndex(input){
     if(row.policyVersion!==m.policyVersion){out('POLICY_MISMATCH');continue;}
     if(!m.scope.sourceIds.includes(row.sourceId)){out('OUT_OF_SCOPE');continue;}
     if(Date.parse(row.observedAt)>time){out('OBSERVED_AFTER_AS_OF');continue;}
+    // 매니페스트가 선언한 관측 기간(양 끝 포함) 밖에서 관측된 행은 해시가 맞아도 이 스냅샷의 공지로 보지 않는다.
+    const seenAt=Date.parse(row.observedAt);
+    if(seenAt<Date.parse(m.scope.observedFrom)||seenAt>Date.parse(m.scope.observedTo)){out('OUTSIDE_OBSERVATION_WINDOW');continue;}
     const hash=listed.get(row.noticeId);
     if(!hash){out('NOT_IN_MANIFEST');continue;}
     if(hash!==noticeMetaSha256(row)){out('HASH_MISMATCH');continue;}
@@ -90,11 +93,23 @@ export function buildNoticeMetaIndex(input){
 
 /** 공개판 어디에도 있으면 안 되는 키 이름. 본문·첨부·FAQ·교수·개인 연락처·수강 현황·학칙/졸업요건 계열이다. */
 const FORBIDDEN_KEY=/^(?:body|content|html|text|paragraphs?|attachments?|files?|faqs?|answers?|instructors?|professors?|teachers?|authors?|writer|emails?|phones?|contacts?|enrollment|capacity|seats?|rules?|graduation\w*|requirements?)$/i;
-const TOP_KEYS=new Set(['snapshotId','indexRevision','policyVersion','provenance','asOf','coverage','notices']);
+
+/**
+ * 학생에게 내보낼 정적 공개판 계약. 필드 이름만이 아니라 값과 필드 간 일관성까지 검사한다.
+ * 공지 행은 NoticeMetaSchema를 그대로 쓰며, 철회 상태는 공개판에 들어올 수 없다.
+ */
+export const PublicNoticeBundleSchema=z.strictObject({
+  snapshotId:Id,indexRevision:Id,policyVersion:Id,
+  provenance:z.enum(['SYNTHETIC','REVIEWED']),
+  asOf:Iso,
+  coverage:z.strictObject({sourceIds:z.array(Id).min(1).max(2),observedFrom:Iso,observedTo:Iso,count:z.number().int().min(0).max(5000)}),
+  notices:z.array(NoticeMetaSchema).max(5000),
+});
 
 /**
  * 학생에게 내보낼 정적 공개판을 검사한다. 위반이 있으면 내보내지 않도록 오류를 던진다.
- * 최상위 키는 허용 목록만, 공지 항목은 메타데이터 계약과 제목 금지 내용 검사를 다시 통과해야 한다.
+ * 1) 어느 깊이든 금지 키 이름이 있으면 거부한다. 2) 엄격한 공개판 계약으로 파싱한다(필수 값 누락·미허용 키 거부).
+ * 3) 공지 행은 제목 금지 내용·ID 충돌 검사를 다시 통과해야 하고, 판본·출처·관측 기간·건수가 공개판 머리 정보와 맞아야 한다.
  * @param {unknown} bundle 공개판 후보
  * @returns {true}
  */
@@ -110,16 +125,26 @@ export function assertPublicNoticeBundle(bundle){
     }
   };
   walk(bundle,'$');
-  if(!bundle||typeof bundle!=='object'||Array.isArray(bundle))problems.push('NOT_AN_OBJECT');
-  else{
-    const obj=/** @type {Record<string,unknown>} */(bundle);
-    for(const k of Object.keys(obj))if(!TOP_KEYS.has(k))problems.push('UNKNOWN_TOP_KEY '+k);
-    const rows=Array.isArray(obj.notices)?obj.notices:[];
-    if(!Array.isArray(obj.notices))problems.push('NOTICES_MISSING');
-    const s=screenNoticeMeta(rows);
-    // 공개판에는 보류·철회 항목이 있으면 안 된다. 보류 사유에는 원문이 아니라 규칙 이름만 남는다.
+  const parsed=PublicNoticeBundleSchema.safeParse(bundle);
+  if(!parsed.success){
+    // 위치만 남기고 값은 남기지 않는다(공개판에 섞인 원문이 오류 메시지로 새지 않게).
+    for(const i of parsed.error.issues)problems.push('SCHEMA '+(i.path.join('.')||'$')+' '+i.code);
+  }else{
+    const b=parsed.data;
+    const s=screenNoticeMeta(b.notices);
     for(const h of s.held)problems.push('NOTICE_HELD '+(h.noticeId??'?')+' '+h.reason+':'+h.detail);
     for(const id of s.withdrawn)problems.push('NOTICE_WITHDRAWN '+id);
+    const from=Date.parse(b.coverage.observedFrom),to=Date.parse(b.coverage.observedTo),asOf=Date.parse(b.asOf);
+    if(from>to)problems.push('COVERAGE_REVERSED');
+    if(to>asOf)problems.push('COVERAGE_AFTER_AS_OF');
+    if(b.coverage.count!==b.notices.length)problems.push('COVERAGE_COUNT_MISMATCH '+b.coverage.count+'!='+b.notices.length);
+    for(const r of b.notices){
+      if(r.policyVersion!==b.policyVersion)problems.push('NOTICE_POLICY_MISMATCH '+r.noticeId);
+      if(r.provenance!==b.provenance)problems.push('NOTICE_PROVENANCE_MISMATCH '+r.noticeId);
+      if(!b.coverage.sourceIds.includes(r.sourceId))problems.push('NOTICE_OUT_OF_SCOPE '+r.noticeId);
+      const t=Date.parse(r.observedAt);
+      if(t<from||t>to)problems.push('NOTICE_OUTSIDE_OBSERVATION_WINDOW '+r.noticeId);
+    }
   }
   if(problems.length)throw new RangeError('Public notice bundle rejected: '+problems.join('; '));
   return true;

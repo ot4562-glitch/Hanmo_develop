@@ -59,6 +59,21 @@ describe('#44 metadata index: only manifest-listed, in-scope, unwithdrawn notice
     const idx=build(rows);
     expect([disp(idx,'P'),disp(idx,'S'),disp(idx,'T')]).toEqual(['POLICY_MISMATCH','OUT_OF_SCOPE','OBSERVED_AFTER_AS_OF']);
   });
+  // PR #131 리뷰(2026-11-23): 매니페스트 관측 기간 밖의 행은 해시가 맞아도 색인하지 않는다.
+  it('rows observed outside the manifest observation window are excluded, with inclusive boundaries',()=>{
+    const scope={sourceIds:['SYN-BOARD'],observedFrom:'2026-11-20T00:00:00+09:00',observedTo:'2026-11-21T23:59:59+09:00'};
+    const rows=[
+      n('EARLY','가상 안내 하나',{observedAt:'2026-11-10T09:00:00+09:00'}),
+      n('FROM','가상 안내 둘',{observedAt:'2026-11-20T00:00:00+09:00'}),
+      n('TO','가상 안내 셋',{observedAt:'2026-11-21T23:59:59+09:00'}),
+      n('JUST_BEFORE','가상 안내 넷',{observedAt:'2026-11-19T23:59:59+09:00'}),
+      n('JUST_AFTER','가상 안내 다섯',{observedAt:'2026-11-22T00:00:00+09:00'}),
+    ];
+    const idx=build(rows,rows,{scope});
+    expect(idx.notices.map(r=>r.noticeId)).toEqual(['FROM','TO']);
+    for(const id of ['EARLY','JUST_BEFORE','JUST_AFTER'])expect(disp(idx,id)).toBe('OUTSIDE_OBSERVATION_WINDOW');
+    expect(idx.status).toBe('PARTIAL');
+  });
   it('a manifest entry without a row is reported as missing',()=>{
     const idx=build([n('A','가상 안내')],[n('A','가상 안내'),n('Z','가상 없는 행')]);
     expect(disp(idx,'Z')).toBe('MISSING_ROW');
@@ -96,8 +111,25 @@ describe('#44 public bundle guard',()=>{
     expect(()=>assertPublicNoticeBundle({...bundle,faq:[]})).toThrow(/FORBIDDEN_KEY \$\.faq/);
     expect(()=>assertPublicNoticeBundle({...bundle,notices:[{...idx.notices[0],body:'본문'}]})).toThrow(/FORBIDDEN_KEY/);
     expect(()=>assertPublicNoticeBundle({...bundle,coverage:{...bundle.coverage,instructors:[]}})).toThrow(/instructors/);
-    expect(()=>assertPublicNoticeBundle({...bundle,extra:1})).toThrow(/UNKNOWN_TOP_KEY extra/);
-    expect(()=>assertPublicNoticeBundle([])).toThrow(/NOT_AN_OBJECT/);
+    expect(()=>assertPublicNoticeBundle({...bundle,extra:1})).toThrow(/SCHEMA \$ unrecognized_keys/);
+    expect(()=>assertPublicNoticeBundle([])).toThrow(/SCHEMA/);
+  });
+  // PR #131 리뷰(2026-11-23): 키 이름만이 아니라 필수 값과 필드 간 일관성을 검사한다.
+  it('rejects incomplete bundles with missing header values',()=>{
+    expect(()=>assertPublicNoticeBundle({notices:[]})).toThrow(/SCHEMA snapshotId/);
+    const {coverage:_c,...noCoverage}=bundle;
+    expect(()=>assertPublicNoticeBundle(noCoverage)).toThrow(/SCHEMA coverage/);
+    expect(()=>assertPublicNoticeBundle({...bundle,policyVersion:''})).toThrow(/SCHEMA policyVersion/);
+  });
+  it('rejects forged or inconsistent coverage and notices',()=>{
+    expect(()=>assertPublicNoticeBundle({...bundle,coverage:{...bundle.coverage,count:5}})).toThrow(/COVERAGE_COUNT_MISMATCH 5!=1/);
+    expect(()=>assertPublicNoticeBundle({...bundle,coverage:{...bundle.coverage,observedFrom:'2026-11-21T10:00:00+09:00'}}))
+      .toThrow(/NOTICE_OUTSIDE_OBSERVATION_WINDOW A/);
+    expect(()=>assertPublicNoticeBundle({...bundle,coverage:{...bundle.coverage,observedTo:'2026-11-24T00:00:00+09:00'}}))
+      .toThrow(/COVERAGE_AFTER_AS_OF/);
+    expect(()=>assertPublicNoticeBundle({...bundle,coverage:{...bundle.coverage,sourceIds:['SYN-OTHER']}})).toThrow(/NOTICE_OUT_OF_SCOPE A/);
+    expect(()=>assertPublicNoticeBundle({...bundle,policyVersion:'SYN-POLICY-2'})).toThrow(/NOTICE_POLICY_MISMATCH A/);
+    expect(()=>assertPublicNoticeBundle({...bundle,provenance:'REVIEWED'})).toThrow(/NOTICE_PROVENANCE_MISMATCH A/);
   });
   it('rejects withdrawn or forbidden-content notices inside a bundle',()=>{
     expect(()=>assertPublicNoticeBundle({...bundle,notices:[n('W','가상 안내',{state:'WITHDRAWN'})]})).toThrow(/NOTICE_WITHDRAWN W/);
